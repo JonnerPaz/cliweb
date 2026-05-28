@@ -10,49 +10,53 @@
 /* ---------- VARIABLES (defaults — los temas las sobrescriben) ---------- */
 :root {
   /* Paleta (override por tema) */
-  --primary:        #005577;
-  --primary-dark:   #003e57;
-  --accent:         #0099cc;
-  --secondary:      #0070ba;
+  --primary: #005577;
+  --primary-dark: #003e57;
+  --accent: #0099cc;
+  --secondary: #0070ba;
 
   /* Estados semánticos (estables entre temas) */
   --success: #2ecc71;
   --success-dark: #1e8449;
   --warning: #f39c12;
   --warning-dark: #b9770e;
-  --danger:  #e74c3c;
+  --danger: #e74c3c;
   --danger-dark: #a93226;
-  --info:    #3498db;
-  --tip:     #2ecc71;
+  --info: #3498db;
+  --tip: #2ecc71;
 
   /* Neutros */
-  --text:    #2d3436;
-  --muted:   #636e72;
-  --bg:      #f5f7fa;
-  --card:    #ffffff;
-  --border:  #e1e5ea;
+  --text: #2d3436;
+  --muted: #636e72;
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --border: #e1e5ea;
 
   /* Código */
-  --code-bg:   #1e272e;
+  --code-bg: #1e272e;
   --code-text: #f5f6fa;
-  --code-inline-bg: rgba(0,0,0,0.05);
+  --code-inline-bg: rgba(0, 0, 0, 0.05);
 
   /* Layout */
-  --radius:    10px;
+  --radius: 10px;
   --radius-lg: 14px;
-  --shadow:    0 4px 12px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
   --container: 1000px;
 
   /* Tipografía */
-  --font-sans: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  --font-mono: 'Fira Code', 'Courier New', Courier, monospace;
+  --font-sans: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --font-mono: "Fira Code", "Courier New", Courier, monospace;
 }
 
 /* ---------- RESET MÍNIMO ---------- */
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   margin: 0;
@@ -62,10 +66,17 @@ body {
   background-color: var(--bg);
 }
 
-img { max-width: 100%; display: block; }
+img {
+  max-width: 100%;
+  display: block;
+}
 
-a { color: var(--accent); }
-a:hover { color: var(--primary); }
+a {
+  color: var(--accent);
+}
+a:hover {
+  color: var(--primary);
+}
 
 /* ---------- LAYOUT ---------- */
 .container {
@@ -85,14 +96,21 @@ header.hero {
   position: relative;
   overflow: hidden;
 }
-header.hero h1 { margin: 0 0 0.5rem 0; font-size: 2rem; }
-header.hero p  { margin: 0; opacity: 0.95; }
+header.hero h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 2rem;
+}
+header.hero p {
+  margin: 0;
+  opacity: 0.95;
+}
 
 /* Decoración opcional via data-deco="<...>" */
 header.hero[data-deco]::before {
   content: attr(data-deco);
   position: absolute;
-  top: -10px; right: 20px;
+  top: -10px;
+  right: 20px;
   font-family: var(--font-mono);
   font-size: 8rem;
   opacity: 0.08;
@@ -106,8 +124,13 @@ header.hero[data-deco]::before {
   font-size: 0.9rem;
   color: var(--muted);
 }
-.breadcrumb a { color: var(--primary); text-decoration: none; }
-.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb a {
+  color: var(--primary);
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
 
 /* ---------- OBJETIVOS DE APRENDIZAJE ---------- */
 .objectives {
@@ -125,8 +148,13 @@ header.hero[data-deco]::before {
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
-.objectives ul { margin: 0.5rem 0 0 0; padding-left: 1.3rem; }
-.objectives li { margin: 0.3rem 0; }
+.objectives ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.3rem;
+}
+.objectives li {
+  margin: 0.3rem 0;
+}
 
 /* ---------- CARDS ---------- */
 .card {
@@ -138,17 +166,35 @@ header.hero[data-deco]::before {
 }
 
 /* ---------- CAJAS DE AVISO ---------- */
-.info-box, .tip-box, .warning-box, .danger-box {
+.info-box,
+.tip-box,
+.warning-box,
+.danger-box {
   padding: 1rem 1.2rem;
   margin: 1rem 0;
   border-radius: 0 var(--radius) var(--radius) 0;
 }
-.info-box    { background: rgba(52,152,219,0.08);  border-left: 4px solid var(--info); }
-.tip-box     { background: rgba(46,204,113,0.08);  border-left: 4px solid var(--tip); }
-.warning-box { background: rgba(243,156,18,0.08);  border-left: 4px solid var(--warning); }
-.danger-box  { background: rgba(231,76,60,0.08);   border-left: 4px solid var(--danger); }
+.info-box {
+  background: rgba(52, 152, 219, 0.08);
+  border-left: 4px solid var(--info);
+}
+.tip-box {
+  background: rgba(46, 204, 113, 0.08);
+  border-left: 4px solid var(--tip);
+}
+.warning-box {
+  background: rgba(243, 156, 18, 0.08);
+  border-left: 4px solid var(--warning);
+}
+.danger-box {
+  background: rgba(231, 76, 60, 0.08);
+  border-left: 4px solid var(--danger);
+}
 
-.info-box h3, .tip-box h3, .warning-box h3, .danger-box h3 {
+.info-box h3,
+.tip-box h3,
+.warning-box h3,
+.danger-box h3 {
   margin-top: 0;
   font-size: 1rem;
 }
@@ -162,7 +208,8 @@ code {
   font-size: 0.92em;
 }
 
-pre.code, pre {
+pre.code,
+pre {
   background: var(--code-bg);
   color: var(--code-text);
   padding: 1rem 1.2rem;
@@ -174,16 +221,19 @@ pre.code, pre {
   line-height: 1.6;
   position: relative;
 }
-pre.code code, pre code {
+pre.code code,
+pre code {
   background: transparent;
   padding: 0;
   font-size: inherit;
   color: inherit;
 }
-pre.code[data-lang]::before, pre[data-lang]::before {
+pre.code[data-lang]::before,
+pre[data-lang]::before {
   content: attr(data-lang);
   position: absolute;
-  top: 6px; right: 10px;
+  top: 6px;
+  right: 10px;
   font-size: 0.7rem;
   color: #95a5a6;
   letter-spacing: 1px;
@@ -191,13 +241,27 @@ pre.code[data-lang]::before, pre[data-lang]::before {
 }
 
 /* Sintaxis coloreada manualmente con spans */
-.html-tag       { color: #e67e22; }
-.html-attribute { color: #3498db; }
-.html-value     { color: #2ecc71; }
-.html-comment   { color: #7f8c8d; }
-.css-selector   { color: #f1c40f; }
-.css-property   { color: #3498db; }
-.css-value      { color: #2ecc71; }
+.html-tag {
+  color: #e67e22;
+}
+.html-attribute {
+  color: #3498db;
+}
+.html-value {
+  color: #2ecc71;
+}
+.html-comment {
+  color: #7f8c8d;
+}
+.css-selector {
+  color: #f1c40f;
+}
+.css-property {
+  color: #3498db;
+}
+.css-value {
+  color: #2ecc71;
+}
 
 /* ============================================================
  * SISTEMA DE RETOS
@@ -221,7 +285,8 @@ pre.code[data-lang]::before, pre[data-lang]::before {
   background: var(--primary);
   color: white;
   font-weight: bold;
-  width: 36px; height: 36px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -242,11 +307,22 @@ pre.code[data-lang]::before, pre[data-lang]::before {
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
-.diff-easy   { background: rgba(46,204,113,0.15); color: var(--success-dark); }
-.diff-medium { background: rgba(243,156,18,0.15); color: var(--warning-dark); }
-.diff-hard   { background: rgba(231,76,60,0.15);  color: var(--danger-dark); }
+.diff-easy {
+  background: rgba(46, 204, 113, 0.15);
+  color: var(--success-dark);
+}
+.diff-medium {
+  background: rgba(243, 156, 18, 0.15);
+  color: var(--warning-dark);
+}
+.diff-hard {
+  background: rgba(231, 76, 60, 0.15);
+  color: var(--danger-dark);
+}
 
-.reto-section { margin-top: 1rem; }
+.reto-section {
+  margin-top: 1rem;
+}
 .reto-section h3 {
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
@@ -260,8 +336,14 @@ pre.code[data-lang]::before, pre[data-lang]::before {
   border-radius: 0 var(--radius) var(--radius) 0;
   margin: 0.5rem 0;
 }
-.mission ol, .mission ul { margin: 0.3rem 0 0 0; padding-left: 1.2rem; }
-.mission li { margin: 0.3rem 0; }
+.mission ol,
+.mission ul {
+  margin: 0.3rem 0 0 0;
+  padding-left: 1.2rem;
+}
+.mission li {
+  margin: 0.3rem 0;
+}
 
 .hints {
   background: rgba(155, 89, 182, 0.06);
@@ -276,8 +358,13 @@ pre.code[data-lang]::before, pre[data-lang]::before {
   font-weight: bold;
   color: #9b59b6;
 }
-.hints[open] summary { margin-bottom: 0.5rem; }
-.hints ul { margin: 0; padding-left: 1.2rem; }
+.hints[open] summary {
+  margin-bottom: 0.5rem;
+}
+.hints ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
 
 .checklist {
   background: rgba(46, 204, 113, 0.06);
@@ -324,16 +411,30 @@ pre.code[data-lang]::before, pre[data-lang]::before {
   font-size: 0.95rem;
   user-select: none;
 }
-.nav-tab:hover { background: rgba(0,0,0,0.03); }
+.nav-tab:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
 .nav-tab.active {
   border-bottom: 3px solid var(--primary);
   font-weight: bold;
   color: var(--primary);
 }
 
-.content-section { display: none; animation: fadeIn 0.4s ease; }
-.content-section.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.content-section {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+.content-section.active {
+  display: block;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 
 /* ---------- COLLAPSIBLES ---------- */
 .collapsible {
@@ -353,14 +454,18 @@ pre.code[data-lang]::before, pre[data-lang]::before {
   justify-content: space-between;
   align-items: center;
 }
-.collapsible:hover { background: #e9ecef; }
+.collapsible:hover {
+  background: #e9ecef;
+}
 .collapsible::after {
-  content: '+';
+  content: "+";
   color: var(--primary);
   font-weight: bold;
   margin-left: 5px;
 }
-.collapsible.active::after { content: '−'; }
+.collapsible.active::after {
+  content: "−";
+}
 .collapsible-content {
   padding: 0 1rem;
   max-height: 0;
@@ -387,7 +492,9 @@ pre.code[data-lang]::before, pre[data-lang]::before {
   box-shadow: var(--shadow);
   text-decoration: none;
   color: var(--text);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
   border-top: 4px solid var(--accent);
 }
 .grid-cards .card-link:hover {
@@ -403,9 +510,15 @@ pre.code[data-lang]::before, pre[data-lang]::before {
   font-size: 0.92rem;
   color: var(--muted);
 }
-.grid-cards .card-link.pdf  { border-top-color: var(--danger); }
-.grid-cards .card-link.retos { border-top-color: var(--warning); }
-.grid-cards .card-link.ejercicio { border-top-color: var(--success); }
+.grid-cards .card-link.pdf {
+  border-top-color: var(--danger);
+}
+.grid-cards .card-link.retos {
+  border-top-color: var(--warning);
+}
+.grid-cards .card-link.ejercicio {
+  border-top-color: var(--success);
+}
 
 /* ============================================================
  * BOTONES DE NAVEGACIÓN INFERIOR
@@ -425,9 +538,14 @@ pre.code[data-lang]::before, pre[data-lang]::before {
   border-radius: var(--radius);
   font-weight: bold;
   text-align: center;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
-.nav-buttons a:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.nav-buttons a:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
 .btn-primary {
   background: var(--primary);
   color: white;
@@ -454,8 +572,14 @@ pre.code[data-lang]::before, pre[data-lang]::before {
   box-shadow: var(--shadow-lg);
   flex-wrap: wrap;
 }
-.retos-banner h2 { margin: 0 0 0.3rem 0; font-size: 1.25rem; }
-.retos-banner p  { margin: 0; opacity: 0.95; }
+.retos-banner h2 {
+  margin: 0 0 0.3rem 0;
+  font-size: 1.25rem;
+}
+.retos-banner p {
+  margin: 0;
+  opacity: 0.95;
+}
 .retos-banner a {
   background: white;
   color: var(--primary);
@@ -466,7 +590,9 @@ pre.code[data-lang]::before, pre[data-lang]::before {
   white-space: nowrap;
   transition: transform 0.2s;
 }
-.retos-banner a:hover { transform: translateY(-2px); }
+.retos-banner a:hover {
+  transform: translateY(-2px);
+}
 
 /* ============================================================
  * FOOTER
@@ -484,8 +610,12 @@ footer.site-footer {
  * RESPONSIVE
  * ============================================================ */
 @media (max-width: 768px) {
-  .container { padding: 1rem; }
-  .nav-tabs { flex-direction: column; }
+  .container {
+    padding: 1rem;
+  }
+  .nav-tabs {
+    flex-direction: column;
+  }
   .nav-tab {
     border-bottom: none;
     border-left: 3px solid transparent;
@@ -494,8 +624,17 @@ footer.site-footer {
     border-bottom: none;
     border-left: 3px solid var(--primary);
   }
-  header.hero { padding: 1.5rem 1.2rem; }
-  header.hero h1 { font-size: 1.5rem; }
-  .reto { padding: 1.2rem; }
-  .retos-banner { flex-direction: column; align-items: flex-start; }
+  header.hero {
+    padding: 1.5rem 1.2rem;
+  }
+  header.hero h1 {
+    font-size: 1.5rem;
+  }
+  .reto {
+    padding: 1.2rem;
+  }
+  .retos-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
