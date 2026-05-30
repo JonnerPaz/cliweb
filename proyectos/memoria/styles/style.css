@@ -1,7 +1,34 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+.pokemon-body {
+  background-image: url("../assets/pokmon-bg-main.png");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  /* height: 100vh; */
+}
+
 .pokemon-text {
+  text-align: center;
+  margin-top: 10rem;
   font-family: "Montserrat", "Impact", sans-serif;
   font-weight: 900;
-  font-size: 4rem;
+  font-size: 10rem;
+  rotate: -5deg;
   text-transform: uppercase;
   color: #ffde00; /* Yellow Fill */
   letter-spacing: 2px;
