@@ -1,0 +1,16 @@
+.pokemon-text {
+  font-family: "Montserrat", "Impact", sans-serif;
+  font-weight: 900;
+  font-size: 4rem;
+  text-transform: uppercase;
+  color: #ffde00; /* Yellow Fill */
+  letter-spacing: 2px;
+  position: relative;
+  /* Blue Stroke and Shadow Effect */
+  text-shadow:
+    -2px -2px 0 #003a70,
+    2px -2px 0 #003a70,
+    -2px 2px 0 #003a70,
+    2px 2px 0 #003a70,
+    4px 4px 0 rgba(0, 58, 112, 0.5); /* Drop Shadow */
+}

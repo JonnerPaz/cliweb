@@ -1,0 +1,58 @@
+# =======================================================================
+# 1. Archivos del Sistema y Editores de Código (Globales)
+# =======================================================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Configuraciones de editores (VS Code, JetBrains, etc.)
+.vscode/
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*~
+
+# Si usas Neovim y plugins de sesión u opacos
+.netrwhist
+apps/
+.replit
+
+# =======================================================================
+# 2. Archivos de Entorno y Dependencias (Por si acaso)
+# =======================================================================
+node_modules/
+jspm_packages/
+.pnpm-store/
+.env
+.env.local
+.env.*.local
+
+# Logs de errores
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =======================================================================
+# 3. Datos locales o Cachés de APIs (PokeAPI)
+# =======================================================================
+# Si decides descargar las respuestas de la PokeAPI en archivos JSON 
+# pesados para hacer pruebas locales, esto evitará subirlos por error.
+*.json.log
+/proyectos/memoria/cache/
+/proyectos/memoria/data/*.json
+!/package.json
+!/.prettierrc
+
+# =======================================================================
+# 4. Compilación / Salida (En caso de que agregues herramientas de empaquetado)
+# =======================================================================
+dist/
+build/
+out/
+.next/
+.nuxt/

@@ -1,0 +1,4 @@
+# Excepciones estándar dentro de la carpeta del proyecto
+**/node_modules/
+**/.DS_Store
+**/*.log
