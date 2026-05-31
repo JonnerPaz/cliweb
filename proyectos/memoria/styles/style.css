@@ -41,3 +41,25 @@ html {
     2px 2px 0 #003a70,
     4px 4px 0 rgba(0, 58, 112, 0.5); /* Drop Shadow */
 }
+
+.pokemon-button {
+  background-color: #ffde00; /* Yellow */
+  border: none;
+  color: #003a70; /* Blue */
+  padding: 1.5rem 3rem;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 2.5rem;
+  margin: 4rem 2rem;
+  cursor: pointer;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  font-family: "Montserrat", "Impact", sans-serif;
+}
+
+.pokemon-button:hover {
+  background-color: #003a70; /* Blue */
+  color: #ffde00; /* Yellow */
+}
