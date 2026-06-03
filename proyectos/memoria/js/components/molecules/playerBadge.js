@@ -1,4 +1,4 @@
- class PlayerBadge extends HTMLElement {
+ export class PlayerBadge extends HTMLElement {
     constructor() {
         super();
         this.badge = document.createElement('article');
@@ -7,7 +7,7 @@
 
     connectedCallback() {
         this.render();
-        this.appendChild(this.badge);
+      this.appendChild(this.badge)
     }
 
     updateStats(newPoints, newMovements) {
@@ -41,6 +41,8 @@
         this.badge.appendChild(stats);
         stats.appendChild(pointsEl);
         stats.appendChild(movementsEl);
+        this.appendChild(this.badge);
+        
     }
 }
 customElements.define('player-badge', PlayerBadge);
