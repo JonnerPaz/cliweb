@@ -1,6 +1,13 @@
 import { Home } from "./pages/Home.js";
-import { MusicToggle } from "./components/organism/MusicToggle.js";
+import { Router } from "./core/Router.js";
 
-const app = document.getElementById("app");
-app.appendChild(new Home());
-app.appendChild(new MusicToggle());
+const appContainer = document.getElementById("app");
+
+// Definición de las rutas de la aplicación
+const routes = {
+  "/": () => new Home(),
+  // Ejemplo: "/juego": () => new GamePage(),
+};
+
+// Inicializamos el enrutador y lo exportamos por si otras páginas necesitan navegar
+export const router = new Router(appContainer, routes);
