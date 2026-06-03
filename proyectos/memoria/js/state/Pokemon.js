@@ -6,12 +6,14 @@ export class PokemonEntity {
   #sprites = { front: "", back: "" };
 
   /**
+   * @param {number} id - Id del pokemon
    * @param {string} name - Nombre del pokemon
    * @param {import("./Pokemon.dto.js").Cries} cries - Gritos del pokemon
    * @param {import("./Pokemon.dto.js").Type[]} types - Tipos del pokemon
    * @param {import("./Pokemon.dto.js").Sprites} sprites - Sprites del pokemon
    */
-  constructor({ name, cries, types, sprites }) {
+  constructor({ id, name, cries, types, sprites }) {
+    this.#id = id ?? 0;
     this.#name = name ?? "";
     this.#cries = cries ?? { latest: "", legacy: "" };
     this.#types = types ?? [];
