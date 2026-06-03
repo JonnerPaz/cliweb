@@ -1,0 +1,39 @@
+.gameboard {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  justify-content: center;
+}
+
+.gameboard__card {
+  display: block;
+  /* El width/height se ajustará en el Card.css o lo haremos responsivo */
+  cursor: pointer;
+  user-select: none;
+}
+
+/* 
+  Mientras no adaptemos el hover de la tarjeta a clases en JS,
+  forzaremos a que las que tengan .is-flipped roten su lado frontal 
+  y muestren el lado trasero, tal como lo hacía el :hover original 
+*/
+.gameboard__card.is-flipped .card__side--front,
+.gameboard__card.is-matched .card__side--front {
+  transform: rotateY(-180deg);
+}
+
+.gameboard__card.is-flipped .card__side--back,
+.gameboard__card.is-matched .card__side--back {
+  transform: rotateY(0deg);
+}
+
+.gameboard-loading {
+  text-align: center;
+  color: var(--color-white);
+  font-family: "Montserrat", sans-serif;
+  margin-top: 10rem;
+  font-size: 2rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
