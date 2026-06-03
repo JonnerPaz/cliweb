@@ -9,6 +9,7 @@ export class MusicToggle extends HTMLElement {
 
   connectedCallback() {
     this.render();
+    this.setupListeners();
   }
 
   render() {
@@ -17,7 +18,9 @@ export class MusicToggle extends HTMLElement {
         <span id="status-icon">🔇</span>
       </button>
     `;
+  }
 
+  setupListeners() {
     this.querySelector("#music-btn").addEventListener("click", () =>
       this.toggleMusic()
     );
