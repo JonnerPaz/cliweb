@@ -1,3 +1,30 @@
+:root {
+  /* Pokémon Colors */
+  --color-primary: #003a70;
+  --color-primary-light: #33618d;
+  --color-primary-dark: #002244;
+  --color-primary-rgb: 0, 58, 112;
+
+  --color-secondary: #ffde00;
+  --color-secondary-light: #ffe533;
+  --color-secondary-dark: #ccb200;
+  --color-secondary-rgb: 255, 222, 0;
+
+  /* Red Pokédex for the 3rd variation */
+  --color-tertiary: #e3350d;
+  --color-tertiary-light: #e95d3d;
+  --color-tertiary-dark: #b62a0a;
+  --color-tertiary-rgb: 227, 53, 13;
+
+  /* Neutrals */
+  --color-grey-light-2: #eee;
+  --color-white: #fff;
+  --color-black: #000;
+
+  /* Variables */
+  --border-radius-default: 3px;
+}
+
 *,
 *::before,
 *::after {
@@ -18,7 +45,7 @@ html {
   background-attachment: fixed;
   min-height: 100vh;
   overflow-x: hidden;
-  overflow-y: hidden;
+  /* overflow-y: hidden; */
   /* height: 100vh; */
 }
 
