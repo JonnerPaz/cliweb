@@ -37,6 +37,77 @@ html {
   font-size: 62.5%;
 }
 
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+home-page {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  justify-content: space-between;
+}
+
+.home-header {
+  flex-basis: 10%;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  padding: 1.5rem;
+  width: 100%;
+
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+.home-footer {
+  flex-basis: 10%;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  padding: 1.5rem;
+  width: 100%;
+
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+.home-main {
+  flex-basis: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.home-main > * {
+  flex-basis: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.home-settings {
+  padding: 3rem;
+  flex-basis: 30%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+
+  border-radius: var(--border-radius-default);
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.15);
+
+  background-color: #444;
+  color: var(--color-secondary);
+}
+
 .pokemon-body {
   background-image: url("../assets/pokmon-bg-main.png");
   background-size: cover;
@@ -46,16 +117,13 @@ html {
   min-height: 100vh;
   overflow-x: hidden;
   /* overflow-y: hidden; */
-  /* height: 100vh; */
 }
 
 .pokemon-text {
   text-align: center;
-  margin-top: 10rem;
   font-family: "Montserrat", "Impact", sans-serif;
   font-weight: 900;
   font-size: 10rem;
-  rotate: -5deg;
   text-transform: uppercase;
   color: #ffde00; /* Yellow Fill */
   letter-spacing: 2px;
@@ -89,4 +157,8 @@ html {
 .pokemon-button:hover {
   background-color: #003a70; /* Blue */
   color: #ffde00; /* Yellow */
+}
+
+.hidden {
+  display: none;
 }
