@@ -1,0 +1,45 @@
+/* Contenedor principal de la molécula */
+.player-badge {
+    background-color: #ffffff;
+    border: 2px solid #2965f1;
+    border-radius: 12px;
+    padding: 16px;
+    width: 250px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: transform 0.2s ease;
+}
+
+.player-badge:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Nombre del jugador (Átomo h3) */
+.player-badge h3 {
+    margin: 0 0 12px 0;
+    color: #2965f1;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+/* Contenedor de estadísticas */
+.stats {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* Párrafos de estadísticas (Átomos p) */
+.points, .movements {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.points {
+    color: #27ae60; /* Verde para puntos */
+}

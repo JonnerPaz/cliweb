@@ -1,34 +1,46 @@
-export const createPlayerBadge = (playerData) => {
-    const badge = document.createElement('article');
-    badge.className = 'playerBadge';
+ class PlayerBadge extends HTMLElement {
+    constructor() {
+        super();
+        this.badge = document.createElement('article');
+        this.badge.className = 'player-badge';
+    }
 
-    const playerName = document.createElement('h3');
-    playerName.textContent = playerData.name;
-    badge.appendChild(playerName);
+    connectedCallback() {
+        this.render();
+        this.appendChild(this.badge);
+    }
 
-    const stats = document.createElement('div');
-    stats.className = 'stats';
+    updateStats(newPoints, newMovements) {
+        const pointsEl = this.badge.querySelector('.points');
+        const movementsEl = this.badge.querySelector('.movements');
+        
+        if (pointsEl) pointsEl.textContent = `Points: ${newPoints}`;
+        if (movementsEl) movementsEl.textContent = `Movements: ${newMovements}`;
+    }
 
-    const points = document.createElement('p');
-    points.className = 'points';
-    badge.pointsElement = points; 
-    points.textContent = `Points: ${playerData.points}`;
-    stats.appendChild(points);
+    render() {
+        const name = this.getAttribute('name') || 'Player';
+        const points = parseInt(this.getAttribute('points')) || 0;
+        const movements = parseInt(this.getAttribute('movements')) || 0;
+        
+        const playerName = document.createElement('h3');
+        playerName.textContent = name;
 
-    const movements = document.createElement('p');
-    movements.className = 'movements';
-    badge.movementsElement = movements;
-    movements.textContent = `Movements: ${playerData.movements}`;
-    stats.appendChild(movements);
+        const stats = document.createElement('div');
+        stats.className = 'stats';
 
-    const awards = document.createElement('p');
-    awards.className = 'awards';
-    badge.awardsElement = awards;
-    awards.textContent = `Awards: ${playerData.awards}`;
-    stats.appendChild(awards);
+        const pointsEl = document.createElement('p');
+        pointsEl.className = 'points';
+        pointsEl.textContent = `Points: ${points}`;
 
-    badge.appendChild(stats);
+        const movementsEl = document.createElement('p');
+        movementsEl.className = 'movements';
+        movementsEl.textContent = `Movements: ${movements}`;
 
-    return badge;
-};
-
+        this.badge.appendChild(playerName);
+        this.badge.appendChild(stats);
+        stats.appendChild(pointsEl);
+        stats.appendChild(movementsEl);
+    }
+}
+customElements.define('player-badge', PlayerBadge);
