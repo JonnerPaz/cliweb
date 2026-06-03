@@ -1,4 +1,5 @@
 import { router } from "../app.js";
+import {Card} from "../components/atoms/Card.js";
 
 export class Home extends HTMLElement {
   constructor() {

@@ -7,15 +7,7 @@
 
     connectedCallback() {
         this.render();
-      this.appendChild(this.badge)
-    }
-
-    updateStats(newPoints, newMovements) {
-        const pointsEl = this.badge.querySelector('.points');
-        const movementsEl = this.badge.querySelector('.movements');
-        
-        if (pointsEl) pointsEl.textContent = `Points: ${newPoints}`;
-        if (movementsEl) movementsEl.textContent = `Movements: ${newMovements}`;
+        this.appendChild(this.badge)
     }
 
     render() {
@@ -43,6 +35,14 @@
         stats.appendChild(movementsEl);
         this.appendChild(this.badge);
         
+    }
+
+    updateStats(newPoints, newMovements) {
+        const pointsEl = this.badge.querySelector('.points');
+        const movementsEl = this.badge.querySelector('.movements');
+        
+        if (pointsEl) pointsEl.textContent = `Points: ${newPoints}`;
+        if (movementsEl) movementsEl.textContent = `Movements: ${newMovements}`;
     }
 }
 customElements.define('player-badge', PlayerBadge);
