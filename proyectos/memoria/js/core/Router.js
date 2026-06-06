@@ -1,19 +1,25 @@
 /**
  * @param {HTMLElement} rootElement - El contenedor principal (ej. #app)
  * @param {Object} routes - Mapa de rutas, ej. { "/": () => new Home() }
+ * @description Clase que maneja el enrutamiento de la aplicación. Estas rutas DEBEN tener entre sus métodos mount() y unmount()
+ * @example
+ * const routes = {
+ *   "/": () => new View(),
+ }
  */
 export class Router {
   constructor(rootElement, routes) {
     this.rootElement = rootElement;
     this.routes = routes;
+    this.currentView = null; // La vista actual. Monta y desmonta según la ruta
 
     // Inicia el router
     this._init();
   }
 
   _init() {
-    // El evento "popstate" se dispara cuando intercepta los botones atrás/adelante del navegador
-    window.addEventListener("popstate", () => this.handleRoute());
+    // El evento "hashchange" se dispara cuando cambia el # de la URL (incluye atrás/adelante)
+    window.addEventListener("hashchange", () => this.handleRoute());
 
     // Intercepta clicks en enlaces que tengan el atributo data-link
     document.body.addEventListener("click", (e) => {
@@ -28,26 +34,34 @@ export class Router {
   }
 
   handleRoute() {
-    const path = window.location.pathname;
+    // Obtenemos el hash actual, o por defecto "/"
+    let path = window.location.hash.slice(1) || "/";
 
-    // Obtenemos el componente de la ruta actual, si no existe, vamos a Home (/)
+    // Obtenemos el handler de la ruta o el home. Es una función
     const routeHandler = this.routes[path] || this.routes["/"];
 
-    // Limpiamos el contenedor (Lo que haya en este momento en la página)
+    // Desmontamos la vista anterior (se borra del DOM)
+    if (this.currentView && typeof this.currentView.unmount === "function") {
+      this.currentView.unmount();
+    }
+
+    // Limpiamos el contenedor
     this.rootElement.innerHTML = "";
 
-    // Si la ruta devuelve un HTMLElement (componente), lo agregamos al DOM
-    const pageComponent = routeHandler();
-    if (pageComponent instanceof HTMLElement) {
-      this.rootElement.appendChild(pageComponent);
+    // Instanciamos la nueva vista
+    this.currentView = routeHandler();
+
+    // Montamos la vista en el contenedor
+    if (this.currentView && typeof this.currentView.mount === "function") {
+      this.currentView.mount(this.rootElement);
     }
   }
 
   /**
-   * @param {string} path
+   * @param {string} path - La ruta a navegar
+   * @description Navega a la ruta indicada y actualiza la URL
    */
   navigateTo(path) {
-    window.history.pushState({}, "", path);
-    this.handleRoute();
+    window.location.hash = path;
   }
 }

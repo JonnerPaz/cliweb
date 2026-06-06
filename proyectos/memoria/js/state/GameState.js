@@ -3,7 +3,10 @@
  * @description Clase que representa el estado del juego. NO CREAR UNA NUEVA INSTANCIA, USAR GameState.instance
  * @property {string} gameMode - Modo del juego
  * @property {string} difficulty - Dificultad del juego
- * @property {string} theme - Tematica del juego
+ * @property {string} theme - Temática del juego
+ * @property {string} playerName - Nombre del jugador (modo Solitario)
+ * @property {number} playerCount - Cantidad de jugadores (modo PvP)
+ * @property {boolean} musicEnabled - Si la música de fondo está activada
  * @property {number} turns - Turnos del juego
  * @property {import("./User.js").User[]} players - Jugadores del juego
  * @constructor
@@ -11,7 +14,10 @@
 class GameState {
   #gameMode = null; // "solo" | "pvp" | "free"
   #difficulty = null; // Facil, Medio, Dificil
-  #theme = null; // Temática general, por tipo pokemon, etc.
+  #theme = null; // "random" | tipo pokemon
+  #playerName = "";
+  #playerCount = 2;
+  #musicEnabled = false;
   #turns = 0;
   #players = [];
 
@@ -24,7 +30,10 @@ class GameState {
 
     this.gameMode = null; // "solo" | "pvp" | "free"
     this.difficulty = null; // Facil, Medio, Dificil
-    this.theme = null; // Temática general, por tipo pokemon, etc.
+    this.theme = null; // "random" | tipo pokemon
+    this.playerName = "";
+    this.playerCount = 2;
+    this.musicEnabled = false;
     this.turns = 0;
     this.players = [];
 
@@ -64,8 +73,40 @@ class GameState {
     this.#turns = turns;
   }
 
+  get playerName() {
+    return this.#playerName;
+  }
+
+  set playerName(playerName) {
+    if (typeof playerName !== "string") return;
+    this.#playerName = playerName.slice(0, 20);
+  }
+
+  get playerCount() {
+    return this.#playerCount;
+  }
+
+  set playerCount(playerCount) {
+    const n = Number(playerCount);
+    if (!Number.isInteger(n) || n < 2 || n > 4) return;
+    this.#playerCount = n;
+  }
+
+  get musicEnabled() {
+    return this.#musicEnabled;
+  }
+
+  set musicEnabled(musicEnabled) {
+    this.#musicEnabled = Boolean(musicEnabled);
+  }
+
   get players() {
     return this.#players;
+  }
+
+  set players(players) {
+    if (!Array.isArray(players)) return;
+    this.#players = players;
   }
 
   /**
@@ -87,6 +128,9 @@ class GameState {
     this.#gameMode = null;
     this.#difficulty = null;
     this.#theme = null;
+    this.#playerName = "";
+    this.#playerCount = 2;
+    this.#musicEnabled = false;
     this.#turns = 0;
     this.#players = [];
   }
