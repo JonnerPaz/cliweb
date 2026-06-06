@@ -1,3 +1,5 @@
+import { User } from "./User.js";
+
 /**
  * @class GameState - Estado del juego
  * @description Clase que representa el estado del juego. NO CREAR UNA NUEVA INSTANCIA, USAR GameState.instance
@@ -12,11 +14,11 @@
  * @constructor
  */
 class GameState {
-  #gameMode = null; // "solo" | "pvp" | "free"
-  #difficulty = null; // Facil, Medio, Dificil
-  #theme = null; // "random" | tipo pokemon
-  #playerName = "";
-  #playerCount = 2;
+  #gameMode = "solo"; // "solo" | "pvp" | "free"
+  #difficulty = "facil"; // facil, medio, dificil
+  #theme = "random"; // "random" | tipo pokemon
+  #playerName = "Entrenador sin nombre";
+  #playerCount = 1;
   #musicEnabled = false;
   #turns = 0;
   #players = [];
@@ -27,15 +29,6 @@ class GameState {
     if (GameState.instance) {
       return GameState.instance;
     }
-
-    this.gameMode = null; // "solo" | "pvp" | "free"
-    this.difficulty = null; // Facil, Medio, Dificil
-    this.theme = null; // "random" | tipo pokemon
-    this.playerName = "";
-    this.playerCount = 2;
-    this.musicEnabled = false;
-    this.turns = 0;
-    this.players = [];
 
     GameState.instance = this;
   }
@@ -88,7 +81,7 @@ class GameState {
 
   set playerCount(playerCount) {
     const n = Number(playerCount);
-    if (!Number.isInteger(n) || n < 2 || n > 4) return;
+    if (!Number.isInteger(n) || (n !== 1 && n !== 2)) return;
     this.#playerCount = n;
   }
 
@@ -125,11 +118,11 @@ class GameState {
   }
 
   reset() {
-    this.#gameMode = null;
-    this.#difficulty = null;
-    this.#theme = null;
-    this.#playerName = "";
-    this.#playerCount = 2;
+    this.#gameMode = "solo";
+    this.#difficulty = "facil";
+    this.#theme = "random";
+    this.#playerName = "Entrenador sin nombre";
+    this.#playerCount = 1;
     this.#musicEnabled = false;
     this.#turns = 0;
     this.#players = [];

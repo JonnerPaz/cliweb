@@ -7,9 +7,6 @@
 export function createCard(pokemon, index, onCardClick) {
   const cardElement = document.createElement("article");
   cardElement.className = "card gameboard__card";
-  cardElement.dataset.index = index;
-  cardElement.dataset.pokemonId = pokemon.id;
-  cardElement.dataset.pokemonName = pokemon.name;
 
   const imageUrl =
     pokemon.image || (pokemon.sprites && pokemon.sprites.front) || "";

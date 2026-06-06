@@ -22,28 +22,52 @@ const POKEMON_TYPES = [
   { value: "fairy", label: "Hada" },
 ];
 
+function updateVisibility(nameItem, countItem) {
+  const mode = gameState.gameMode;
+  if (nameItem) nameItem.hidden = mode !== "solo";
+  if (countItem) countItem.hidden = mode !== "pvp";
+  if (gameState.playerName === "")
+    gameState.playerName = "Entrenador sin nombre";
+}
+
+const escapeAttr = (value) =>
+  String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+// Asignar Eventos
+const handleModeChange = (e) => {
+  gameState.gameMode = e.target.value;
+  updateVisibility();
+};
+
+const handleDiffChange = (e) => (gameState.difficulty = e.target.value);
+const handleThemeChange = (e) => (gameState.theme = e.target.value);
+const handleNameChange = (e) => (gameState.playerName = e.target.value);
+const handleCountChange = (e) =>
+  (gameState.playerCount = Number(e.target.value));
+const handleMusicChange = (e) => {
+  const enabled = e.target.checked;
+  gameState.musicEnabled = enabled;
+  window.dispatchEvent(
+    new CustomEvent("music-setting-changed", { detail: { enabled } })
+  );
+};
+
+const themeOptions = POKEMON_TYPES.map(
+  (t) =>
+    `<option value="${t.value}"${
+      t.value === gameState.theme ? " selected" : ""
+    }>${t.label}</option>`
+).join("");
+
 export function renderSettings(container) {
   const gameMode = gameState.gameMode ?? "solo";
   const difficulty = gameState.difficulty ?? "Facil";
-  const theme = gameState.theme ?? "random";
-  const playerName = gameState.playerName ?? "";
   const playerCount = gameState.playerCount ?? 2;
   const musicEnabled = Boolean(gameState.musicEnabled);
-
-  const themeOptions = POKEMON_TYPES.map(
-    (t) =>
-      `<option value="${t.value}"${
-        t.value === theme ? " selected" : ""
-      }>${t.label}</option>`
-  ).join("");
-
-  const escapeAttr = (value) => {
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/"/g, "&quot;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-  };
 
   container.innerHTML = `
     <section class="settings" aria-label="Configuración de la partida">
@@ -67,7 +91,7 @@ export function renderSettings(container) {
 
         <div class="settings__item">
           <label class="settings__item--label" for="settings-difficulty">
-            <span class="settings__item-icon" aria-hidden="true">🏆</span>
+            <span class="settings__item-icon">🏆</span>
             Dificultad
           </label>
           <select id="settings-difficulty" class="settings__select">
@@ -87,9 +111,9 @@ export function renderSettings(container) {
           </select>
         </div>
 
-        <div class="settings__item" id="settings-player-name-item" hidden>
+        <div class="settings__item" id="settings-player-name-item" >
           <label class="settings__item--label" for="settings-player-name">
-            <span class="settings__item-icon" aria-hidden="true">👤</span>
+            <span class="settings__item-icon">👤</span>
             Tu nombre
           </label>
           <input
@@ -98,7 +122,7 @@ export function renderSettings(container) {
             class="settings__input"
             maxlength="20"
             placeholder="Entrenador"
-            value="${escapeAttr(playerName)}"
+            value=""
           />
         </div>
 
@@ -141,32 +165,10 @@ export function renderSettings(container) {
   const countSelect = container.querySelector("#settings-player-count");
   const musicSwitch = container.querySelector("#settings-music");
 
+  // Inicializar visibilidad
   const nameItem = container.querySelector("#settings-player-name-item");
   const countItem = container.querySelector("#settings-player-count-item");
-
-  const updateVisibility = () => {
-    const mode = gameState.gameMode;
-    if (nameItem) nameItem.hidden = mode !== "solo";
-    if (countItem) countItem.hidden = mode !== "pvp";
-  };
-
-  // Asignar Eventos
-  const handleModeChange = (e) => {
-    gameState.gameMode = e.target.value;
-    updateVisibility();
-  };
-  const handleDiffChange = (e) => (gameState.difficulty = e.target.value);
-  const handleThemeChange = (e) => (gameState.theme = e.target.value);
-  const handleNameChange = (e) => (gameState.playerName = e.target.value);
-  const handleCountChange = (e) =>
-    (gameState.playerCount = Number(e.target.value));
-  const handleMusicChange = (e) => {
-    const enabled = e.target.checked;
-    gameState.musicEnabled = enabled;
-    window.dispatchEvent(
-      new CustomEvent("music-setting-changed", { detail: { enabled } })
-    );
-  };
+  updateVisibility(nameItem, countItem);
 
   modeSelect.addEventListener("change", handleModeChange);
   difficultySelect.addEventListener("change", handleDiffChange);
@@ -174,9 +176,6 @@ export function renderSettings(container) {
   nameInput.addEventListener("input", handleNameChange);
   countSelect.addEventListener("change", handleCountChange);
   musicSwitch.addEventListener("change", handleMusicChange);
-
-  // Inicializar visibilidad
-  updateVisibility();
 
   // Devolver función de limpieza
   return function cleanup() {

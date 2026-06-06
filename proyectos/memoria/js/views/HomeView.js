@@ -38,11 +38,13 @@ export class HomeView {
 
     this.container.appendChild(wrapper);
 
+    // Abre la sección modos y configuración
     this.btnSettings = this.container.querySelector("#btn-settings");
     this.btnSettings.addEventListener("click", () =>
       this.toggleSettings(this.container)
     );
 
+    // Inicia el juego
     this.btnPlay = this.container.querySelector("#btn-play");
     this.btnPlay.addEventListener("click", this.handlePlay);
 
@@ -53,9 +55,9 @@ export class HomeView {
     this.settingsCleanup = renderSettings(settingsContainer);
   }
 
-  handlePlay = () => {
+  handlePlay() {
     router.navigateTo("/game");
-  };
+  }
 
   toggleSettings(container) {
     container.querySelector(".home-settings").classList.toggle("hidden");
