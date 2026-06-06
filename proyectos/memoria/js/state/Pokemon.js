@@ -36,6 +36,10 @@ export class PokemonEntity {
     return this.#sprites;
   }
 
+  get image() {
+    return this.#sprites.front;
+  }
+
   get cries() {
     return this.#cries;
   }

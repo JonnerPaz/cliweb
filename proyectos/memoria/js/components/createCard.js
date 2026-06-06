@@ -11,20 +11,21 @@ export function createCard(pokemon, index, onCardClick) {
   cardElement.dataset.pokemonId = pokemon.id;
   cardElement.dataset.pokemonName = pokemon.name;
 
+  const imageUrl =
+    pokemon.image || (pokemon.sprites && pokemon.sprites.front) || "";
+
   cardElement.innerHTML = `
-    <div class="card__side card__side--front">
-      <div class="card__picture card__picture--1" style="background-image: url(${pokemon.image || ""})">&nbsp;</div>
-      <h4 class="card__heading">
-        <span class="card__heading-span card__heading-span--1">
-            ${pokemon.name}
-        </span>
-      </h4>
+    <div class="card__side card__side--back">
+      <div class="pokeball">
+        <div class="pokeball__button"></div>
+      </div>
     </div>
-    <div class="card__side card__side--back card__side--back-1">
-      <div class="card__cta">
-        <div class="card__price-box">
-          <p class="card__price-only">Poké</p>
-        </div>
+    <div class="card__side card__side--front">
+      <div class="card__image-container">
+        <img class="card__image" src="${imageUrl}" alt="${pokemon.name}" loading="lazy" />
+      </div>
+      <div class="card__info">
+        <span class="card__name">${pokemon.name}</span>
       </div>
     </div>
   `;
