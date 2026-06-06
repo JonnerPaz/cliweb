@@ -8,6 +8,19 @@ export class GameView {
     this.boardCleanup = null;
   }
 
+  onWin(turn) {
+    // Usaremos un timeout simple para la victoria por ahora.
+    // Proximamente debería ser un navigate to Results
+    // router.navigateTo("/results");
+    setTimeout(() => alert(`¡Ganaste en ${turn} turnos!`));
+  }
+
+  onTurnUpdate(turn) {
+    if (this.hudTurns) {
+      this.hudTurns.textContent = turn;
+    }
+  }
+
   async mount(container) {
     this.container = container;
 
@@ -28,7 +41,6 @@ export class GameView {
     // Eventos
     this.btnBack = this.container.querySelector("#btn-back");
     this.btnBack.addEventListener("click", this.handleBack);
-
     this.hudTurns = this.container.querySelector("#hud-turns");
 
     // Determinar dificultad
@@ -49,34 +61,22 @@ export class GameView {
         : [p1];
     gameState.players = players;
 
-    // Callbacks del juego
-    const onWin = (turnos) => {
-      // Usaremos un timeout simple para la victoria por ahora
-      setTimeout(() => alert(`¡Ganaste en ${turnos} turnos!`), 300);
-    };
-
-    const onTurnUpdate = (turnos) => {
-      if (this.hudTurns) {
-        this.hudTurns.textContent = turnos;
-      }
-    };
-
     // Montar el tablero
     const boardContainer = this.container.querySelector("#board-container");
     const boardState = await renderBoard(
       boardContainer,
       pairsCount,
-      onWin,
-      onTurnUpdate
+      this.onWin.bind(this),
+      this.onTurnUpdate.bind(this)
     );
     this.boardCleanup = boardState.cleanup;
   }
 
-  handleBack = () => {
+  handleBack() {
     import("../app.js").then(({ router }) => {
       router.navigateTo("/");
     });
-  };
+  }
 
   unmount() {
     if (this.btnBack) {
