@@ -1,6 +1,8 @@
 import gameState from "../state/GameState.js";
 
 class GameEngine {
+  static pointsPerMatch = 10;
+
   constructor() {
     this.flippedCards = [];
     this.isLocked = false;
@@ -8,6 +10,7 @@ class GameEngine {
     this.pairsCount = 0;
     this.onWin = null;
     this.onTurnUpdate = null;
+    this.activePlayerIndex = 0;
   }
 
   init(pairsCount, onWin, onTurnUpdate) {
@@ -17,6 +20,7 @@ class GameEngine {
     this.pairsCount = pairsCount;
     this.onWin = onWin;
     this.onTurnUpdate = onTurnUpdate;
+    this.activePlayerIndex = 0;
     gameState.turns = 0;
     if (this.onTurnUpdate) this.onTurnUpdate(gameState.turns);
   }
@@ -35,15 +39,21 @@ class GameEngine {
   checkMatch() {
     this.isLocked = true;
     gameState.turns += 1;
-    if (this.onTurnUpdate) this.onTurnUpdate(gameState.turns);
+    if (this.onTurnUpdate) this.onTurnUpdate(gameState.turns, this.activePlayerIndex);
 
     const [card1, card2] = this.flippedCards;
     const isMatch = card1.pokemon.id === card2.pokemon.id;
+
+    const players = gameState.players;
+    const active = players[this.activePlayerIndex];
 
     if (isMatch) {
       this.matches += 1;
       card1.markAsMatched();
       card2.markAsMatched();
+
+      if (active) active.addPoints(GameEngine.pointsPerMatch);
+
       this.resetBoardState();
 
       if (this.matches === this.pairsCount) {
@@ -56,6 +66,11 @@ class GameEngine {
         card1.unflip();
         card2.unflip();
         this.resetBoardState();
+
+        if (players.length > 1) {
+          this.activePlayerIndex =
+            (this.activePlayerIndex + 1) % players.length;
+        }
       }, 1000);
     }
   }
