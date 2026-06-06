@@ -21,9 +21,10 @@ export class HomeView {
 
         <main class="home-main">
           <section class="home-section">
-            <section class="home-settings" id="settings-container"></section>
+            <section class="home-settings hidden" id="settings-container"></section>
             <div>
-              <button id="btn-play" class="pokemon-button">Play</button>
+              <button id="btn-settings" class="pokemon-button">Start</button>
+              <button id="btn-play" class="pokemon-button hidden">Play</button>
             </div>
           </section>
 
@@ -36,6 +37,11 @@ export class HomeView {
     `;
 
     this.container.appendChild(wrapper);
+
+    this.btnSettings = this.container.querySelector("#btn-settings");
+    this.btnSettings.addEventListener("click", () =>
+      this.toggleSettings(this.container)
+    );
 
     this.btnPlay = this.container.querySelector("#btn-play");
     this.btnPlay.addEventListener("click", this.handlePlay);
@@ -50,6 +56,12 @@ export class HomeView {
   handlePlay = () => {
     router.navigateTo("/game");
   };
+
+  toggleSettings(container) {
+    container.querySelector(".home-settings").classList.toggle("hidden");
+    container.querySelector("#btn-settings").classList.toggle("hidden");
+    container.querySelector("#btn-play").classList.toggle("hidden");
+  }
 
   unmount() {
     if (this.btnPlay) {
