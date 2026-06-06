@@ -1,45 +1,41 @@
-/* Contenedor principal de la molécula */
 .player-badge {
     background-color: #ffffff;
-    border: 2px solid #2965f1;
+    border: 1px solid #e0e0e0;
     border-radius: 12px;
     padding: 16px;
-    width: 250px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 300px;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     transition: transform 0.2s ease;
 }
 
 .player-badge:hover {
-    transform: translateY(-5px);
+    transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Nombre del jugador (Átomo h3) */
-.player-badge h3 {
-    margin: 0 0 12px 0;
-    color: #2965f1;
-    font-size: 1.2rem;
-    text-transform: uppercase;
-    border-bottom: 1px solid #eee;
+.player-name {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #f0f0f0;
     padding-bottom: 8px;
 }
 
-/* Contenedor de estadísticas */
 .stats {
     display: flex;
-    justify-content: space-between;
-    gap: 10px;
+    flex-direction: column;
+    gap: 8px;
 }
 
-/* Párrafos de estadísticas (Átomos p) */
-.points, .movements {
-    margin: 0;
-    font-size: 0.9rem;
+.stats span {
+    font-size: 0.95rem;
+    color: #666;
+}
+
+.points, .movements, .awards {
     font-weight: 600;
-    color: #333;
-}
-
-.points {
-    color: #27ae60; /* Verde para puntos */
+    color: #2c3e50;
 }

@@ -1,30 +1,29 @@
-export class GameTimer extends HTMLElement {
-    constructor() {
-        super();
-        this.timer = document.createElement('div');
-        this.timer.className = 'game-timer';
-        }
+/**
+ * Crea y retorna el elemento del temporizador.
+ * @returns {HTMLElement} El elemento DOM creado.
+ */
 
-        connectedCallback() {
-        this.render();
-        this.appendChild(this.timer);
-        }
-            
-        render() {
-            const label = document.createElement('span');
-            label.className = 'label';
-            label.textContent = 'Time: ';
-            this.timer.appendChild(label);
-    }
+export function createGameTimer() {
+    const timerContainer = document.createElement('div');
+    timerContainer.className = 'game-timer';
 
-    updateTime(seconds) {
-        // Pendiente verificar una vez tengamos el timer.js en core
-        const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
-        const secs = (seconds % 60).toString().padStart(2, '0');
-        if (this.valueElement) {
-            this.valueElement.textContent = `${mins}:${secs}`;
+    const label = document.createElement('span');
+    label.className = 'label';
+    label.textContent = 'Time: ';
+    
+    const valueElement = document.createElement('span');
+    valueElement.className = 'value';
+    valueElement.textContent = '00:00'; // Valor inicial
+
+    timerContainer.appendChild(label);
+    timerContainer.appendChild(valueElement);
+
+    return {
+        element: timerContainer,
+        updateTime: (seconds) => {
+            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const secs = (seconds % 60).toString().padStart(2, '0');
+            valueElement.textContent = `${mins}:${secs}`;
         }
-    }
+    };
 }
-
-customElements.define('game-timer', GameTimer);
