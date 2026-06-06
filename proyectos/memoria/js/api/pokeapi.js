@@ -22,16 +22,22 @@ export class PokeApi {
       /** @type {import("./Pokemon.dto.js").PokemonResponse} */
       const pokemonRes = await response.json();
 
-      return Result.ok(new PokemonEntity({
-        id: pokemonRes.id,
-        name: pokemonRes.name,
-        cries: pokemonRes.cries,
-        types: pokemonRes.types,
-        sprites: {
-          front: pokemonRes.sprites?.front_default,
-          back: pokemonRes.sprites?.back_default
-        }
-      }));
+      const frontSprite =
+        pokemonRes.sprites?.other?.dream_world?.front_default ||
+        pokemonRes.sprites?.front_default;
+
+      return Result.ok(
+        new PokemonEntity({
+          id: pokemonRes.id,
+          name: pokemonRes.name,
+          cries: pokemonRes.cries,
+          types: pokemonRes.types,
+          sprites: {
+            front: frontSprite,
+            back: pokemonRes.sprites?.back_default,
+          },
+        })
+      );
     } catch (error) {
       return Result.err(error);
     }
@@ -51,16 +57,22 @@ export class PokeApi {
       /** @type {import("./Pokemon.dto.js").PokemonResponse} */
       const pokemonRes = await response.json();
 
-      return Result.ok(new PokemonEntity({
-        id: pokemonRes.id,
-        name: pokemonRes.name,
-        cries: pokemonRes.cries,
-        types: pokemonRes.types,
-        sprites: {
-          front: pokemonRes.sprites?.front_default,
-          back: pokemonRes.sprites?.back_default
-        }
-      }));
+      const frontSprite =
+        pokemonRes.sprites?.other?.dream_world?.front_default ||
+        pokemonRes.sprites?.front_default;
+
+      return Result.ok(
+        new PokemonEntity({
+          id: pokemonRes.id,
+          name: pokemonRes.name,
+          cries: pokemonRes.cries,
+          types: pokemonRes.types,
+          sprites: {
+            front: frontSprite,
+            back: pokemonRes.sprites?.back_default,
+          },
+        })
+      );
     } catch (error) {
       return Result.err(error);
     }
