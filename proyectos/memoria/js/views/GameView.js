@@ -1,5 +1,6 @@
 import { renderBoard } from "../components/board.js";
 import gameState from "../state/GameState.js";
+import { User } from "../state/User.js";
 
 export class GameView {
   constructor() {
@@ -15,9 +16,9 @@ export class GameView {
     wrapper.innerHTML = `
       <header class="game-header">
         <button id="btn-back" class="pokemon-button" style="padding: 0.5rem 1rem;">⬅ Volver</button>
-        <div class="game-hud">
+        <nav class="hud-menu">
           <div class="hud-item">Turnos: <span id="hud-turns">0</span></div>
-        </div>
+        </nav>
       </header>
       <main id="board-container" class="game-main"></main>
     `;
@@ -36,6 +37,17 @@ export class GameView {
     if (diff === "Medio") gridSize = 6;
     if (diff === "Dificil") gridSize = 8;
     const pairsCount = (gridSize * gridSize) / 2;
+
+    // Construir jugadores a partir de los nombres del settings
+    const p1 = new User(gameState.playerName.trim() || "Entrenador 1", 0, 0, 0);
+    const players =
+      gameState.gameMode === "pvp"
+        ? [
+            p1,
+            new User(gameState.player2Name.trim() || "Entrenador 2", 0, 0, 0),
+          ]
+        : [p1];
+    gameState.players = players;
 
     // Callbacks del juego
     const onWin = (turnos) => {

@@ -177,6 +177,18 @@ settings-panel {
   font-weight: 500;
 }
 
+.settings__input--error {
+  border-color: #d32f2f;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.3);
+}
+
+/* ---------- Players section (dynamic 1 or 2 inputs) ---------- */
+#settings-players {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
 /* ---------- Toggle switch ---------- */
 .settings__switch {
   position: relative;

@@ -6,8 +6,9 @@ import { User } from "./User.js";
  * @property {string} gameMode - Modo del juego
  * @property {string} difficulty - Dificultad del juego
  * @property {string} theme - Temática del juego
- * @property {string} playerName - Nombre del jugador (modo Solitario)
- * @property {number} playerCount - Cantidad de jugadores (modo PvP)
+ * @property {string} playerName - Nombre del jugador (modo Solitario/Libre o Jugador 1 en PvP)
+ * @property {string} player2Name - Nombre del Jugador 2 (modo PvP)
+ * @property {number} playerCount - Cantidad de jugadores (derivado de players.length)
  * @property {boolean} musicEnabled - Si la música de fondo está activada
  * @property {number} turns - Turnos del juego
  * @property {import("./User.js").User[]} players - Jugadores del juego
@@ -18,7 +19,7 @@ class GameState {
   #difficulty = "facil"; // facil, medio, dificil
   #theme = "random"; // "random" | tipo pokemon
   #playerName = "Entrenador sin nombre";
-  #playerCount = 1;
+  #player2Name = "";
   #musicEnabled = false;
   #turns = 0;
   #players = [];
@@ -75,14 +76,17 @@ class GameState {
     this.#playerName = playerName.slice(0, 20);
   }
 
-  get playerCount() {
-    return this.#playerCount;
+  get player2Name() {
+    return this.#player2Name;
   }
 
-  set playerCount(playerCount) {
-    const n = Number(playerCount);
-    if (!Number.isInteger(n) || (n !== 1 && n !== 2)) return;
-    this.#playerCount = n;
+  set player2Name(player2Name) {
+    if (typeof player2Name !== "string") return;
+    this.#player2Name = player2Name.slice(0, 20);
+  }
+
+  get playerCount() {
+    return this.#players.length > 0 ? this.#players.length : 1;
   }
 
   get musicEnabled() {
@@ -122,7 +126,7 @@ class GameState {
     this.#difficulty = "facil";
     this.#theme = "random";
     this.#playerName = "Entrenador sin nombre";
-    this.#playerCount = 1;
+    this.#player2Name = "";
     this.#musicEnabled = false;
     this.#turns = 0;
     this.#players = [];

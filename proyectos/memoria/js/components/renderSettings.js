@@ -22,14 +22,6 @@ const POKEMON_TYPES = [
   { value: "fairy", label: "Hada" },
 ];
 
-function updateVisibility(nameItem, countItem) {
-  const mode = gameState.gameMode;
-  if (nameItem) nameItem.hidden = mode !== "solo";
-  if (countItem) countItem.hidden = mode !== "pvp";
-  if (gameState.playerName === "")
-    gameState.playerName = "Entrenador sin nombre";
-}
-
 const escapeAttr = (value) =>
   String(value)
     .replace(/&/g, "&amp;")
@@ -37,17 +29,101 @@ const escapeAttr = (value) =>
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
-// Asignar Eventos
+let activePlayersContainer = null;
+
+function buildPlayerItem({ id, label, placeholder }) {
+  return `
+    <div class="settings__item">
+      <label class="settings__item--label" for="${id}">
+        <span class="settings__item-icon">👤</span>
+        ${label}
+      </label>
+      <input
+        type="text"
+        id="${id}"
+        class="settings__input"
+        maxlength="20"
+        placeholder="${placeholder}"
+        value=""
+      />
+    </div>
+  `;
+}
+
+function renderPlayersSection() {
+  const container = activePlayersContainer;
+  if (!container) return;
+
+  if (container._listeners) {
+    for (const [el, ev, fn] of container._listeners) {
+      el.removeEventListener(ev, fn);
+    }
+    container._listeners = null;
+  }
+
+  container.innerHTML = "";
+
+  const mode = gameState.gameMode;
+  const items = [];
+
+  if (mode === "pvp") {
+    items.push(
+      buildPlayerItem({
+        id: "settings-player-1-name",
+        label: "Jugador 1",
+        placeholder: "Entrenador 1",
+      })
+    );
+    items.push(
+      buildPlayerItem({
+        id: "settings-player-2-name",
+        label: "Jugador 2",
+        placeholder: "Entrenador 2",
+      })
+    );
+  } else {
+    items.push(
+      buildPlayerItem({
+        id: "settings-player-name",
+        label: "Tu nombre",
+        placeholder: "Entrenador",
+      })
+    );
+  }
+
+  container.innerHTML = items.join("");
+
+  const listeners = [];
+  const player1 = container.querySelector("#settings-player-1-name");
+  const player2 = container.querySelector("#settings-player-2-name");
+  const playerName = container.querySelector("#settings-player-name");
+
+  if (player1) {
+    const fn = (e) => (gameState.playerName = e.target.value);
+    player1.addEventListener("input", fn);
+    listeners.push([player1, "input", fn]);
+  }
+  if (player2) {
+    const fn = (e) => (gameState.player2Name = e.target.value);
+    player2.addEventListener("input", fn);
+    listeners.push([player2, "input", fn]);
+  }
+  if (playerName) {
+    const fn = (e) => (gameState.playerName = e.target.value);
+    playerName.addEventListener("input", fn);
+    listeners.push([playerName, "input", fn]);
+  }
+
+  container._listeners = listeners;
+}
+
 const handleModeChange = (e) => {
   gameState.gameMode = e.target.value;
-  updateVisibility();
+  renderPlayersSection();
 };
 
 const handleDiffChange = (e) => (gameState.difficulty = e.target.value);
 const handleThemeChange = (e) => (gameState.theme = e.target.value);
-const handleNameChange = (e) => (gameState.playerName = e.target.value);
-const handleCountChange = (e) =>
-  (gameState.playerCount = Number(e.target.value));
 const handleMusicChange = (e) => {
   const enabled = e.target.checked;
   gameState.musicEnabled = enabled;
@@ -58,7 +134,7 @@ const handleMusicChange = (e) => {
 
 const themeOptions = POKEMON_TYPES.map(
   (t) =>
-    `<option value="${t.value}"${
+    `<option value="${escapeAttr(t.value)}"${
       t.value === gameState.theme ? " selected" : ""
     }>${t.label}</option>`
 ).join("");
@@ -66,7 +142,6 @@ const themeOptions = POKEMON_TYPES.map(
 export function renderSettings(container) {
   const gameMode = gameState.gameMode ?? "solo";
   const difficulty = gameState.difficulty ?? "Facil";
-  const playerCount = gameState.playerCount ?? 2;
   const musicEnabled = Boolean(gameState.musicEnabled);
 
   container.innerHTML = `
@@ -111,32 +186,7 @@ export function renderSettings(container) {
           </select>
         </div>
 
-        <div class="settings__item" id="settings-player-name-item" >
-          <label class="settings__item--label" for="settings-player-name">
-            <span class="settings__item-icon">👤</span>
-            Tu nombre
-          </label>
-          <input
-            type="text"
-            id="settings-player-name"
-            class="settings__input"
-            maxlength="20"
-            placeholder="Entrenador"
-            value=""
-          />
-        </div>
-
-        <div class="settings__item" id="settings-player-count-item" hidden>
-          <label class="settings__item--label" for="settings-player-count">
-            <span class="settings__item-icon" aria-hidden="true">👥</span>
-            Nº de jugadores
-          </label>
-          <select id="settings-player-count" class="settings__select">
-            <option value="2"${playerCount === 2 ? " selected" : ""}>2 jugadores</option>
-            <option value="3"${playerCount === 3 ? " selected" : ""}>3 jugadores</option>
-            <option value="4"${playerCount === 4 ? " selected" : ""}>4 jugadores</option>
-          </select>
-        </div>
+        <div id="settings-players"></div>
 
         <div class="settings__item">
           <label class="settings__item--label" for="settings-music">
@@ -157,34 +207,70 @@ export function renderSettings(container) {
     </section>
   `;
 
-  // Referencias a elementos
   const modeSelect = container.querySelector("#settings-mode");
   const difficultySelect = container.querySelector("#settings-difficulty");
   const themeSelect = container.querySelector("#settings-theme");
-  const nameInput = container.querySelector("#settings-player-name");
-  const countSelect = container.querySelector("#settings-player-count");
   const musicSwitch = container.querySelector("#settings-music");
+  const playersContainer = container.querySelector("#settings-players");
 
-  // Inicializar visibilidad
-  const nameItem = container.querySelector("#settings-player-name-item");
-  const countItem = container.querySelector("#settings-player-count-item");
-  updateVisibility(nameItem, countItem);
+  activePlayersContainer = playersContainer;
+  renderPlayersSection();
 
   modeSelect.addEventListener("change", handleModeChange);
   difficultySelect.addEventListener("change", handleDiffChange);
   themeSelect.addEventListener("change", handleThemeChange);
-  nameInput.addEventListener("input", handleNameChange);
-  countSelect.addEventListener("change", handleCountChange);
   musicSwitch.addEventListener("change", handleMusicChange);
 
-  // Devolver función de limpieza
-  return function cleanup() {
-    modeSelect.removeEventListener("change", handleModeChange);
-    difficultySelect.removeEventListener("change", handleDiffChange);
-    themeSelect.removeEventListener("change", handleThemeChange);
-    nameInput.removeEventListener("input", handleNameChange);
-    countSelect.removeEventListener("change", handleCountChange);
-    musicSwitch.removeEventListener("change", handleMusicChange);
-    container.innerHTML = "";
+  function validate() {
+    const mode = gameState.gameMode;
+    const errors = {};
+    const player1 = playersContainer.querySelector("#settings-player-1-name");
+    const player2 = playersContainer.querySelector("#settings-player-2-name");
+    const playerName = playersContainer.querySelector("#settings-player-name");
+
+    [player1, player2, playerName].forEach((el) => {
+      if (el) el.classList.remove("settings__input--error");
+    });
+
+    if (mode === "pvp") {
+      if (!player1 || player1.value.trim() === "") {
+        errors.playerName = true;
+        if (player1) player1.classList.add("settings__input--error");
+      }
+      if (!player2 || player2.value.trim() === "") {
+        errors.player2Name = true;
+        if (player2) player2.classList.add("settings__input--error");
+      }
+    } else {
+      if (!playerName || playerName.value.trim() === "") {
+        errors.playerName = true;
+        if (playerName) playerName.classList.add("settings__input--error");
+      }
+    }
+
+    return { ok: Object.keys(errors).length === 0, errors };
+  }
+
+  return {
+    cleanup: function () {
+      modeSelect.removeEventListener("change", handleModeChange);
+      difficultySelect.removeEventListener("change", handleDiffChange);
+      themeSelect.removeEventListener("change", handleThemeChange);
+      musicSwitch.removeEventListener("change", handleMusicChange);
+
+      if (playersContainer._listeners) {
+        for (const [el, ev, fn] of playersContainer._listeners) {
+          el.removeEventListener(ev, fn);
+        }
+        playersContainer._listeners = null;
+      }
+
+      if (activePlayersContainer === playersContainer) {
+        activePlayersContainer = null;
+      }
+
+      container.innerHTML = "";
+    },
+    validate,
   };
 }

@@ -56,6 +56,8 @@ export class HomeView {
   }
 
   handlePlay() {
+    const result = this.settingsCleanup?.validate?.() ?? { ok: true };
+    if (!result.ok) return;
     router.navigateTo("/game");
   }
 
@@ -71,7 +73,7 @@ export class HomeView {
     }
 
     if (this.settingsCleanup) {
-      this.settingsCleanup();
+      this.settingsCleanup.cleanup?.();
     }
 
     this.container.innerHTML = "";
