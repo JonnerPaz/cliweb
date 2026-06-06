@@ -13,24 +13,24 @@ export class User {
 
   addPoints(points) {
     if (this.#points < 0 || points < 0) return;
-    this.points += points;
+    this.#points += points;
   }
 
   addMovements(movements) {
     if (this.#movements < 0 || movements < 0) return;
-    this.movements += movements;
+    this.#movements += movements;
   }
 
   addAwards(awards) {
     if (this.#awards < 0 || awards < 0) return;
-    this.awards += awards;
+    this.#awards += awards;
   }
 
   get name() {
     return this.#name;
   }
 
-  set setName(name) {
+  set name(name) {
     this.#name = name;
   }
 
