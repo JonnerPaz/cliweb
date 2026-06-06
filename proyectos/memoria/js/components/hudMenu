@@ -1,0 +1,12 @@
+// En tu hudMenu.js
+import './atoms/timer.js';
+import './molecules/playerBadge.js';
+
+// ... al inicializar el HUD:
+const timerElement = document.createElement('game-timer');
+hudContainer.appendChild(timerElement);
+
+// Iniciar el cronómetro y vincularlo con el componente
+const interval = startTimer((seconds) => {
+    timerElement.updateTime(seconds);
+});
