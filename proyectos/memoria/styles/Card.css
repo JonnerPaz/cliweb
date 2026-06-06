@@ -1,238 +1,189 @@
 .card {
-  perspective: 150rem;
-  -moz-perspective: 150rem;
+  perspective: 100rem;
   position: relative;
-  /* Due to absolute position, this lost it's heigt so we're explicity defining it */
-  /* so our float layout remains unchanged */
-  height: 52rem;
-
-  &:hover .card__side--front {
-    transform: rotateY(-180deg);
-  }
-
-  &:hover .card__side--back {
-    transform: rotateY(0deg);
-  }
+  max-width: var(--card-max-width, 120px);
+  aspect-ratio: 3 / 4;
+  container-type: inline-size;
+  margin: 0 auto;
+  user-select: none; /* Impide que el usuario pueda seleccionar el texto */
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
+/* Esta propiedad se aplica en createCard.js */
+.card:not(.is-matched):hover {
+  transform: translateY(-4px) scale(1.03);
+}
+
+/* Esta propiedad se aplica en createCard.js */
+.card:not(.is-matched):active {
+  transform: translateY(-2px) scale(1);
+}
+
+/* Card sides */
 .card__side {
-  background-color: orange;
-  height: 52rem;
-  transition: all 1s ease;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  backface-visibility: hidden;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 1.2rem;
+  overflow: hidden;
+}
+
+/* Parte de atrás - Esto se muestra al principio del juego */
+.card__side--back {
+  background: radial-gradient(circle at center, #ff3333 0%, #bd0f0f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 5px solid #ffde00; /* Pokémon yellow border */
+  box-shadow:
+    inset 0 0 15px rgba(0, 0, 0, 0.5),
+    0 8px 16px rgba(0, 0, 0, 0.25);
+  transform: rotateY(0deg);
+}
+
+/* Figura de pokeball */
+.pokeball {
+  width: 45%;
+  aspect-ratio: 1;
+  background: #ffffff;
+  border-radius: 50%;
+  position: relative;
+  border: 4px solid #1a1a1a;
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 -3px 5px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Top half of the Pokeball (red) */
+.pokeball::before {
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  backface-visibility: hidden;
-  border-radius: var(--border-radius-default);
-  overflow: hidden; /* Images won't overflow */
-  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.15); /* used actual black rgb */
+  height: 50%;
+  background: #e3350d;
+  border-bottom: 4px solid #1a1a1a;
 }
 
+/* Pokeball center button */
+.pokeball__button {
+  width: 30%;
+  aspect-ratio: 1;
+  background: #ffffff;
+  border-radius: 50%;
+  border: 4px solid #1a1a1a;
+  z-index: 2;
+  box-shadow:
+    0 0 0 2px #ffffff,
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+/* Color shift highlight on hover of card */
+.card:not(.is-matched):hover .pokeball__button {
+  background: #ffde00;
+  border-color: #003a70;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Front Side - Shows Pokemon image and name */
 .card__side--front {
-  background-color: var(--color-white);
-}
-
-.card__side--back {
+  background: linear-gradient(135deg, #ffffff 0%, #f3f4f6 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8cqw;
+  border: 5px solid #003a70; /* Pokémon blue border */
+  box-shadow:
+    inset 0 0 10px rgba(0, 0, 0, 0.05),
+    0 8px 16px rgba(0, 0, 0, 0.25);
   transform: rotateY(180deg);
 }
 
-.card__side--back-1 {
-  background-image: linear-gradient(
-    to right bottom,
-    var(--color-secondary-light),
-    var(--color-secondary-dark)
-  );
+/* Image container and formatting */
+.card__image-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 2cqw;
+  margin-bottom: 4cqw;
 }
 
-.card__side--back-2 {
-  background-image: linear-gradient(
-    to right bottom,
-    var(--color-primary-light),
-    var(--color-primary-dark)
-  );
+.card__image {
+  max-width: 95%;
+  max-height: 95%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+  transition: transform 0.3s ease;
 }
 
-.card__side--back-3 {
-  background-image: linear-gradient(
-    to right bottom,
-    var(--color-tertiary-light),
-    var(--color-tertiary-dark)
-  );
+/* Smooth zoom on front image when flipped and hovered */
+.card.is-flipped:not(.is-matched):hover .card__image {
+  transform: scale(1.08);
 }
 
-/* Front side styling */
-.card__picture {
-  background-size: cover;
-  height: 23rem;
-  background-blend-mode: screen;
-  clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-}
-
-.card__picture--1 {
-  background-image: linear-gradient(
-      to right bottom,
-      var(--color-secondary-light),
-      var(--color-secondary-dark)
-    )
-    /* url(../img/nat-5.jpg); REPLACE WITH ACTUAL IMAGE URL */;
-}
-
-.card__picture--2 {
-  background-image: linear-gradient(
-      to right bottom,
-      var(--color-primary-light),
-      var(--color-primary-dark)
-    )
-    /* url(../img/nat-6.jpg); REPLACE WITH ACTUAL IMAGE URL */;
-}
-
-.card__picture--3 {
-  background-image: linear-gradient(
-      to right bottom,
-      var(--color-tertiary-light),
-      var(--color-tertiary-dark)
-    )
-    /* url(../img/nat-7.jpg); REPLACE WITH ACTUAL IMAGE URL */;
-}
-
-.card__heading {
-  font-size: 2.8rem;
-  font-weight: 300;
-  text-align: right;
-  text-transform: uppercase;
-  color: var(--color-white);
-  position: absolute;
-  top: 12rem;
-  right: 2rem;
-  width: 75%;
-}
-
-.card__heading-span {
-  padding: 1rem 1.5rem;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-}
-
-.card__heading-span--1 {
-  background-image: linear-gradient(
-    to right bottom,
-    rgba(var(--color-secondary-rgb), 0.85),
-    rgba(var(--color-secondary-rgb), 0.85)
-      /* Simplified dark alpha to same base */
-  );
-}
-
-.card__heading-span--2 {
-  background-image: linear-gradient(
-    to right bottom,
-    rgba(var(--color-primary-rgb), 0.85),
-    rgba(var(--color-primary-rgb), 0.85)
-  );
-}
-
-.card__heading-span--3 {
-  background-image: linear-gradient(
-    to right bottom,
-    rgba(var(--color-tertiary-rgb), 0.85),
-    rgba(var(--color-tertiary-rgb), 0.85)
-  );
-}
-
-.card__details {
-  padding: 3rem;
-
-  ul {
-    margin: 0 auto;
-    list-style: none;
-    width: 80%; /* In order to underlining doesn't go that far. */
-
-    li {
-      text-align: center;
-      font-size: 1.5rem;
-      padding: 1rem;
-
-      &:not(:last-child) {
-        border-bottom: 1px solid var(--color-grey-light-2);
-      }
-    }
-  }
-}
-
-/* Back card styling */
-.card__cta {
-  /* @include absoluteCenter */
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-
-  width: 90%;
+/* Name card formatting */
+.card__info {
+  width: 100%;
   text-align: center;
+  background: rgba(0, 58, 112, 0.05);
+  padding: 3cqw 2cqw;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 58, 112, 0.1);
 }
 
-.card__price-box {
-  color: var(--color-white);
-  text-align: center;
-  margin-bottom: 8rem;
-}
-
-.card__price-only {
-  font-size: 1.4rem;
+.card__name {
+  font-family: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 800;
+  font-size: 11cqw;
   text-transform: uppercase;
+  color: #003a70;
+  letter-spacing: 0.5px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.card__price-value {
-  font-size: 6rem;
-  font-weight: 100;
+/* Flip rotation states */
+.card.is-flipped .card__side--front,
+.card.is-matched .card__side--front {
+  transform: rotateY(0deg);
 }
 
-@media only screen and (max-width: 56.25em), only screen and (hover: none) {
-  /* Due to absolute position, this lost it's heigt so we're explicity defining it */
-  /* so our float layout remains unchanged */
-  .card {
-    height: auto;
-    border-radius: var(--border-radius-default);
-    background-color: var(--color-white);
-    box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.15);
+.card.is-flipped .card__side--back,
+.card.is-matched .card__side--back {
+  transform: rotateY(-180deg);
+}
 
-    &:hover .card__side--front {
-      transform: rotateY(0);
-    }
-  }
+/* Match state visual cue */
+.card.is-matched {
+  cursor: default;
+  transform: none !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
 
-  .card__side {
-    height: auto;
-    position: relative;
-    box-shadow: none;
-  }
+.card.is-matched .card__side--front {
+  border-color: #2ec4b6; /* Green highlight for matches */
+  background: linear-gradient(135deg, #f0fdfa 0%, #e6fffa 100%);
+}
 
-  .card__side--back {
-    transform: rotateY(0);
-    clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 100%);
-  }
-
-  .card__details {
-    padding: 1rem 3rem;
-  }
-
-  /* Back card styling */
-  .card__cta {
-    position: relative;
-    top: 0;
-    left: 0;
-    transform: translate(0);
-    width: 100%;
-    padding: 7rem 4rem 4rem 4rem;
-  }
-
-  .card__price-box {
-    margin-bottom: 3rem;
-  }
-
-  .card__price-value {
-    font-size: 6rem;
-  }
+.card.is-matched .card__name {
+  color: #0f766e;
 }

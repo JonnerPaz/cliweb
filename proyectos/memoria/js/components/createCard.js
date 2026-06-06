@@ -24,9 +24,6 @@ export function createCard(pokemon, index, onCardClick) {
       <div class="card__image-container">
         <img class="card__image" src="${imageUrl}" alt="${pokemon.name}" loading="lazy" />
       </div>
-      <div class="card__info">
-        <span class="card__name">${pokemon.name}</span>
-      </div>
     </div>
   `;
 

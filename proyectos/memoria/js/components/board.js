@@ -81,9 +81,9 @@ export async function renderBoard(
 
     // Crear grilla donde se van a colocar las tarjetas
     const gridContainer = document.createElement("div");
-    gridContainer.className = "gameboard";
+    // Las cols reflejan el tamaño de la grilla
     const cols = Math.sqrt(pairsCount * 2);
-    gridContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    gridContainer.className = `gameboard gameboard--${cols}`;
 
     // Crear tarjetas
     const cards = createCards(rawDeck);
