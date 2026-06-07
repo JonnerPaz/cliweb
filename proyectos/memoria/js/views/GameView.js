@@ -1,23 +1,29 @@
 import { renderBoard } from "../components/board.js";
 import gameState from "../state/GameState.js";
 import { User } from "../state/User.js";
+import { startTimer} from "../core/timer.js";
+import { createHudMenu } from "../components/hudMenu.js";
 
 export class GameView {
   constructor() {
     this.container = null;
     this.boardCleanup = null;
+    this.timerInterval = null;
+    this.hud = null; 
   }
 
   onWin(turn) {
-    // Usaremos un timeout simple para la victoria por ahora.
-    // Proximamente debería ser un navigate to Results
-    // router.navigateTo("/results");
+    if(this.timerInterval) clearInterval(this.timerInterval);
     setTimeout(() => alert(`¡Ganaste en ${turn} turnos!`));
   }
 
-  onTurnUpdate(turn) {
-    if (this.hudTurns) {
-      this.hudTurns.textContent = turn;
+  onTurnUpdate() {
+    if (this.hud) {
+      this.hud.updatePlayerStats();
+      // Si es PvP, actualiza quien tiene el turno visualmente
+      if (gameState.gameMode === "pvp") {
+        this.hud.updateTurn(gameState.currentPlayerIndex);
+      }
     }
   }
 
@@ -29,9 +35,7 @@ export class GameView {
     wrapper.innerHTML = `
       <header class="game-header">
         <button id="btn-back" class="pokemon-button" style="padding: 0.5rem 1rem;">⬅ Volver</button>
-        <nav class="hud-menu">
-          <div class="hud-item">Turnos: <span id="hud-turns">0</span></div>
-        </nav>
+        <div class="hud-wrapper"></div>
       </header>
       <main id="board-container" class="game-main"></main>
     `;
@@ -40,8 +44,7 @@ export class GameView {
 
     // Eventos
     this.btnBack = this.container.querySelector("#btn-back");
-    this.btnBack.addEventListener("click", this.handleBack);
-    this.hudTurns = this.container.querySelector("#hud-turns");
+    this.btnBack.addEventListener("click", () => this.handleBack());
 
     // Determinar dificultad
     let gridSize = 4;
@@ -61,7 +64,21 @@ export class GameView {
         : [p1];
     gameState.players = players;
 
-    // Montar el tablero
+    // Montar el HUD Menu
+    const hudWrapper = this.container.querySelector(".hud-wrapper");
+    
+    // Inyectamos el componente pasandole el arreglo de jugadores y el modo
+    this.hud = createHudMenu();
+    hudWrapper.appendChild(this.hud.element);
+
+    // Iniciar el Timer si aplica
+    if (gameState.gameMode === 'solo') {
+      this.timerInterval = startTimer((segundos) => {
+          this.hud.updateTimer(segundos);
+      });
+    }
+
+    // Montar el Tablero
     const boardContainer = this.container.querySelector("#board-container");
     const boardState = await renderBoard(
       boardContainer,
@@ -85,6 +102,10 @@ export class GameView {
 
     if (this.boardCleanup) {
       this.boardCleanup();
+    }
+    // Previene fugas de memoria si el usuario sale usando el boton volver
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
     }
 
     this.container.innerHTML = "";

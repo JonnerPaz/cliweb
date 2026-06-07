@@ -2,14 +2,9 @@ export function createPlayerBadge(user) {
     const badge = document.createElement('article');
     badge.className = 'player-badge';
 
-    const infoDiv = document.createElement('div');
-    infoDiv.className = 'info';
-
+    // Creacion de elementos
     const nameSpan = document.createElement('span');
     nameSpan.className = 'player-name';
-
-    const statsDiv = document.createElement('div');
-    statsDiv.className = 'stats';
 
     const pointsSpan = document.createElement('span');
     pointsSpan.className = 'points';
@@ -20,7 +15,13 @@ export function createPlayerBadge(user) {
     const awardsSpan = document.createElement('span');
     awardsSpan.className = 'awards';
 
+    // Construcción
+    const statsDiv = document.createElement('div');
+    statsDiv.className = 'stats';
     statsDiv.append(pointsSpan, movementsSpan, awardsSpan);
+    
+    const infoDiv = document.createElement('div');
+    infoDiv.className = 'info';
     infoDiv.append(nameSpan, statsDiv);
     badge.appendChild(infoDiv);
 
@@ -33,7 +34,8 @@ export function createPlayerBadge(user) {
 
     updateView();
 
-    badge.refresh = updateView;
-
-    return badge;
+    return { 
+        element: badge, 
+        refresh: updateView
+    };
 }

@@ -6,7 +6,16 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 300px;
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    transition: transform 0.2s ease;
+    opacity: 0.6;
+    transform: scale(0.95);
+    transition: all 0.3s ease;
+}
+
+.player-badge.is-active {
+    opacity: 1;
+    transform: scale(1);
+    border-color: #f1c40f; 
+    box-shadow: 0 4px 12px rgba(241, 196, 15, 0.4);
 }
 
 .player-badge:hover {
