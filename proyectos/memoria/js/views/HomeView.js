@@ -46,7 +46,7 @@ export class HomeView {
 
     // Inicia el juego
     this.btnPlay = this.container.querySelector("#btn-play");
-    this.btnPlay.addEventListener("click", this.handlePlay);
+    this.btnPlay.addEventListener("click", this.handlePlay.bind(this));
 
     const settingsContainer = this.container.querySelector(
       "#settings-container"

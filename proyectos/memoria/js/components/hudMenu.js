@@ -2,7 +2,7 @@ import gameState from '../state/GameState.js';
 import { createGameTimer } from './timer.js';
 import { createPlayerBadge } from './playerBadge.js';
 
-export function createHudMenu(players, gameMode) {
+export function createHudMenu() {
     const hudContainer = document.createElement('nav');
     hudContainer.id = 'game-hud';
     hudContainer.className = 'hud-menu';

@@ -13,9 +13,11 @@
 
 .player-badge.is-active {
     opacity: 1;
-    transform: scale(1);
-    border-color: #f1c40f; 
-    box-shadow: 0 4px 12px rgba(241, 196, 15, 0.4);
+    transform: scale(1.03);
+    border-width: 2px;
+    border-color: #f39c12;
+    background: linear-gradient(135deg, #fff8e1, #fff3c4);
+    box-shadow: 0 8px 20px rgba(243, 156, 18, 0.35);
 }
 
 .player-badge:hover {
