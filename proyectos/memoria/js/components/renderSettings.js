@@ -99,17 +99,20 @@ function renderPlayersSection() {
   const playerName = container.querySelector("#settings-player-name");
 
   if (player1) {
-    const fn = (e) => (gameState.playerName = e.target.value);
+    const fn = (e) =>
+      (gameState.playerNames = { ...gameState.playerNames, player1: e.target.value });
     player1.addEventListener("input", fn);
     listeners.push([player1, "input", fn]);
   }
   if (player2) {
-    const fn = (e) => (gameState.player2Name = e.target.value);
+    const fn = (e) =>
+      (gameState.playerNames = { ...gameState.playerNames, player2: e.target.value });
     player2.addEventListener("input", fn);
     listeners.push([player2, "input", fn]);
   }
   if (playerName) {
-    const fn = (e) => (gameState.playerName = e.target.value);
+    const fn = (e) =>
+      (gameState.playerNames = { player1: e.target.value });
     playerName.addEventListener("input", fn);
     listeners.push([playerName, "input", fn]);
   }

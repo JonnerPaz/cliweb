@@ -6,8 +6,7 @@ import { User } from "./User.js";
  * @property {string} gameMode - Modo del juego
  * @property {string} difficulty - Dificultad del juego
  * @property {string} theme - Temática del juego
- * @property {string} playerName - Nombre del jugador (modo Solitario/Libre o Jugador 1 en PvP)
- * @property {string} player2Name - Nombre del Jugador 2 (modo PvP)
+ * @property {{player1:string, player2:string}} playerNames - Nombres de los jugadores
  * @property {number} playerCount - Cantidad de jugadores (derivado de players.length)
  * @property {boolean} musicEnabled - Si la música de fondo está activada
  * @property {number} turns - Turnos del juego
@@ -18,8 +17,7 @@ class GameState {
   #gameMode = "solo"; // "solo" | "pvp" | "free"
   #difficulty = "facil"; // facil, medio, dificil
   #theme = "random"; // "random" | tipo pokemon
-  #playerName = "Entrenador sin nombre";
-  #player2Name = "";
+  #playerNames = { player1: "", player2: "" };
   #musicEnabled = false;
   #turns = 0;
   #rounds = 0;
@@ -69,22 +67,16 @@ class GameState {
     this.#turns = turns;
   }
 
-  get playerName() {
-    return this.#playerName;
+  get playerNames() {
+    return this.#playerNames;
   }
 
-  set playerName(playerName) {
-    if (typeof playerName !== "string") return;
-    this.#playerName = playerName.slice(0, 20);
-  }
-
-  get player2Name() {
-    return this.#player2Name;
-  }
-
-  set player2Name(player2Name) {
-    if (typeof player2Name !== "string") return;
-    this.#player2Name = player2Name.slice(0, 20);
+  set playerNames(names) {
+    if (!names || typeof names !== "object") return;
+    this.#playerNames = {
+      player1: typeof names.player1 === "string" ? names.player1.slice(0, 20) : "",
+      player2: typeof names.player2 === "string" ? names.player2.slice(0, 20) : "",
+    };
   }
 
   get playerCount() {
@@ -143,8 +135,7 @@ class GameState {
     this.#gameMode = "solo";
     this.#difficulty = "facil";
     this.#theme = "random";
-    this.#playerName = "Entrenador sin nombre";
-    this.#player2Name = "";
+    this.#playerNames = { player1: "", player2: "" };
     this.#musicEnabled = false;
     this.#turns = 0;
     this.#rounds = 0;

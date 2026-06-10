@@ -100,12 +100,13 @@ export class GameView {
     const pairsCount = (gridSize * gridSize) / 2;
 
     // Construir jugadores a partir de los nombres del settings
-    const p1 = new User(gameState.playerName.trim() || "Entrenador 1", 0, 0, 0);
+    const names = gameState.playerNames;
+    const p1 = new User(names.player1?.trim() || "Entrenador 1", 0, 0, 0);
     const players =
       gameState.gameMode === "pvp"
         ? [
             p1,
-            new User(gameState.player2Name.trim() || "Entrenador 2", 0, 0, 0),
+            new User(names.player2?.trim() || "Entrenador 2", 0, 0, 0),
           ]
         : [p1];
     gameState.players = players;
