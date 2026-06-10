@@ -13,9 +13,15 @@ export class GameView {
   }
 
   onWin(turn) {
-    if (this.timerController) this.timerController.stop();
-    if (this.hud) this.hud.updatePlayerStats();
-    setTimeout(() => alert(`¡Ganaste en ${turn} turnos!`), 100);
+    if (gameState.gameMode === 'free') {
+      gameState.rounds += 1;
+      if (this.hud) this.hud.updatePlayerStats();
+      setTimeout(() => this.reloadBoard(), 1500);
+    } else {
+      if (this.timerController) this.timerController.stop();
+      if (this.hud) this.hud.updatePlayerStats();
+      setTimeout(() => alert(`¡Ganaste en ${turn} turnos!`), 100);
+    }
   }
 
   onTurnUpdate(turns, activePlayerIndex) {
@@ -25,6 +31,38 @@ export class GameView {
         this.hud.updateTurn(activePlayerIndex);
       }
     }
+  }
+
+  async reloadBoard() {
+    if (this.boardCleanup) this.boardCleanup();
+    let gridSize = 4;
+    const diff = gameState.difficulty || "Facil";
+    if (diff === "Medio") gridSize = 6;
+    if (diff === "Dificil") gridSize = 8;
+    const pairsCount = (gridSize * gridSize) / 2;
+    const boardContainer = this.container.querySelector("#board-container");
+    const boardState = await renderBoard(
+      boardContainer,
+      pairsCount,
+      this.onWin.bind(this),
+      this.onTurnUpdate.bind(this)
+    );
+    this.boardCleanup = boardState.cleanup;
+  }
+
+  handleFinish() {
+    const totalTime = this.timerController ? this.timerController.seconds : 0;
+    if (this.timerController) this.timerController.stop();
+    const player = gameState.players[0];
+    gameState.results = {
+      playerName: player.name,
+      points: player.points,
+      movements: player.movements,
+      time: totalTime,
+      rounds: gameState.rounds,
+      gameMode: 'free',
+    };
+    import("../app.js").then(({ router }) => router.navigateTo("/results"));
   }
 
   async mount(container) {
@@ -65,12 +103,10 @@ export class GameView {
     // Montar el HUD Menu
     const hudWrapper = this.container.querySelector(".hud-wrapper");
     
-    // Inyectamos el componente pasandole el arreglo de jugadores y el modo
-    this.hud = createHudMenu();
+    this.hud = createHudMenu({ onFinish: () => this.handleFinish() });
     hudWrapper.appendChild(this.hud.element);
 
-    // Iniciar el Timer si aplica
-    if (gameState.gameMode === 'solo') {
+    if (gameState.gameMode === 'solo' || gameState.gameMode === 'free') {
       this.timerController = startTimer((segundos) => {
           this.hud.updateTimer(segundos);
       });
