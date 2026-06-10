@@ -3,6 +3,7 @@ import { GameView } from "./views/GameView.js";
 import { ResultsView } from "./views/ResultsView.js";
 import { Router } from "./core/Router.js";
 import { audioController } from "./core/audioController.js";
+import { createMusicToggle } from "./components/musicToggle.js";
 
 const appContainer = document.getElementById("app");
 
@@ -17,3 +18,6 @@ export const router = new Router(appContainer, routes);
 
 // Inicializamos el controlador de audio global
 audioController.init();
+
+// Botón flotante de música visible en toda la aplicación
+document.body.appendChild(createMusicToggle().element);
