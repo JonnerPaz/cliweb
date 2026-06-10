@@ -19,6 +19,7 @@ class GameState {
   #theme = "random"; // "random" | tipo pokemon
   #playerNames = { player1: "", player2: "" };
   #musicEnabled = false;
+  #musicTrack = "pokemon-center-bgmusic";
   #turns = 0;
   #rounds = 0;
   #results = null;
@@ -91,6 +92,15 @@ class GameState {
     this.#musicEnabled = Boolean(musicEnabled);
   }
 
+  get musicTrack() {
+    return this.#musicTrack;
+  }
+
+  set musicTrack(track) {
+    if (typeof track !== "string") return;
+    this.#musicTrack = track;
+  }
+
   get rounds() {
     return this.#rounds;
   }
@@ -137,6 +147,7 @@ class GameState {
     this.#theme = "random";
     this.#playerNames = { player1: "", player2: "" };
     this.#musicEnabled = false;
+    this.#musicTrack = "pokemon-center-bgmusic";
     this.#turns = 0;
     this.#rounds = 0;
     this.#results = null;

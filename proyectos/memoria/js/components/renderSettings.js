@@ -135,6 +135,14 @@ const handleMusicChange = (e) => {
   );
 };
 
+const handleMusicTrackChange = (e) => {
+  const track = e.target.value;
+  gameState.musicTrack = track;
+  window.dispatchEvent(
+    new CustomEvent("music-track-changed", { detail: { track } })
+  );
+};
+
 const themeOptions = POKEMON_TYPES.map(
   (t) =>
     `<option value="${escapeAttr(t.value)}"${
@@ -146,6 +154,21 @@ export function renderSettings(container) {
   const gameMode = gameState.gameMode ?? "solo";
   const difficulty = gameState.difficulty ?? "Facil";
   const musicEnabled = Boolean(gameState.musicEnabled);
+  const musicTrack = gameState.musicTrack;
+
+  const MUSIC_TRACKS = [
+    { value: "pokemon-center-bgmusic", label: "Centro Pokémon" },
+    { value: "aspertia-city", label: "Ciudad Aspertia" },
+    { value: "driftveil-city", label: "Ciudad Espiral" },
+    { value: "summer-in-kagome", label: "Verano en Kagome" },
+  ];
+
+  const musicTrackOptions = MUSIC_TRACKS.map(
+    (t) =>
+      `<option value="${escapeAttr(t.value)}"${
+        t.value === musicTrack ? " selected" : ""
+      }>${t.label}</option>`
+  ).join("");
 
   container.innerHTML = `
     <section class="settings" aria-label="Configuración de la partida">
@@ -206,6 +229,16 @@ export function renderSettings(container) {
             <span class="settings__switch-slider" aria-hidden="true"></span>
           </label>
         </div>
+
+        <div class="settings__item">
+          <label class="settings__item--label" for="settings-music-track">
+            <span class="settings__item-icon" aria-hidden="true">🎶</span>
+            Pista musical
+          </label>
+          <select id="settings-music-track" class="settings__select">
+            ${musicTrackOptions}
+          </select>
+        </div>
       </div>
     </section>
   `;
@@ -214,6 +247,7 @@ export function renderSettings(container) {
   const difficultySelect = container.querySelector("#settings-difficulty");
   const themeSelect = container.querySelector("#settings-theme");
   const musicSwitch = container.querySelector("#settings-music");
+  const musicTrackSelect = container.querySelector("#settings-music-track");
   const playersContainer = container.querySelector("#settings-players");
 
   activePlayersContainer = playersContainer;
@@ -223,6 +257,7 @@ export function renderSettings(container) {
   difficultySelect.addEventListener("change", handleDiffChange);
   themeSelect.addEventListener("change", handleThemeChange);
   musicSwitch.addEventListener("change", handleMusicChange);
+  musicTrackSelect.addEventListener("change", handleMusicTrackChange);
 
   function validate() {
     const mode = gameState.gameMode;
@@ -260,6 +295,7 @@ export function renderSettings(container) {
       difficultySelect.removeEventListener("change", handleDiffChange);
       themeSelect.removeEventListener("change", handleThemeChange);
       musicSwitch.removeEventListener("change", handleMusicChange);
+      musicTrackSelect.removeEventListener("change", handleMusicTrackChange);
 
       if (playersContainer._listeners) {
         for (const [el, ev, fn] of playersContainer._listeners) {
