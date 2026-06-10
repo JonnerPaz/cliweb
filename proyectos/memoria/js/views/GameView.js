@@ -1,30 +1,99 @@
 import { renderBoard } from "../components/board.js";
 import gameState from "../state/GameState.js";
 import { User } from "../state/User.js";
-import { startTimer} from "../core/timer.js";
+import { startTimer } from "../core/timer.js";
 import { createHudMenu } from "../components/hudMenu.js";
+import { router } from "../app.js";
 
 export class GameView {
   constructor() {
     this.container = null;
     this.boardCleanup = null;
-    this.timerInterval = null;
-    this.hud = null; 
+    this.timerController = null;
+    this.hud = null;
+    this.pairsCount = 0;
   }
 
-  onWin(turn) {
-    if(this.timerInterval) clearInterval(this.timerInterval);
-    setTimeout(() => alert(`¡Ganaste en ${turn} turnos!`));
-  }
+  onWin() {
+    const players = gameState.players;
+    const results = {
+      gameMode: gameState.gameMode,
+      players: players.map((p) => ({
+        playerName: p.name,
+        points: p.points,
+        movements: p.movements,
+      })),
+      time: this.timerController ? this.timerController.seconds : 0,
+      totalPairs: this.pairsCount,
+      totalMovements: gameState.turns,
+    };
 
-  onTurnUpdate() {
-    if (this.hud) {
-      this.hud.updatePlayerStats();
-      // Si es PvP, actualiza quien tiene el turno visualmente
-      if (gameState.gameMode === "pvp") {
-        this.hud.updateTurn(gameState.currentPlayerIndex);
+    if (gameState.gameMode === "pvp" && players.length === 2) {
+      if (players[0].points > players[1].points) {
+        results.winner = players[0].name;
+      } else if (players[1].points > players[0].points) {
+        results.winner = players[1].name;
+      } else {
+        results.winner = null;
       }
     }
+
+    gameState.results = results;
+
+    if (gameState.gameMode === "free") {
+      gameState.rounds += 1;
+      if (this.hud) this.hud.updatePlayerStats();
+      setTimeout(() => this.reloadBoard(), 1500);
+    } else {
+      if (this.timerController) this.timerController.stop();
+      if (this.hud) this.hud.updatePlayerStats();
+      router.navigateTo("/results");
+    }
+  }
+
+  onTurnUpdate(turns, activePlayerIndex) {
+    if (this.hud) {
+      this.hud.updatePlayerStats();
+      if (gameState.gameMode === "pvp" && activePlayerIndex !== undefined) {
+        this.hud.updateTurn(activePlayerIndex);
+      }
+    }
+  }
+
+  async reloadBoard() {
+    if (this.boardCleanup) this.boardCleanup();
+    let gridSize = 4;
+    const diff = gameState.difficulty || "Facil";
+    if (diff === "Medio") gridSize = 6;
+    if (diff === "Dificil") gridSize = 8;
+    this.pairsCount = (gridSize * gridSize) / 2;
+    const boardContainer = this.container.querySelector("#board-container");
+    const boardState = await renderBoard(
+      boardContainer,
+      this.pairsCount,
+      this.onWin.bind(this),
+      this.onTurnUpdate.bind(this)
+    );
+    this.boardCleanup = boardState.cleanup;
+  }
+
+  handleFinish() {
+    if (this.timerController) this.timerController.stop();
+    const player = gameState.players[0];
+    gameState.results = {
+      gameMode: "free",
+      players: [
+        {
+          playerName: player.name,
+          points: player.points,
+          movements: player.movements,
+        },
+      ],
+      time: 0,
+      totalPairs: this.pairsCount,
+      totalMovements: gameState.turns,
+    };
+    router.navigateTo("/results");
   }
 
   async mount(container) {
@@ -33,10 +102,8 @@ export class GameView {
     // Configurar HUD y Layout de Juego
     const wrapper = document.createElement("div");
     wrapper.innerHTML = `
-      <header class="game-header">
-        <button id="btn-back" class="pokemon-button" style="padding: 0.5rem 1rem;">⬅ Volver</button>
-        <div class="hud-wrapper"></div>
-      </header>
+      <button id="btn-back" class="pokemon-button">⬅ Volver</button>
+      <div class="hud-wrapper"></div>
       <main id="board-container" class="game-main"></main>
     `;
 
@@ -51,30 +118,29 @@ export class GameView {
     const diff = gameState.difficulty || "Facil";
     if (diff === "Medio") gridSize = 6;
     if (diff === "Dificil") gridSize = 8;
-    const pairsCount = (gridSize * gridSize) / 2;
+    this.pairsCount = (gridSize * gridSize) / 2;
 
     // Construir jugadores a partir de los nombres del settings
-    const p1 = new User(gameState.playerName.trim() || "Entrenador 1", 0, 0, 0);
+    const names = gameState.playerNames;
+    const p1 = new User(names.player1?.trim() || "Entrenador 1", 0, 0, 0);
     const players =
       gameState.gameMode === "pvp"
         ? [
             p1,
-            new User(gameState.player2Name.trim() || "Entrenador 2", 0, 0, 0),
+            new User(names.player2?.trim() || "Entrenador 2", 0, 0, 0),
           ]
         : [p1];
     gameState.players = players;
 
     // Montar el HUD Menu
     const hudWrapper = this.container.querySelector(".hud-wrapper");
-    
-    // Inyectamos el componente pasandole el arreglo de jugadores y el modo
-    this.hud = createHudMenu();
+
+    this.hud = createHudMenu({ onFinish: () => this.handleFinish() });
     hudWrapper.appendChild(this.hud.element);
 
-    // Iniciar el Timer si aplica
-    if (gameState.gameMode === 'solo') {
-      this.timerInterval = startTimer((segundos) => {
-          this.hud.updateTimer(segundos);
+    if (gameState.gameMode === "solo" || gameState.gameMode === "free") {
+      this.timerController = startTimer((segundos) => {
+        this.hud.updateTimer(segundos);
       });
     }
 
@@ -82,7 +148,7 @@ export class GameView {
     const boardContainer = this.container.querySelector("#board-container");
     const boardState = await renderBoard(
       boardContainer,
-      pairsCount,
+      this.pairsCount,
       this.onWin.bind(this),
       this.onTurnUpdate.bind(this)
     );
@@ -104,8 +170,8 @@ export class GameView {
       this.boardCleanup();
     }
     // Previene fugas de memoria si el usuario sale usando el boton volver
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
+    if (this.timerController) {
+      this.timerController.stop();
     }
 
     this.container.innerHTML = "";

@@ -10,11 +10,15 @@
     box-sizing: border-box;
     padding: 20px 40px;
     
-    /* Flexbox para alinear el badge y el timer a los extremos */
+    /* Flexbox para centrar el badge y el timer */
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: flex-start;
+    gap: 20px;
     
+    /* Permite que los clics pasen a través hacia las cartas */
+    pointer-events: none;
+
     /* Asegura que el HUD esté siempre arriba de los elementos del juego */
     z-index: 1000;
 }

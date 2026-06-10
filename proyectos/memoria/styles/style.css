@@ -45,7 +45,7 @@ html {
 
 body {
   display: flex;
-  background-image: url("../assets/pokmon-bg-main.png");
+  background-image: url("../assets/images/pokmon-bg-main.png");
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
@@ -97,4 +97,29 @@ body {
 
 .hidden {
   display: none;
+}
+
+.music-toggle {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  width: 5rem;
+  height: 5rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-secondary);
+  color: var(--color-primary);
+  font-size: 2.4rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.music-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }

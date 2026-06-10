@@ -39,13 +39,14 @@ class GameEngine {
   checkMatch() {
     this.isLocked = true;
     gameState.turns += 1;
-    if (this.onTurnUpdate) this.onTurnUpdate(gameState.turns, this.activePlayerIndex);
 
     const [card1, card2] = this.flippedCards;
     const isMatch = card1.pokemon.id === card2.pokemon.id;
 
     const players = gameState.players;
     const active = players[this.activePlayerIndex];
+
+    if (active) active.addMovements(1);
 
     if (isMatch) {
       this.matches += 1;
@@ -55,6 +56,9 @@ class GameEngine {
       if (active) active.addPoints(GameEngine.pointsPerMatch);
 
       this.resetBoardState();
+
+      if (this.onTurnUpdate)
+        this.onTurnUpdate(gameState.turns, this.activePlayerIndex);
 
       if (this.matches === this.pairsCount) {
         setTimeout(() => {
@@ -71,6 +75,9 @@ class GameEngine {
           this.activePlayerIndex =
             (this.activePlayerIndex + 1) % players.length;
         }
+
+        if (this.onTurnUpdate)
+          this.onTurnUpdate(gameState.turns, this.activePlayerIndex);
       }, 1000);
     }
   }

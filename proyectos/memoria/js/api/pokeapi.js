@@ -90,4 +90,36 @@ export class PokeApi {
     const id = await this._generateRandomNumber(1, max);
     return this.getPokemonById(id);
   }
+
+  /**
+   * @description Devuelve la lista de pokemons de un determinado tipo
+   * @param {string} type
+   * @returns {Promise<Result<PokemonEntity[], Error>>}
+   */
+  async getPokemonsByType(type) {
+    try {
+      const response = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
+      if (!response.ok) {
+        return Result.err(new Error(`Error HTTP: ${response.status}`));
+      }
+
+      const data = await response.json();
+      const ids = await data.pokemon
+        .map((entry) => {
+          const parts = entry.pokemon.url.split("/").filter(Boolean);
+          return parseInt(parts[parts.length - 1], 10);
+        })
+        .filter((id) => !isNaN(id) && id <= PokeApi.MAX_POKEMON_NUM);
+
+      const promises = ids.map((id) => this.getPokemonById(id));
+      const results = await Promise.all(promises);
+      const pokemons = results
+        .filter((res) => res.isSuccess)
+        .map((res) => res.value);
+
+      return Result.ok(pokemons);
+    } catch (error) {
+      return Result.err(error);
+    }
+  }
 }

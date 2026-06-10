@@ -1,3 +1,7 @@
+#board-container {
+    padding-top: 180px;
+}
+
 .gameboard {
   display: grid;
   max-width: 1200px;
@@ -35,7 +39,7 @@
 
 /* Responsive queries to shrink card dimensions and gaps on smaller viewports */
 @media (max-width: 600px) {
-  .gameboard {
+.gameboard {
     padding: 1rem;
   }
   .gameboard--4 {
