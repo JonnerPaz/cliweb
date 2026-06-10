@@ -11,18 +11,34 @@ export class GameView {
     this.boardCleanup = null;
     this.timerController = null;
     this.hud = null;
+    this.pairsCount = 0;
   }
 
-  onWin(turn) {
-    const player = gameState.players[0];
-    gameState.results = {
-      playerName: player.name,
-      points: player.points,
-      movements: player.movements,
-      time: this.timerController ? this.timerController.seconds : 0,
-      rounds: gameState.rounds,
+  onWin() {
+    const players = gameState.players;
+    const results = {
       gameMode: gameState.gameMode,
+      players: players.map((p) => ({
+        playerName: p.name,
+        points: p.points,
+        movements: p.movements,
+      })),
+      time: this.timerController ? this.timerController.seconds : 0,
+      totalPairs: this.pairsCount,
+      totalMovements: gameState.turns,
     };
+
+    if (gameState.gameMode === "pvp" && players.length === 2) {
+      if (players[0].points > players[1].points) {
+        results.winner = players[0].name;
+      } else if (players[1].points > players[0].points) {
+        results.winner = players[1].name;
+      } else {
+        results.winner = null;
+      }
+    }
+
+    gameState.results = results;
 
     if (gameState.gameMode === "free") {
       gameState.rounds += 1;
@@ -50,11 +66,11 @@ export class GameView {
     const diff = gameState.difficulty || "Facil";
     if (diff === "Medio") gridSize = 6;
     if (diff === "Dificil") gridSize = 8;
-    const pairsCount = (gridSize * gridSize) / 2;
+    this.pairsCount = (gridSize * gridSize) / 2;
     const boardContainer = this.container.querySelector("#board-container");
     const boardState = await renderBoard(
       boardContainer,
-      pairsCount,
+      this.pairsCount,
       this.onWin.bind(this),
       this.onTurnUpdate.bind(this)
     );
@@ -65,12 +81,17 @@ export class GameView {
     if (this.timerController) this.timerController.stop();
     const player = gameState.players[0];
     gameState.results = {
-      playerName: player.name,
-      points: player.points,
-      movements: player.movements,
-      time: this.timerController ? this.timerController.seconds : 0,
-      rounds: gameState.rounds,
       gameMode: "free",
+      players: [
+        {
+          playerName: player.name,
+          points: player.points,
+          movements: player.movements,
+        },
+      ],
+      time: 0,
+      totalPairs: this.pairsCount,
+      totalMovements: gameState.turns,
     };
     router.navigateTo("/results");
   }
@@ -97,7 +118,7 @@ export class GameView {
     const diff = gameState.difficulty || "Facil";
     if (diff === "Medio") gridSize = 6;
     if (diff === "Dificil") gridSize = 8;
-    const pairsCount = (gridSize * gridSize) / 2;
+    this.pairsCount = (gridSize * gridSize) / 2;
 
     // Construir jugadores a partir de los nombres del settings
     const names = gameState.playerNames;
@@ -127,7 +148,7 @@ export class GameView {
     const boardContainer = this.container.querySelector("#board-container");
     const boardState = await renderBoard(
       boardContainer,
-      pairsCount,
+      this.pairsCount,
       this.onWin.bind(this),
       this.onTurnUpdate.bind(this)
     );
