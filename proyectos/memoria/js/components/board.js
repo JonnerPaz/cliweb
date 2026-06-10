@@ -1,6 +1,7 @@
 import { PokeApi } from "../api/pokeapi.js";
 import { createCard } from "./createCard.js";
 import gameEngine from "../core/gameEngine.js";
+import gameState from "../state/GameState.js";
 
 const api = new PokeApi();
 
@@ -26,6 +27,27 @@ function shuffle(array) {
  * @param {number} pairsCount - Cantidad de pares de Pokemons
  */
 async function fetchPokemons(pairsCount) {
+  const theme = gameState.theme;
+
+  if (theme !== "random") {
+    const pokemonsByType = await api.getPokemonsByType(theme);
+
+    if (pokemonsByType.isError) {
+      throw new Error(`Error al obtener Pokemons: ${pokemonsByType.error}`);
+    }
+
+    if (!pokemonsByType.value) {
+      throw new Error("No se encontraron Pokemons");
+    }
+
+    // Mezclar Pokemons acá es necesario para evitar que siempre se repitan al
+    // seleccionar la misma temática, a pesar que luego se volverán a mezclar
+    const shuffledPokemons = shuffle(pokemonsByType.value);
+
+    // Devolvemos la cantidad de pares de Pokemons, no todos los que traiga la API
+    return shuffledPokemons.slice(0, pairsCount);
+  }
+
   // Obtener Pokemons
   const promises = [];
   for (let i = 0; i < pairsCount; i++) {
@@ -33,7 +55,12 @@ async function fetchPokemons(pairsCount) {
   }
 
   const results = await Promise.all(promises);
-  return results.filter((res) => res.isSuccess).map((res) => res.value);
+
+  if (results.some((res) => res.isError)) {
+    throw new Error("Error al obtener Pokemons");
+  }
+
+  return results.map((res) => res.value);
 }
 
 /**
