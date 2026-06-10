@@ -25,17 +25,17 @@ export function createPlayerBadge(user) {
   infoDiv.append(nameSpan, statsDiv);
   badge.appendChild(infoDiv);
 
-  const updateView = () => {
+  const updatePlayerStats = (points, movements) => {
     nameSpan.textContent = user.name;
-    pointsSpan.textContent = `Puntos: ${user.points}`;
-    movementsSpan.textContent = `Movimientos: ${user.movements}`;
+    pointsSpan.textContent = `Puntos: ${points}`;
+    movementsSpan.textContent = `Movimientos: ${movements}`;
     awardsSpan.textContent = `Logros: ${user.awards}`;
   };
 
-  updateView();
+  updatePlayerStats(user.points, user.movements);
 
   return {
     element: badge,
-    refresh: updateView,
+    updatePlayerStats,
   };
 }

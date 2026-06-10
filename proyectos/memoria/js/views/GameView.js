@@ -14,7 +14,8 @@ export class GameView {
 
   onWin(turn) {
     if(this.timerInterval) clearInterval(this.timerInterval);
-    setTimeout(() => alert(`¡Ganaste en ${turn} turnos!`));
+    if (this.hud) this.hud.updatePlayerStats();
+    setTimeout(() => alert(`¡Ganaste en ${turn} turnos!`), 100);
   }
 
   onTurnUpdate(turns, activePlayerIndex) {
