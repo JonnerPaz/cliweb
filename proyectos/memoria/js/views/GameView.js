@@ -17,12 +17,11 @@ export class GameView {
     setTimeout(() => alert(`¡Ganaste en ${turn} turnos!`));
   }
 
-  onTurnUpdate() {
+  onTurnUpdate(turns, activePlayerIndex) {
     if (this.hud) {
       this.hud.updatePlayerStats();
-      // Si es PvP, actualiza quien tiene el turno visualmente
-      if (gameState.gameMode === "pvp") {
-        this.hud.updateTurn(gameState.currentPlayerIndex);
+      if (gameState.gameMode === "pvp" && activePlayerIndex !== undefined) {
+        this.hud.updateTurn(activePlayerIndex);
       }
     }
   }

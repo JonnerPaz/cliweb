@@ -39,7 +39,8 @@ class GameEngine {
   checkMatch() {
     this.isLocked = true;
     gameState.turns += 1;
-    if (this.onTurnUpdate) this.onTurnUpdate(gameState.turns, this.activePlayerIndex);
+    if (this.onTurnUpdate)
+      this.onTurnUpdate(gameState.turns, this.activePlayerIndex);
 
     const [card1, card2] = this.flippedCards;
     const isMatch = card1.pokemon.id === card2.pokemon.id;
@@ -71,6 +72,9 @@ class GameEngine {
           this.activePlayerIndex =
             (this.activePlayerIndex + 1) % players.length;
         }
+
+        if (this.onTurnUpdate)
+          this.onTurnUpdate(gameState.turns, this.activePlayerIndex);
       }, 1000);
     }
   }
