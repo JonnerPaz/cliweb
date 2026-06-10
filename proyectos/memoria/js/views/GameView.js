@@ -33,10 +33,8 @@ export class GameView {
     // Configurar HUD y Layout de Juego
     const wrapper = document.createElement("div");
     wrapper.innerHTML = `
-      <header class="game-header">
-        <button id="btn-back" class="pokemon-button" style="padding: 0.5rem 1rem;">⬅ Volver</button>
-        <div class="hud-wrapper"></div>
-      </header>
+      <button id="btn-back" class="pokemon-button">⬅ Volver</button>
+      <div class="hud-wrapper"></div>
       <main id="board-container" class="game-main"></main>
     `;
 
