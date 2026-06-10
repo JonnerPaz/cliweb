@@ -1,0 +1,42 @@
+.results-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  gap: 2rem;
+}
+
+.results-container h1 {
+  font-size: 2.5rem;
+  color: var(--color-primary, #ffcb05);
+  text-shadow: 2px 2px 0 var(--color-dark, #2a75bb);
+}
+
+.results-card {
+  background: var(--color-surface, #fff);
+  border-radius: 1rem;
+  padding: 2rem 3rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 280px;
+}
+
+.results-card p {
+  font-size: 1.2rem;
+  margin: 0;
+  color: var(--color-text, #333);
+}
+
+.results-card strong {
+  color: var(--color-dark, #2a75bb);
+}
+
+.results-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
