@@ -1,7 +1,11 @@
 export const startTimer = (onTick) => {
     let seconds = 0;
-    return setInterval(() => {
+    const intervalId = setInterval(() => {
         seconds++;
-        onTick(seconds);
+        if (onTick) onTick(seconds);
     }, 1000);
+    return {
+        stop: () => clearInterval(intervalId),
+        get seconds() { return seconds; },
+    };
 };

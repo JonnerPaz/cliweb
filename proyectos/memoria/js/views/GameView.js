@@ -8,12 +8,12 @@ export class GameView {
   constructor() {
     this.container = null;
     this.boardCleanup = null;
-    this.timerInterval = null;
+    this.timerController = null;
     this.hud = null; 
   }
 
   onWin(turn) {
-    if(this.timerInterval) clearInterval(this.timerInterval);
+    if (this.timerController) this.timerController.stop();
     if (this.hud) this.hud.updatePlayerStats();
     setTimeout(() => alert(`¡Ganaste en ${turn} turnos!`), 100);
   }
@@ -71,7 +71,7 @@ export class GameView {
 
     // Iniciar el Timer si aplica
     if (gameState.gameMode === 'solo') {
-      this.timerInterval = startTimer((segundos) => {
+      this.timerController = startTimer((segundos) => {
           this.hud.updateTimer(segundos);
       });
     }
@@ -102,8 +102,8 @@ export class GameView {
       this.boardCleanup();
     }
     // Previene fugas de memoria si el usuario sale usando el boton volver
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
+    if (this.timerController) {
+      this.timerController.stop();
     }
 
     this.container.innerHTML = "";
