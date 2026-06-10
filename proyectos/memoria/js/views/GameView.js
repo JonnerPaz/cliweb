@@ -1,26 +1,37 @@
 import { renderBoard } from "../components/board.js";
 import gameState from "../state/GameState.js";
 import { User } from "../state/User.js";
-import { startTimer} from "../core/timer.js";
+import { startTimer } from "../core/timer.js";
 import { createHudMenu } from "../components/hudMenu.js";
+import { router } from "../app.js";
 
 export class GameView {
   constructor() {
     this.container = null;
     this.boardCleanup = null;
     this.timerController = null;
-    this.hud = null; 
+    this.hud = null;
   }
 
   onWin(turn) {
-    if (gameState.gameMode === 'free') {
+    const player = gameState.players[0];
+    gameState.results = {
+      playerName: player.name,
+      points: player.points,
+      movements: player.movements,
+      time: this.timerController ? this.timerController.seconds : 0,
+      rounds: gameState.rounds,
+      gameMode: gameState.gameMode,
+    };
+
+    if (gameState.gameMode === "free") {
       gameState.rounds += 1;
       if (this.hud) this.hud.updatePlayerStats();
       setTimeout(() => this.reloadBoard(), 1500);
     } else {
       if (this.timerController) this.timerController.stop();
       if (this.hud) this.hud.updatePlayerStats();
-      setTimeout(() => alert(`¡Ganaste en ${turn} turnos!`), 100);
+      router.navigateTo("/results");
     }
   }
 
@@ -51,18 +62,17 @@ export class GameView {
   }
 
   handleFinish() {
-    const totalTime = this.timerController ? this.timerController.seconds : 0;
     if (this.timerController) this.timerController.stop();
     const player = gameState.players[0];
     gameState.results = {
       playerName: player.name,
       points: player.points,
       movements: player.movements,
-      time: totalTime,
+      time: this.timerController ? this.timerController.seconds : 0,
       rounds: gameState.rounds,
-      gameMode: 'free',
+      gameMode: "free",
     };
-    import("../app.js").then(({ router }) => router.navigateTo("/results"));
+    router.navigateTo("/results");
   }
 
   async mount(container) {
@@ -102,13 +112,13 @@ export class GameView {
 
     // Montar el HUD Menu
     const hudWrapper = this.container.querySelector(".hud-wrapper");
-    
+
     this.hud = createHudMenu({ onFinish: () => this.handleFinish() });
     hudWrapper.appendChild(this.hud.element);
 
-    if (gameState.gameMode === 'solo' || gameState.gameMode === 'free') {
+    if (gameState.gameMode === "solo" || gameState.gameMode === "free") {
       this.timerController = startTimer((segundos) => {
-          this.hud.updateTimer(segundos);
+        this.hud.updateTimer(segundos);
       });
     }
 

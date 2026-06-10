@@ -1,14 +1,15 @@
 import { HomeView } from "./views/HomeView.js";
 import { GameView } from "./views/GameView.js";
+import { ResultsView } from "./views/ResultsView.js";
 import { Router } from "./core/Router.js";
 import { audioController } from "./core/audioController.js";
 
 const appContainer = document.getElementById("app");
 
-// Definición de las rutas de la aplicación
 const routes = {
   "/": () => new HomeView(),
   "/game": () => new GameView(),
+  "/results": () => new ResultsView(),
 };
 
 // Inicializamos el enrutador y lo exportamos por si otras páginas necesitan navegar
