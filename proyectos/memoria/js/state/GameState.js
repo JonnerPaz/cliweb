@@ -22,6 +22,8 @@ class GameState {
   #player2Name = "";
   #musicEnabled = false;
   #turns = 0;
+  #rounds = 0;
+  #results = null;
   #players = [];
 
   static instance = null;
@@ -97,6 +99,22 @@ class GameState {
     this.#musicEnabled = Boolean(musicEnabled);
   }
 
+  get rounds() {
+    return this.#rounds;
+  }
+
+  set rounds(rounds) {
+    this.#rounds = rounds;
+  }
+
+  get results() {
+    return this.#results;
+  }
+
+  set results(results) {
+    this.#results = results;
+  }
+
   get players() {
     return this.#players;
   }
@@ -129,6 +147,8 @@ class GameState {
     this.#player2Name = "";
     this.#musicEnabled = false;
     this.#turns = 0;
+    this.#rounds = 0;
+    this.#results = null;
     this.#players = [];
   }
 }
