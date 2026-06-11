@@ -1,4 +1,5 @@
 import gameState from "../state/GameState.js";
+import { musicService } from "../core/musicService.js";
 
 const POKEMON_TYPES = [
   { value: "random", label: "Aleatoria" },
@@ -128,19 +129,11 @@ const handleModeChange = (e) => {
 const handleDiffChange = (e) => (gameState.difficulty = e.target.value);
 const handleThemeChange = (e) => (gameState.theme = e.target.value);
 const handleMusicChange = (e) => {
-  const enabled = e.target.checked;
-  gameState.musicEnabled = enabled;
-  window.dispatchEvent(
-    new CustomEvent("music-setting-changed", { detail: { enabled } })
-  );
+  musicService.setEnabled(e.target.checked);
 };
 
 const handleMusicTrackChange = (e) => {
-  const track = e.target.value;
-  gameState.musicTrack = track;
-  window.dispatchEvent(
-    new CustomEvent("music-track-changed", { detail: { track } })
-  );
+  musicService.setTrack(e.target.value);
 };
 
 const themeOptions = POKEMON_TYPES.map(
@@ -153,8 +146,8 @@ const themeOptions = POKEMON_TYPES.map(
 export function renderSettings(container) {
   const gameMode = gameState.gameMode ?? "solo";
   const difficulty = gameState.difficulty ?? "Facil";
-  const musicEnabled = Boolean(gameState.musicEnabled);
-  const musicTrack = gameState.musicTrack;
+  const musicEnabled = musicService.enabled;
+  const musicTrack = musicService.track;
 
   const MUSIC_TRACKS = [
     { value: "pokemon-center-bgmusic", label: "Centro Pokémon" },
@@ -259,6 +252,11 @@ export function renderSettings(container) {
   musicSwitch.addEventListener("change", handleMusicChange);
   musicTrackSelect.addEventListener("change", handleMusicTrackChange);
 
+  const unsubMusicSync = musicService.onChange(() => {
+    musicSwitch.checked = musicService.enabled;
+    musicTrackSelect.value = musicService.track;
+  });
+
   function validate() {
     const mode = gameState.gameMode;
     const errors = {};
@@ -296,6 +294,7 @@ export function renderSettings(container) {
       themeSelect.removeEventListener("change", handleThemeChange);
       musicSwitch.removeEventListener("change", handleMusicChange);
       musicTrackSelect.removeEventListener("change", handleMusicTrackChange);
+      unsubMusicSync();
 
       if (playersContainer._listeners) {
         for (const [el, ev, fn] of playersContainer._listeners) {
