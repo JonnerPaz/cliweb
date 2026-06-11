@@ -6,12 +6,12 @@
   display: grid;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
   justify-content: center;
   justify-items: center;
   width: 100%;
 
-  grid-template-columns: repeat(8, minmax(var(--card-max-width), 1fr));
+  grid-template-columns: repeat(var(--grid-columns, 4), minmax(var(--card-max-width), 1fr));
 }
 
 .gameboard__card {
@@ -21,38 +21,39 @@
   width: 100%;
 }
 
-/* Sizing columns based on grid columns and screen sizes */
 .gameboard--4 {
-  --card-max-width: 14rem;
-  gap: 2rem;
-}
-
-.gameboard--6 {
-  --card-max-width: 9rem;
+  --grid-columns: 4;
+  --card-max-width: 12rem;
   gap: 1rem;
 }
 
-.gameboard--8 {
-  --card-max-width: 7rem;
-  gap: 0.8rem;
+.gameboard--6 {
+  --grid-columns: 6;
+  --card-max-width: 8rem;
+  gap: 0.6rem;
 }
 
-/* Responsive queries to shrink card dimensions and gaps on smaller viewports */
+.gameboard--8 {
+  --grid-columns: 8;
+  --card-max-width: 7rem;
+  gap: 0.5rem;
+}
+
 @media (max-width: 600px) {
 .gameboard {
-    padding: 1rem;
+    padding: 0.5rem;
   }
   .gameboard--4 {
     --card-max-width: 80px;
-    gap: 0.8rem;
+    gap: 0.6rem;
   }
   .gameboard--6 {
     --card-max-width: 55px;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
   .gameboard--8 {
     --card-max-width: 42px;
-    gap: 0.4rem;
+    gap: 0.3rem;
   }
 }
 
