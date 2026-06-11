@@ -151,7 +151,7 @@ export class GameView {
 
     gameState.players = createPlayers(
       gameState.gameMode,
-      gameState.playerNames
+      gameState.players
     );
 
     if (gameState.gameMode === "solo" || gameState.gameMode === "free") {

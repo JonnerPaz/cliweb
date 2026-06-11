@@ -1,4 +1,5 @@
 import gameState from "../state/GameState.js";
+import { User } from "../state/User.js";
 import { musicService } from "../core/musicService.js";
 
 const POKEMON_TYPES = [
@@ -101,19 +102,19 @@ function renderPlayersSection() {
 
   if (player1) {
     const fn = (e) =>
-      (gameState.playerNames = { ...gameState.playerNames, player1: e.target.value });
+      (gameState.players = { ...gameState.players, player1: new User(e.target.value, 0, 0, 0) });
     player1.addEventListener("input", fn);
     listeners.push([player1, "input", fn]);
   }
   if (player2) {
     const fn = (e) =>
-      (gameState.playerNames = { ...gameState.playerNames, player2: e.target.value });
+      (gameState.players = { ...gameState.players, player2: new User(e.target.value, 0, 0, 0) });
     player2.addEventListener("input", fn);
     listeners.push([player2, "input", fn]);
   }
   if (playerName) {
     const fn = (e) =>
-      (gameState.playerNames = { player1: e.target.value });
+      (gameState.players = { player1: new User(e.target.value, 0, 0, 0), player2: null });
     playerName.addEventListener("input", fn);
     listeners.push([playerName, "input", fn]);
   }

@@ -9,10 +9,11 @@ export function buildResults({
   totalMovements,
   firstMatchTurn,
 }) {
+  const playerList = Object.values(players).filter(Boolean);
   const results = {
     gameMode,
     difficulty,
-    players: players.map((p) => ({
+    players: playerList.map((p) => ({
       playerName: p.name,
       points: p.points,
       movements: p.movements,
@@ -23,12 +24,12 @@ export function buildResults({
     firstMoveMatch: firstMatchTurn,
   };
 
-  if (gameMode === "pvp" && players.length === 2) {
+  if (gameMode === "pvp" && playerList.length === 2) {
     results.winner =
-      players[0].points > players[1].points
-        ? players[0].name
-        : players[1].points > players[0].points
-          ? players[1].name
+      playerList[0].points > playerList[1].points
+        ? playerList[0].name
+        : playerList[1].points > playerList[0].points
+          ? playerList[1].name
           : null;
   }
 

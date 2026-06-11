@@ -86,15 +86,19 @@ export class GameEngine {
     }, 1000);
   }
 
+  get #activePlayers() {
+    return Object.values(gameState.players).filter(Boolean);
+  }
+
   #switchToNextPlayer() {
-    const playerCount = gameState.players.length;
-    if (playerCount > 1) {
-      this.activePlayerIndex = (this.activePlayerIndex + 1) % playerCount;
+    const list = this.#activePlayers;
+    if (list.length > 1) {
+      this.activePlayerIndex = (this.activePlayerIndex + 1) % list.length;
     }
   }
 
   #getActivePlayer() {
-    return gameState.players[this.activePlayerIndex];
+    return this.#activePlayers[this.activePlayerIndex];
   }
 
   #checkMidGameAwards() {

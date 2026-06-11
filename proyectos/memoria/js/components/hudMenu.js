@@ -9,7 +9,7 @@ export function createHudMenu({ onFinish } = {}) {
 
   const badgeElements = [];
 
-  const players = gameState.players;
+  const players = Object.values(gameState.players).filter(Boolean);
   const gameMode = gameState.gameMode;
 
   players.forEach((player, index) => {
@@ -38,7 +38,7 @@ export function createHudMenu({ onFinish } = {}) {
     element: hudContainer,
 
     updatePlayerStats: () => {
-      const currentPlayers = gameState.players;
+      const currentPlayers = Object.values(gameState.players).filter(Boolean);
 
       badgeElements.forEach((badge, index) => {
         const player = currentPlayers[index];
