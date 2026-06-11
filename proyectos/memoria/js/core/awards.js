@@ -107,7 +107,7 @@ export class AwardChecker {
     // Verifica Demonio de Velocidad (<= 30s general, o <= 60s en Difícil o Medio)
     const time = gameData.time;
     const isTimeValid = time !== undefined && time !== null;
-    const isFastEnough = (gameData.difficulty === 'Medio' && time <= 180) || 
+    const isFastEnough = (gameData.difficulty === 'Medio' && time <= 60) || 
     (gameData.difficulty === 'Dificil' && time <= 120) || (time <= 30);
 
     if (isTimeValid && isFastEnough && !this.unlockedAwards.has(AwardType.SPEED_DEMON)) {
