@@ -9,7 +9,16 @@ export function showToast(message = 'Congratulations!', type = 'success') {
     document.body.appendChild(toast);
 
     setTimeout(() => {
-        toast.classList.add('hide'); // Dispara la transición CSS     
+        toast.classList.add('hide');
         setTimeout(() => toast.remove(), 300);
     }, 3000);
+}
+
+/**
+ * Muestra notificaciones toast para awards recién desbloqueados.
+ */
+export function showAwardToasts(newAwards) {
+  newAwards.forEach(award => {
+    showToast(`${award.icon} ${award.name} desbloqueado!`, 'success');
+  });
 }

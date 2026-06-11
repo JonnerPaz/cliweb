@@ -68,11 +68,6 @@ export class HomeView {
     const header = container.querySelector(".home-header");
 
     header.classList.toggle("home-header--compact");
-    
-    settingsSection.classList.toggle("hidden");
-    btnSettings.classList.toggle("hidden");
-    btnPlay.classList.toggle("hidden");
-
   }
 
   unmount() {

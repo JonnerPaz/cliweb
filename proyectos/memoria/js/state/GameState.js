@@ -75,8 +75,10 @@ class GameState {
   set playerNames(names) {
     if (!names || typeof names !== "object") return;
     this.#playerNames = {
-      player1: typeof names.player1 === "string" ? names.player1.slice(0, 20) : "",
-      player2: typeof names.player2 === "string" ? names.player2.slice(0, 20) : "",
+      player1:
+        typeof names.player1 === "string" ? names.player1.slice(0, 20) : "",
+      player2:
+        typeof names.player2 === "string" ? names.player2.slice(0, 20) : "",
     };
   }
 
