@@ -51,11 +51,11 @@ export const AWARD_DEFINITIONS = {
     rarity: 'epic'
   },
   [AwardType.STREAK_COMMON]: {
-    id: AwardType.STREAK_,
+    id: AwardType.STREAK_COMMON,
     name: 'Aprendiz de Racha',
     description: 'Encuentra 3 pares seguidos sin errores',
     icon: '⭐',
-    rarity: 'common' 
+    rarity: 'common'
   },
   [AwardType.STREAK_MASTER]: {
     id: AwardType.STREAK_MASTER,
@@ -134,6 +134,32 @@ export class AwardChecker {
     }
 
     // Verifica Maestro de Racha
+    if (this.maxStreak >= 5 && !this.unlockedAwards.has(AwardType.STREAK_MASTER)) {
+      newAwards.push(AWARD_DEFINITIONS[AwardType.STREAK_MASTER]);
+      this.unlockedAwards.add(AwardType.STREAK_MASTER);
+    }
+
+    return newAwards;
+  }
+
+  /**
+   * Verifica awards que pueden desbloquearse durante la partida
+   * @param {Object} gameData
+   * @returns {Array}
+   */
+  checkMidGameAwards(gameData) {
+    const newAwards = [];
+
+    if (gameData.firstMoveMatch && !this.unlockedAwards.has(AwardType.LUCKY_START)) {
+      newAwards.push(AWARD_DEFINITIONS[AwardType.LUCKY_START]);
+      this.unlockedAwards.add(AwardType.LUCKY_START);
+    }
+
+    if (this.maxStreak >= 3 && !this.unlockedAwards.has(AwardType.STREAK_COMMON)) {
+      newAwards.push(AWARD_DEFINITIONS[AwardType.STREAK_COMMON]);
+      this.unlockedAwards.add(AwardType.STREAK_COMMON);
+    }
+
     if (this.maxStreak >= 5 && !this.unlockedAwards.has(AwardType.STREAK_MASTER)) {
       newAwards.push(AWARD_DEFINITIONS[AwardType.STREAK_MASTER]);
       this.unlockedAwards.add(AwardType.STREAK_MASTER);

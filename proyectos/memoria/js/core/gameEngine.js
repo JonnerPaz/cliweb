@@ -66,6 +66,17 @@ class GameEngine {
       if (active) active.addPoints(GameEngine.pointsPerMatch);
 
       awardChecker.onMatch();
+
+      const midGameAwards = awardChecker.checkMidGameAwards({
+        firstMoveMatch: this.firstMatchTurn,
+        difficulty: gameState.difficulty,
+        gameMode: gameState.gameMode,
+      });
+
+      if (this.onAwardUnlock && midGameAwards.length > 0) {
+        midGameAwards.forEach((award) => this.onAwardUnlock(award));
+      }
+
       this.resetBoardState();
 
       if (this.onTurnUpdate)

@@ -21,6 +21,8 @@
   --color-white: #fff;
   --color-black: #000;
 
+  --font-family: 'Montserrat', 'Segoe UI', Tahoma, sans-serif;
+  
   /* Variables */
   --border-radius-default: 3px;
 }
@@ -31,6 +33,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: var(--font-family);
 }
 
 html {
@@ -60,19 +63,20 @@ body {
 }
 
 body.theme-medium {
-  background-image: url("../assets/images/way.jpg");
+  background-image: url("../assets/images/pokmon-bg-main.png");
 }
 
 body.theme-hard {
-  background-image: url("../assets/images/bg-hard.png");
+  background-image: url("../assets/images/pokmon-bg-main.png");
 }
 
 .pokemon-text {
   text-align: center;
   font-family: "Montserrat", "Impact", sans-serif;
   font-weight: 900;
-  font-size: 5rem;
+  font-size: 8rem;
   text-transform: uppercase;
+  transition: font-size 0.4s ease;
   color: #ffde00; /* Yellow Fill */
   letter-spacing: 2px;
   position: relative;
@@ -84,6 +88,10 @@ body.theme-hard {
     -2px 2px 0 #003a70,
     2px 2px 0 #003a70,
     4px 4px 0 rgba(0, 58, 112, 0.5); /* Drop Shadow */
+}
+
+.home-header--compact .pokemon-text {
+  font-size: 4rem;
 }
 
 .pokemon-button {

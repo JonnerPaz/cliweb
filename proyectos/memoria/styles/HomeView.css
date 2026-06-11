@@ -13,6 +13,8 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  height: 20vh;
+  transition: all 0.4s ease;
   background-color: var(--color-primary);
   color: var(--color-secondary);
   padding: 0.5rem 1.5 rem;
@@ -20,6 +22,10 @@
 
   font-size: 1.2rem;
   text-align: center;
+}
+
+.home-header.home-header--compact {
+  height: 9vh;
 }
 
 .home-header__music {
