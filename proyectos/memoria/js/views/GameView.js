@@ -1,6 +1,6 @@
 import { renderBoard } from "../components/board.js";
 import gameState from "../state/GameState.js";
-import gameEngine from "../core/gameEngine.js";
+import { GameEngine } from "../core/gameEngine.js";
 import { createPlayers } from "../state/playerFactory.js";
 import { startTimer } from "../core/timer.js";
 import { createHudMenu } from "../components/hudMenu.js";
@@ -15,6 +15,7 @@ export class GameView {
     this.timerController = null;
     this.hud = null;
     this.pairsCount = 0;
+    this.engine = null;
   }
 
   onWin() {
@@ -24,8 +25,8 @@ export class GameView {
       players: gameState.players,
       timerSeconds: this.timerController?.seconds ?? 0,
       pairsCount: this.pairsCount,
-      totalMovements: gameEngine.turns,
-      firstMatchTurn: gameEngine.firstMatchTurn,
+      totalMovements: this.engine.turns,
+      firstMatchTurn: this.engine.firstMatchTurn,
     });
 
     gameState.results = results;
@@ -51,6 +52,14 @@ export class GameView {
     }
   }
 
+  setupEngine() {
+    this.engine = new GameEngine();
+    this.engine.onWin = () => this.onWin();
+    this.engine.onTurnUpdate = (turns, player) =>
+      this.onTurnUpdate(turns, player);
+    this.engine.onAwardUnlock = (award) => this.onAwardUnlock(award);
+  }
+
   setupDifficulty(difficulty) {
     let themeClass = "theme-easy";
     let gridSize = 4;
@@ -73,7 +82,6 @@ export class GameView {
 
     document.body.className = themeClass;
     this.pairsCount = (gridSize * gridSize) / 2;
-    return;
   }
 
   async reloadBoard() {
@@ -84,9 +92,7 @@ export class GameView {
     const boardState = await renderBoard(
       boardContainer,
       this.pairsCount,
-      this.onWin.bind(this),
-      this.onTurnUpdate.bind(this),
-      this.onAwardUnlock.bind(this)
+      this.engine
     );
 
     this.boardCleanup = boardState.cleanup;
@@ -100,8 +106,8 @@ export class GameView {
       difficulty: gameState.difficulty,
       players: gameState.players,
       pairsCount: this.pairsCount,
-      totalMovements: gameEngine.turns,
-      firstMatchTurn: gameEngine.firstMatchTurn,
+      totalMovements: this.engine.turns,
+      firstMatchTurn: this.engine.firstMatchTurn,
     });
 
     gameState.results = results;
@@ -114,7 +120,6 @@ export class GameView {
   }
 
   setupHUD() {
-    // Configurar HUD y Layout de Juego
     const hudController = document.createElement("div");
     hudController.innerHTML = `
       <button id="btn-back" class="pokemon-button">⬅ Volver</button>
@@ -129,8 +134,6 @@ export class GameView {
       onFinish: () => this.handleFinish(),
     });
     hudWrapper.appendChild(this.hud.element);
-
-    return;
   }
 
   setupEvents() {
@@ -141,16 +144,11 @@ export class GameView {
   async mount(container) {
     this.container = container;
 
-    // render HUD
     this.setupHUD();
-
-    // Eventos
     this.setupEvents();
-
-    // Configurar dificultad
     this.setupDifficulty(gameState.difficulty);
+    this.setupEngine();
 
-    // Configurar Jugadores
     gameState.players = createPlayers(
       gameState.gameMode,
       gameState.playerNames
@@ -162,14 +160,11 @@ export class GameView {
       });
     }
 
-    // Montar el Tablero en el DOM
     const boardContainer = this.container.querySelector("#board-container");
     const boardState = await renderBoard(
       boardContainer,
       this.pairsCount,
-      this.onWin.bind(this),
-      this.onTurnUpdate.bind(this),
-      this.onAwardUnlock.bind(this)
+      this.engine
     );
     this.boardCleanup = boardState.cleanup;
   }
@@ -187,12 +182,12 @@ export class GameView {
     if (this.boardCleanup) {
       this.boardCleanup();
     }
-    // Previene fugas de memoria si el usuario sale usando el boton volver
+
     if (this.timerController) {
       this.timerController.stop();
     }
 
-    document.body.className = ""; // Limpiamos al salir
+    document.body.className = "";
     this.container.innerHTML = "";
   }
 }

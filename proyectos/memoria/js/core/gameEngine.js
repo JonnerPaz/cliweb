@@ -1,7 +1,7 @@
 import gameState from "../state/GameState.js";
 import awardChecker from "./awards.js";
 
-class GameEngine {
+export class GameEngine {
   static pointsPerMatch = 10;
 
   constructor() {
@@ -17,14 +17,11 @@ class GameEngine {
     this.turns = 0;
   }
 
-  init(pairsCount, onWin, onTurnUpdate, onAwardUnlock) {
+  init(pairsCount) {
     this.flippedCards = [];
     this.isLocked = false;
     this.matches = 0;
     this.pairsCount = pairsCount;
-    this.onWin = onWin;
-    this.onTurnUpdate = onTurnUpdate;
-    this.onAwardUnlock = onAwardUnlock;
     this.activePlayerIndex = 0;
     this.firstMatchTurn = false;
     this.turns = 0;
@@ -121,5 +118,3 @@ class GameEngine {
     this.onTurnUpdate?.(this.turns, this.activePlayerIndex);
   }
 }
-
-export default new GameEngine();
