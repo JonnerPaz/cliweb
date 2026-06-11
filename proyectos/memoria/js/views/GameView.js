@@ -24,7 +24,7 @@ export class GameView {
       players: gameState.players,
       timerSeconds: this.timerController?.seconds ?? 0,
       pairsCount: this.pairsCount,
-      totalMovements: gameState.turns,
+      totalMovements: gameEngine.turns,
       firstMatchTurn: gameEngine.firstMatchTurn,
     });
 
@@ -100,7 +100,7 @@ export class GameView {
       difficulty: gameState.difficulty,
       players: gameState.players,
       pairsCount: this.pairsCount,
-      totalMovements: gameState.turns,
+      totalMovements: gameEngine.turns,
       firstMatchTurn: gameEngine.firstMatchTurn,
     });
 

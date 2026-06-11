@@ -11,9 +11,10 @@ class GameEngine {
     this.pairsCount = 0;
     this.onWin = null;
     this.onTurnUpdate = null;
-    this.activePlayerIndex = 0;
     this.onAwardUnlock = null;
+    this.activePlayerIndex = 0;
     this.firstMatchTurn = false;
+    this.turns = 0;
   }
 
   init(pairsCount, onWin, onTurnUpdate, onAwardUnlock) {
@@ -26,9 +27,9 @@ class GameEngine {
     this.onAwardUnlock = onAwardUnlock;
     this.activePlayerIndex = 0;
     this.firstMatchTurn = false;
-    gameState.turns = 0;
+    this.turns = 0;
     awardChecker.reset();
-    if (this.onTurnUpdate) this.onTurnUpdate(gameState.turns);
+    this.#notifyTurnUpdate();
   }
 
   handleCardClick(cardApi) {
@@ -38,76 +39,86 @@ class GameEngine {
     this.flippedCards.push(cardApi);
 
     if (this.flippedCards.length === 2) {
-      this.checkMatch();
+      this.#evaluateMatch();
     }
   }
 
-  checkMatch() {
+  #evaluateMatch() {
     this.isLocked = true;
-    gameState.turns += 1;
+    this.turns += 1;
 
     const [card1, card2] = this.flippedCards;
     const isMatch = card1.pokemon.id === card2.pokemon.id;
+    const activePlayer = this.#getActivePlayer();
 
-    const players = gameState.players;
-    const active = players[this.activePlayerIndex];
-
-    if (active) active.addMovements(1);
-
-    if (isMatch && gameState.turns === 1) {
-      this.firstMatchTurn = true;
-    }
+    activePlayer?.addMovements(1);
 
     if (isMatch) {
-      this.matches += 1;
-      card1.markAsMatched();
-      card2.markAsMatched();
-
-      if (active) active.addPoints(GameEngine.pointsPerMatch);
-
-      awardChecker.onMatch();
-
-      const midGameAwards = awardChecker.checkMidGameAwards({
-        firstMoveMatch: this.firstMatchTurn,
-        difficulty: gameState.difficulty,
-        gameMode: gameState.gameMode,
-      });
-
-      if (this.onAwardUnlock && midGameAwards.length > 0) {
-        midGameAwards.forEach((award) => this.onAwardUnlock(award));
-      }
-
-      this.resetBoardState();
-
-      if (this.onTurnUpdate)
-        this.onTurnUpdate(gameState.turns, this.activePlayerIndex);
-
-      if (this.matches === this.pairsCount) {
-        setTimeout(() => {
-          if (this.onWin) this.onWin(gameState.turns);
-        }, 500);
-      }
+      this.#handleMatch(card1, card2, activePlayer);
     } else {
-      awardChecker.onMismatch();
-      setTimeout(() => {
-        card1.unflip();
-        card2.unflip();
-        this.resetBoardState();
-
-        if (players.length > 1) {
-          this.activePlayerIndex =
-            (this.activePlayerIndex + 1) % players.length;
-        }
-
-        if (this.onTurnUpdate)
-          this.onTurnUpdate(gameState.turns, this.activePlayerIndex);
-      }, 1000);
+      this.#handleMismatch(card1, card2);
     }
   }
 
-  resetBoardState() {
+  #handleMatch(card1, card2, activePlayer) {
+    this.matches += 1;
+    this.firstMatchTurn = this.turns === 1;
+    card1.markAsMatched();
+    card2.markAsMatched();
+
+    activePlayer?.addPoints(GameEngine.pointsPerMatch);
+
+    awardChecker.onMatch();
+    this.#checkMidGameAwards();
+    this.#resetBoardState();
+    this.#notifyTurnUpdate();
+
+    if (this.matches === this.pairsCount) {
+      setTimeout(() => this.onWin?.(this.turns), 500);
+    }
+  }
+
+  #handleMismatch(card1, card2) {
+    awardChecker.onMismatch();
+    setTimeout(() => {
+      card1.unflip();
+      card2.unflip();
+      this.#resetBoardState();
+      this.#switchToNextPlayer();
+      this.#notifyTurnUpdate();
+    }, 1000);
+  }
+
+  #switchToNextPlayer() {
+    const playerCount = gameState.players.length;
+    if (playerCount > 1) {
+      this.activePlayerIndex = (this.activePlayerIndex + 1) % playerCount;
+    }
+  }
+
+  #getActivePlayer() {
+    return gameState.players[this.activePlayerIndex];
+  }
+
+  #checkMidGameAwards() {
+    const awards = awardChecker.checkMidGameAwards({
+      firstMoveMatch: this.firstMatchTurn,
+      difficulty: gameState.difficulty,
+      gameMode: gameState.gameMode,
+    });
+
+    if (this.onAwardUnlock && awards.length > 0) {
+      awards.forEach((award) => this.onAwardUnlock(award));
+    }
+  }
+
+  #resetBoardState() {
     this.flippedCards = [];
     this.isLocked = false;
+  }
+
+  #notifyTurnUpdate() {
+    this.onTurnUpdate?.(this.turns, this.activePlayerIndex);
   }
 }
 
