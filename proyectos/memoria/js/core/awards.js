@@ -108,7 +108,7 @@ export class AwardChecker {
     const time = gameData.time;
     const isTimeValid = time !== undefined && time !== null;
     const isFastEnough = (gameData.difficulty === 'Medio' && time <= 60) || 
-    (gameData.difficulty === 'Dificil' && time <= 60) || (time <= 30);
+    (gameData.difficulty === 'Dificil' && time <= 120) || (time <= 30);
 
     if (isTimeValid && isFastEnough && !this.unlockedAwards.has(AwardType.SPEED_DEMON)) {
       newAwards.push(AWARD_DEFINITIONS[AwardType.SPEED_DEMON]);
