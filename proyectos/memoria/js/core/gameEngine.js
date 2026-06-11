@@ -1,4 +1,5 @@
 import gameState from "../state/GameState.js";
+import awardChecker from "./awards.js";
 
 class GameEngine {
   static pointsPerMatch = 10;
@@ -11,17 +12,22 @@ class GameEngine {
     this.onWin = null;
     this.onTurnUpdate = null;
     this.activePlayerIndex = 0;
+    this.onAwardUnlock = null;
+    this.firstMatchTurn = false;
   }
 
-  init(pairsCount, onWin, onTurnUpdate) {
+  init(pairsCount, onWin, onTurnUpdate, onAwardUnlock) {
     this.flippedCards = [];
     this.isLocked = false;
     this.matches = 0;
     this.pairsCount = pairsCount;
     this.onWin = onWin;
     this.onTurnUpdate = onTurnUpdate;
+    this.onAwardUnlock = onAwardUnlock;
     this.activePlayerIndex = 0;
+    this.firstMatchTurn = false;
     gameState.turns = 0;
+    awardChecker.reset();
     if (this.onTurnUpdate) this.onTurnUpdate(gameState.turns);
   }
 
@@ -48,6 +54,10 @@ class GameEngine {
 
     if (active) active.addMovements(1);
 
+    if (isMatch && gameState.turns === 1) {
+      this.firstMatchTurn = true;
+    }
+
     if (isMatch) {
       this.matches += 1;
       card1.markAsMatched();
@@ -55,6 +65,7 @@ class GameEngine {
 
       if (active) active.addPoints(GameEngine.pointsPerMatch);
 
+      awardChecker.onMatch();
       this.resetBoardState();
 
       if (this.onTurnUpdate)
@@ -66,6 +77,7 @@ class GameEngine {
         }, 500);
       }
     } else {
+      awardChecker.onMismatch();
       setTimeout(() => {
         card1.unflip();
         card2.unflip();

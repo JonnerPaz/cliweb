@@ -21,10 +21,12 @@ export class ResultsView {
     const results = gameState.results || {};
     const mode = results.gameMode;
     const players = results.players || [];
+    const awards = results.awards || [];
 
     let winnerHtml = "";
     let timeHtml = "";
     let playersHtml = "";
+    let awardsHtml = "";
 
     if (mode === "pvp" && players.length === 2) {
       if (results.winner) {
@@ -42,36 +44,76 @@ export class ResultsView {
       .map((p) => {
         const pairs = Math.floor(p.points / 10);
         return `
-          <div class="results-player">
+          <article class="results-player">
             <h3>${p.playerName}</h3>
-            <p><strong>Pares:</strong> ${pairs}</p>
-            <p><strong>Puntos:</strong> ${p.points}</p>
-            <p><strong>Movimientos:</strong> ${p.movements}</p>
-            <p><strong>Precisión:</strong> ${hitRate(pairs, p.movements)}%</p>
-          </div>
+            <ul>
+              <li><strong>Pares:</strong> ${pairs}</li>
+              <li><strong>Puntos:</strong> ${p.points}</li>
+              <li><strong>Movimientos:</strong> ${p.movements}</li>
+              <li><strong>Precisión:</strong> ${hitRate(pairs, p.movements)}%</li>
+            </ul>
+          </article>
         `;
       })
       .join("");
 
+    // Generar HTML de awards
+    if (awards.length > 0) {
+      awardsHtml = `
+        <section class="results-awards">
+          <h3>🏅 Logros Desbloqueados</h3>
+          <ul class="awards-grid">
+            ${awards.map(award => `
+              <li class="award-item award-${award.rarity}">
+                <span class="award-icon" aria-hidden="true">${award.icon}</span>
+                <div class="award-info">
+                  <h4>${award.name}</h4>
+                  <p>${award.description}</p>
+                </div>
+              </li>
+            `).join('')}
+          </ul>
+        </section>
+      `;
+    } else {
+      awardsHtml = `
+        <section class="results-awards">
+          <h3>🏅 Logros Desbloqueados</h3>
+          <p class="no-awards">Sigue jugando para desbloquear logros</p>
+        </section>
+      `;
+    }
+    
     const totalPairs = results.totalPairs ?? 0;
     const totalMovements = results.totalMovements ?? 0;
 
     container.innerHTML = `
-      <div class="results-container">
-        <h1>¡Resultados!</h1>
-        ${winnerHtml}
-        <div class="results-card">
-          <p><strong>Total pares:</strong> ${totalPairs}</p>
-          <p><strong>Total movimientos:</strong> ${totalMovements}</p>
-          <p><strong>Precisión global:</strong> ${hitRate(totalPairs, totalMovements)}%</p>
-          ${timeHtml}
-        </div>
-        <div class="results-players">${playersHtml}</div>
-        <div class="results-actions">
+      <section class="results-container">    
+        <header>
+          <h1>¡Resultados!</h1>
+          ${winnerHtml}
+        </header>
+        <article class="results-card">
+          <ul>
+            <li><strong>Total pares:</strong> ${totalPairs}</li>
+            <li><strong>Total movimientos:</strong> ${totalMovements}</li>
+            <li><strong>Precisión global:</strong> ${hitRate(totalPairs, totalMovements)}%</li>
+            ${timeHtml}
+          </ul>
+        </article>
+
+        <section class="results-players">
+          ${playersHtml}
+        </section>
+        
+        ${awardsHtml}
+
+        <nav class="results-actions" aria-label="Acciones de fin de juego">
           <button class="pokemon-button" id="btn-play-again">Jugar de nuevo</button>
           <button class="pokemon-button" id="btn-back-menu">Volver al menú</button>
-        </div>
-      </div>
+        </nav>
+
+      </section>
     `;
 
     container.querySelector("#btn-play-again").addEventListener("click", () => {

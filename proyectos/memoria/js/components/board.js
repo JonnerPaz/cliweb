@@ -80,12 +80,14 @@ function createCards(deck) {
  * @param {number} pairsCount - Cantidad de pares de Pokemons
  * @param {function} onWinCallback - Funcion que se ejecuta cuando se gana el juego
  * @param {function} onTurnUpdateCallback - Funcion que se ejecuta cuando se actualiza el turno
+ * @param {function} onAwardUnlockCallback - Funcion que se ejecuta cuando se desbloquea un logro
  */
 export async function renderBoard(
   container,
   pairsCount,
   onWinCallback,
-  onTurnUpdateCallback
+  onTurnUpdateCallback,
+  onAwardUnlockCallback
 ) {
   container.innerHTML = `
     <div class="gameboard-loading">
@@ -102,7 +104,7 @@ export async function renderBoard(
     }
 
     const rawDeck = shuffle([...validPokemons, ...validPokemons]);
-    gameEngine.init(pairsCount, onWinCallback, onTurnUpdateCallback);
+    gameEngine.init(pairsCount, onWinCallback, onTurnUpdateCallback, onAwardUnlockCallback);
 
     container.innerHTML = "";
 

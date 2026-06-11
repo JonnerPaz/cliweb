@@ -1,9 +1,12 @@
 import { renderBoard } from "../components/board.js";
 import gameState from "../state/GameState.js";
+import gameEngine from "../core/gameEngine.js";
 import { User } from "../state/User.js";
 import { startTimer } from "../core/timer.js";
 import { createHudMenu } from "../components/hudMenu.js";
 import { router } from "../app.js";
+import { showToast } from "../components/toast.js";
+import awardChecker from "../core/awards.js";
 
 export class GameView {
   constructor() {
@@ -18,6 +21,7 @@ export class GameView {
     const players = gameState.players;
     const results = {
       gameMode: gameState.gameMode,
+      difficulty: gameState.difficulty,
       players: players.map((p) => ({
         playerName: p.name,
         points: p.points,
@@ -26,6 +30,7 @@ export class GameView {
       time: this.timerController ? this.timerController.seconds : 0,
       totalPairs: this.pairsCount,
       totalMovements: gameState.turns,
+      firstMoveMatch: gameEngine.firstMatchTurn,
     };
 
     if (gameState.gameMode === "pvp" && players.length === 2) {
@@ -37,6 +42,15 @@ export class GameView {
         results.winner = null;
       }
     }
+
+    // Verificar awards
+    const newAwards = awardChecker.checkAwards(results);
+    results.awards = awardChecker.getUnlockedAwards();
+
+    // Mostrar notificaciones de toast para nuevos awards
+    newAwards.forEach(award => {
+      showToast(`${award.icon} ${award.name} desbloqueado!`, 'success');
+    });
 
     gameState.results = results;
 
@@ -72,7 +86,8 @@ export class GameView {
       boardContainer,
       this.pairsCount,
       this.onWin.bind(this),
-      this.onTurnUpdate.bind(this)
+      this.onTurnUpdate.bind(this),
+      this.onAwardUnlock.bind(this)
     );
     this.boardCleanup = boardState.cleanup;
   }
@@ -82,6 +97,7 @@ export class GameView {
     const player = gameState.players[0];
     gameState.results = {
       gameMode: "free",
+      difficulty: gameState.difficulty,
       players: [
         {
           playerName: player.name,
@@ -92,8 +108,23 @@ export class GameView {
       time: 0,
       totalPairs: this.pairsCount,
       totalMovements: gameState.turns,
+      firstMoveMatch: gameEngine.firstMatchTurn,
     };
+
+    // Verificar awards
+    const newAwards = awardChecker.checkAwards(gameState.results);
+    gameState.results.awards = awardChecker.getUnlockedAwards();
+
+    // Mostrar notificaciones de toast para nuevos awards
+    newAwards.forEach(award => {
+      showToast(`${award.icon} ${award.name} desbloqueado!`, 'success');
+    });
+
     router.navigateTo("/results");
+  }
+
+  onAwardUnlock(award) {
+    showToast(`${award.icon} ${award.name} desbloqueado!`, 'success');
   }
 
   async mount(container) {
@@ -150,7 +181,8 @@ export class GameView {
       boardContainer,
       this.pairsCount,
       this.onWin.bind(this),
-      this.onTurnUpdate.bind(this)
+      this.onTurnUpdate.bind(this),
+      this.onAwardUnlock.bind(this)
     );
     this.boardCleanup = boardState.cleanup;
   }
