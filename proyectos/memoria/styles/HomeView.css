@@ -8,17 +8,17 @@
 }
 
 .home-header {
-  flex-basis: 10%;
+  flex-basis: 6rem;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   background-color: var(--color-primary);
   color: var(--color-secondary);
-  padding: 1.5rem;
+  padding: 0.5rem 1.5 rem;
   width: 100%;
 
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   text-align: center;
 }
 
@@ -34,33 +34,36 @@
 }
 
 .home-footer {
-  flex-basis: 10%;
+  flex-basis: 4rem;
   justify-content: center;
   align-items: center;
   background-color: var(--color-primary);
   color: var(--color-secondary);
-  padding: 1.5rem;
+  padding: 0.5rem;
   width: 100%;
 
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   text-align: center;
 }
 
 .home-main {
-  flex-basis: 80%;
+  flex-basis: auto;
+  flex-direction: column;
+  flex-grow: 1;
   display: flex;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   justify-content: center;
   align-items: center;
   gap: 1rem;
 }
 
 .home-section {
-  flex-basis: 50%;
+  flex-basis: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .home-main > * {

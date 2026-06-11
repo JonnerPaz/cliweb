@@ -76,10 +76,18 @@ export class GameView {
 
   async reloadBoard() {
     if (this.boardCleanup) this.boardCleanup();
-    let gridSize = 4;
     const diff = gameState.difficulty || "Facil";
-    if (diff === "Medio") gridSize = 6;
-    if (diff === "Dificil") gridSize = 8;
+    let gridSize = 4;
+    let themeClass = "theme-easy"; 
+    if (diff === "Medio") {
+      gridSize = 6;
+      themeClass = "theme-medium";
+    }     if (diff === "Dificil") {
+      gridSize = 8;
+      themeClass = "theme-hard";
+    }
+    // Aplicamos la clase al contenedor principal (o al body)
+    document.body.className = themeClass;
     this.pairsCount = (gridSize * gridSize) / 2;
     const boardContainer = this.container.querySelector("#board-container");
     const boardState = await renderBoard(
@@ -145,10 +153,18 @@ export class GameView {
     this.btnBack.addEventListener("click", () => this.handleBack());
 
     // Determinar dificultad
-    let gridSize = 4;
     const diff = gameState.difficulty || "Facil";
-    if (diff === "Medio") gridSize = 6;
-    if (diff === "Dificil") gridSize = 8;
+    let gridSize = 4;
+    let themeClass = ""; 
+    if (diff === "Medio") {
+      gridSize = 6;
+      themeClass = "theme-medium";
+    }     if (diff === "Dificil") {
+      gridSize = 8;
+      themeClass = "theme-hard";
+    }
+    document.body.className = themeClass;
+    
     this.pairsCount = (gridSize * gridSize) / 2;
 
     // Construir jugadores a partir de los nombres del settings
@@ -206,6 +222,7 @@ export class GameView {
       this.timerController.stop();
     }
 
+    document.body.className = ""; // Limpiamos al salir
     this.container.innerHTML = "";
   }
 }

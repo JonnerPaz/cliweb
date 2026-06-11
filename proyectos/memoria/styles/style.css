@@ -45,6 +45,9 @@ html {
 
 body {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   background-image: url("../assets/images/pokmon-bg-main.png");
   background-size: cover;
   background-position: center center;
@@ -52,18 +55,28 @@ body {
   background-attachment: fixed;
   min-height: 100vh;
   overflow-x: hidden;
+  transition: background 0.5s ease;
   /* overflow-y: hidden; */
+}
+
+body.theme-medium {
+  background-image: url("../assets/images/way.jpg");
+}
+
+body.theme-hard {
+  background-image: url("../assets/images/bg-hard.png");
 }
 
 .pokemon-text {
   text-align: center;
   font-family: "Montserrat", "Impact", sans-serif;
   font-weight: 900;
-  font-size: 10rem;
+  font-size: 5rem;
   text-transform: uppercase;
   color: #ffde00; /* Yellow Fill */
   letter-spacing: 2px;
   position: relative;
+  margin: 0;
   /* Blue Stroke and Shadow Effect */
   text-shadow:
     -2px -2px 0 #003a70,
@@ -82,7 +95,7 @@ body {
   text-decoration: none;
   display: inline-block;
   font-size: 2.5rem;
-  margin: 4rem 2rem;
+  margin: 2rem 2rem;
   cursor: pointer;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
