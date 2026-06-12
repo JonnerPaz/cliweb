@@ -1,110 +1,118 @@
-# PokeMory: Juego de Memoria con temática de Pokémon
+# 🎮 PokeMory: El Juego de Memoria Pokémon
 
-## Introducción
+## Descripción
 
-PokeMory es un juego de memoria inspirado con temática de pokémon. Esta aplicación web 
-está siendo desarrollada por Jonner Paz y Vanessa Pérez en el marco de la asignatura 
-de lenguajes de clientes web de la Universidad Rafael Urdaneta.
+¡Bienvenido a PokeMory! 🌟 Un juego de memoria web desafiante y nostálgico, diseñado para poner a prueba tu agilidad mental al estilo de los mejores entrenadores Pokémon. 🧠⚡
 
-Este documento describe la arquitectura de software, la organización 
-de carpetas y el flujo de datos para el proyecto "PokeMory", desarrollado en 
-HTML5, CSS3 y JavaScript.
+🚀 Descripción
+PokeMory es una SPA (Single Page Application) construida con tecnologías web modernas, enfocada en la limpieza del código y la modularidad de componentes. ¡Entrena tu memoria encontrando parejas de tus criaturas favoritas! 🐾✨
 
-El diseño se fundamenta en dos pilares: **ES Modules (`import`/`export`)** para
-la encapsulación del código y **Atomic Design** para la construcción escalable 
-de la interfaz de usuario.
+## ✨ Características Principales
+- Modos de juego versátiles: Solitario, PvP (Jugador vs Jugador) y Modo Libre. 🎮
+- Dificultad ajustable: Elige tu reto (4×4, 6×6 u 8×8). 🏆
+- Temáticas dinámicas: Filtra tus cartas por tipos de Pokémon. 🎨
+- Experiencia inmersiva: Música de fondo seleccionable y efectos sonoros. 🎵
+- Progreso detallado: Seguimiento de puntajes, movimientos realizados y tiempo. ⏱️
+- Sistema de Logros: ¡Desbloquea medallas al completar retos especiales! 🏅
+- Interfaz elegante: Pantalla de resultados finales con estadísticas detalladas. 📊
 
-## 1. Estructura de Directorios
-
-La base de código está organizada para separar claramente la lógica de negocio,
-el manejo del estado, el consumo de APIs externas y la renderización del DOM.
+## Estructura del proyecto
 
 ```text
-/
-├── index.html            -> Punto de entrada. Carga únicamente `<script type="module" src="./js/app.js">`
-├── css/
-│   └── styles.css        → Estilos globales, variables CSS, utilidades de Grid/Flexbox 
+proyectos/memoria/
+├── index.html
+├── README.md
+├── requirements.md
 ├── assets/
-│   └── images/           -> Recursos estáticos locales (fondos, logos)
-└── js/
-    ├── app.js            -> Entry point: inicializa el router básico y monta la vista inicial
-    │
-    ├── api/              
-    │   └── pokeApi.js    -> Servicios: `fetch` a la PokeAPI, normalización de datos y manejo de errores
-    │
-    ├── state/            
-    │   └── store.js      -> Estado global: almacena jugadores, puntajes, turnos y configuraciones actuales
-    │
-    ├── core/             -> Lógica de negocio (Independiente del DOM)
-    │   ├── timer.js      -> Lógica del cronómetro para el Modo Solitario 
-    │   ├── modes.js      -> Reglas de los 3 modos: Solitario, PvP, Libre 
-    │   ├── themes.js     -> Definición y validación de las 3 temáticas visuales 
-    │   └── achievements.js -> Sistema de verificación para los 4 logros en sesión 
-    │
-    └── components/       -> Capa de Presentación (Atomic Design)
-        ├── 1-atoms/      -> Elementos UI indivisibles
-        │   ├── card.js   -> Crea `<article class="card">` y maneja su propia animación de giro 
-        │   └── button.js -> Creación estandarizada de botones de la interfaz
-        │
-        ├── 2-molecules/  -> Agrupación simple de átomos
-        │   ├── playerBadge.js -> Combina el nombre del jugador con su puntaje y estado de turno 
-        │   └── toast.js       -> Notificación flotante en el DOM para logros  
-        │
-        ├── 3-organisms/  -> Secciones complejas de la UI
-        │   ├── gameBoard.js   -> Genera dinámicamente la cuadrícula (4x4, 6x6, 8x8) inyectando átomos `card` 
-        │   ├── hudMenu.js     -> Panel superior que renderiza `timer` y `playerBadge`s 
-        │   └── configForm.js  -> Formulario de selección de modo, dificultad, temática y nombres 
-        │
-        └── 4-pages/      -> Vistas principales orquestadoras
-            ├── Home.js        -> Vista inicial de configuración 
-            ├── Game.js        -> Vista principal del juego activo (integra HUD y Tablero)
-            └── Results.js     -> Vista modal/pantalla final con estadísticas y opciones de reinicio 
+│   ├── audio/
+│   └── images/
+├── js/
+│   ├── app.js
+│   ├── api/
+│   │   └── pokeapi.js
+│   ├── components/
+│   │   ├── board.js
+│   │   ├── createCard.js
+│   │   ├── hudMenu.js
+│   │   ├── musicToggle.js
+│   │   ├── playerBadge.js
+│   │   ├── renderSettings.js
+│   │   ├── timer.js
+│   │   └── toast.js
+│   ├── core/
+│   │   ├── awards.js
+│   │   ├── gameEngine.js
+│   │   ├── musicService.js
+│   │   ├── Router.js
+│   │   └── timer.js
+│   ├── state/
+│   │   ├── GameState.js
+│   │   ├── playerFactory.js
+│   │   ├── Pokemon.js
+│   │   └── User.js
+│   ├── utils/
+│   │   └── resultsBuilder.js
+│   └── views/
+│       ├── GameView.js
+│       ├── HomeView.js
+│       └── ResultsView.js
+└── styles/
+    ├── Card.css
+    ├── GameBoard.css
+    ├── GameView.css
+    ├── HomeView.css
+    ├── ResultsView.css
+    ├── Settings.css
+    ├── style.css
+    ├── timer.css
+    ├── toast.css
+    └── hudMenu.css
 ```
 
+## Carpeta `js/`
 
-## 2. Flujo de Datos y Módulos
+- `app.js`: punto de entrada que inicializa el `Router`, carga las vistas y añade
+  el control de música.
+- `api/pokeapi.js`: cliente para consumir la PokeAPI y obtener datos de Pokémon.
+- `components/`: UI reutilizable y lógica de renderizado.
+  - `board.js`: genera el tablero de cartas y solicita los Pokémon.
+  - `createCard.js`: crea las cartas con flip y estado de coincidencia.
+  - `hudMenu.js`: muestra jugadores, cronómetro y controles de finalización.
+  - `musicToggle.js`: botón flotante para reproducir/pausar la música.
+  - `playerBadge.js`: representación de cada jugador en el HUD.
+  - `renderSettings.js`: formulario de configuración de modo, dificultad,
+    temática y audio.
+  - `timer.js`: componente de temporizador del juego.
+  - `toast.js`: notificaciones de logros y mensajes emergentes.
+- `core/`: lógica del juego independiente del DOM.
+  - `Router.js`: manejador de rutas hash para navegación SPA.
+  - `gameEngine.js`: reglas de emparejamiento, turnos, puntos y fin de juego.
+  - `awards.js`: lógica de desbloqueo de logros.
+  - `musicService.js`: administración de música de fondo.
+  - `timer.js`: controlador del cronómetro del juego.
+- `state/`: almacenamiento y construcción de datos de juego.
+  - `GameState.js`: singleton que mantiene el estado global.
+  - `playerFactory.js`: crea los jugadores activos según el modo.
+  - `Pokemon.js`: DTO/entidad de los datos del Pokémon.
+  - `User.js`: modelo de jugador.
+- `views/`: vistas principales montadas por el router.
+  - `HomeView.js`: pantalla inicial y acceso a la configuración.
+  - `GameView.js`: vista principal del juego con tablero y HUD.
+  - `ResultsView.js`: pantalla final con estadísticas y logros.
 
-Al utilizar ES Modules, abandonamos la dependencia del ámbito global (window).
-El flujo de ejecución es el siguiente:
+## 🛠️ Tecnologías Utilizadas
 
-1. Inicialización (`app.js`): El archivo actúa como un orquestador. Importa la página 
-Home.js y la renderiza en el contenedor principal del index.html.
+- HTML5 & CSS3 🌐
+- Vanilla JavaScript (ES Modules) 🚀
+- PokeAPI 🍎 (Fuente de datos de Pokémon)
 
-2. Configuración (`components/4-pages/Home.js`): Captura los eventos del formulario 
-inicial y guarda la configuración llamando a los métodos exportados por state/store.js.
+## 🚀 Cómo Empezar
+1. Clona o descarga este repositorio.
+2. Ejecuta el proyecto:
+  - Puedes simplemente abrir index.html en tu navegador. 🌐
+  - Recomendación: Usa un servidor local (como Live Server en VS Code o npx http-server) para evitar problemas con los módulos ES.
+3. ¡Prepárate para ser el mejor entrenador de memoria! 🧢✨
 
-3. Generación del Tablero (`components/3-organisms/gameBoard.js`): Lee la dificultad 
-y la temática desde store.js. Si la temática es Pokémon, realiza una llamada asíncrona
-a la pokeapi para obtener los sprites necesarios antes de renderizar las cartas.
-
-4. Mecánica de Juego (`core/modes.js` y `components/1-atoms/card.js`): Al hacer clic 
-en una carta, esta despacha un evento o llama a una función del core para validar el par.
-El core evalúa la coincidencia, bloquea temporalmente el tablero si es necesario,
-actualiza el store.js, y notifica a la UI que debe re-renderizar los puntajes 
-o mostrar un logro (`achievements.js -> toast.js`).
-
-## 3. Manejo del estado (`state/store.js`)
-
-Dado que Vanilla JS no cuenta con reactividad nativa, el estado se maneja mediante 
-un módulo centralizado que exporta funciones getter y setter.
-
-```javascript
-// Ejemplo conceptual del estado
-let gameState = {
-  mode: null, // 'solitario' | 'pvp' | 'libre'
-  difficulty: null, // 16 | 36 | 64
-  theme: 'pokemon',
-  players: [],
-  currentPlayerIndex: 0,
-  moves: 0,
-  pairsFound: 0,
-  achievementsUnlocked: []
-};
-
-export const getState = () => ({ ...gameState });
-export const updateState = (updates) => {
-  gameState = { ...gameState, ...updates };
-  // Aquí se podrían disparar eventos personalizados del DOM para notificar a la UI
-}
-};
-```
+## 👥 Autores
+- Jonner Paz 👤
+- Vanessa Pérez 👤
