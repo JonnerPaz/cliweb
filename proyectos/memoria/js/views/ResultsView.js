@@ -1,4 +1,5 @@
 import gameState from "../state/GameState.js";
+import { router } from "../app.js ";
 
 function hitRate(pairs, movements) {
   if (!movements || movements === 0) return "0.0";
@@ -6,7 +7,9 @@ function hitRate(pairs, movements) {
 }
 
 function formatTime(seconds) {
-  const m = Math.floor((seconds || 0) / 60).toString().padStart(2, "0");
+  const m = Math.floor((seconds || 0) / 60)
+    .toString()
+    .padStart(2, "0");
   const s = ((seconds || 0) % 60).toString().padStart(2, "0");
   return `${m}:${s}`;
 }
@@ -63,7 +66,9 @@ export class ResultsView {
         <section class="results-awards">
           <h3>🏅 Logros Desbloqueados</h3>
           <ul class="awards-grid">
-            ${awards.map(award => `
+            ${awards
+              .map(
+                (award) => `
               <li class="award-item award-${award.rarity}">
                 <span class="award-icon" aria-hidden="true">${award.icon}</span>
                 <div class="award-info">
@@ -71,7 +76,9 @@ export class ResultsView {
                   <p>${award.description}</p>
                 </div>
               </li>
-            `).join('')}
+            `
+              )
+              .join("")}
           </ul>
         </section>
       `;
@@ -83,12 +90,12 @@ export class ResultsView {
         </section>
       `;
     }
-    
+
     const totalPairs = results.totalPairs ?? 0;
     const totalMovements = results.totalMovements ?? 0;
 
     container.innerHTML = `
-      <section class="results-container">    
+      <section class="results-container">
         <header>
           <h1>¡Resultados!</h1>
           ${winnerHtml}
@@ -105,7 +112,7 @@ export class ResultsView {
         <section class="results-players">
           ${playersHtml}
         </section>
-        
+
         ${awardsHtml}
 
         <nav class="results-actions" aria-label="Acciones de fin de juego">
@@ -117,11 +124,11 @@ export class ResultsView {
     `;
 
     container.querySelector("#btn-play-again").addEventListener("click", () => {
-      import("../app.js").then(({ router }) => router.navigateTo("/game"));
+      router.navigateTo("/game");
     });
 
     container.querySelector("#btn-back-menu").addEventListener("click", () => {
-      import("../app.js").then(({ router }) => router.navigateTo("/"));
+      router.navigateTo("/");
     });
   }
 

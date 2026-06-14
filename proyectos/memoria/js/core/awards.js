@@ -93,6 +93,7 @@ export class AwardChecker {
         ? (gameData.totalPairs / gameData.totalMovements) * 100
         : 0;
 
+    // tiempos según dificultad de juego
     const isFastEnough =
       (gameData.difficulty === "Medio" && gameData.time <= 60) ||
       (gameData.difficulty === "Dificil" && gameData.time <= 120) ||

@@ -149,10 +149,7 @@ export class GameView {
     this.setupDifficulty(gameState.difficulty);
     this.setupEngine();
 
-    gameState.players = createPlayers(
-      gameState.gameMode,
-      gameState.players
-    );
+    gameState.players = createPlayers(gameState.gameMode, gameState.players);
 
     if (gameState.gameMode === "solo" || gameState.gameMode === "free") {
       this.timerController = startTimer((segundos) => {

@@ -116,3 +116,14 @@ proyectos/memoria/
 ## 👥 Autores
 - Jonner Paz 👤
 - Vanessa Pérez 👤
+
+## Capturas de Pantalla
+
+### Inicio
+![Captura de Pantalla 1](./assets/images/inicio.png)
+
+### Jugando (Modo fácil)
+![Captura de Pantalla 2](./assets/images/jugando.png)
+
+### Resultados
+![Captura de Pantalla 3](./assets/images/resultados.png)

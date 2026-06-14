@@ -21,14 +21,6 @@ export class Router {
     // El evento "hashchange" se dispara cuando cambia el # de la URL (incluye atrás/adelante)
     window.addEventListener("hashchange", () => this.handleRoute());
 
-    // Intercepta clicks en enlaces que tengan el atributo data-link
-    document.body.addEventListener("click", (e) => {
-      if (e.target.matches("[data-link]")) {
-        e.preventDefault();
-        this.navigateTo(e.target.getAttribute("href"));
-      }
-    });
-
     // Renderiza la ruta inicial al cargar la página
     this.handleRoute();
   }
