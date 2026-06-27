@@ -23,3 +23,8 @@ nav a {
     color: #333;
     font-weight: bold;
 }
+
+nav a.active {
+    color: #b8860b;
+    border-bottom: 2px solid #b8860b;
+}

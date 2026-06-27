@@ -59,3 +59,9 @@
     margin: 0;
     font-style: italic;
 }
+
+.card-meta {
+    font-size: 0.8rem;
+    color: #95a5a6;
+    margin: 6px 0 0 0;
+}
