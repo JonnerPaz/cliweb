@@ -8,6 +8,7 @@ import { metApi } from "./api.js";
 import { HomeView } from "./views/home.js";
 import { ExploreView } from "./views/explore.js";
 
+// Configura las rutas del router
 const router = new Router(document.getElementById("app"), [
   { pattern: "/", handler: () => new HomeView({ api: metApi, router }) },
   {
@@ -15,3 +16,6 @@ const router = new Router(document.getElementById("app"), [
     handler: () => new ExploreView({ api: metApi, router }),
   },
 ]);
+
+// Inicia el router (debe iniciar después de configurar las rutas)
+router.start();

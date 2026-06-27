@@ -3,13 +3,6 @@ export class Router {
     this.rootElement = rootElement;
     this.routes = routes;
     this.currentView = null;
-
-    this.#init();
-  }
-
-  #init() {
-    window.addEventListener("hashchange", () => this.handleRoute());
-    this.handleRoute();
   }
 
   /**
@@ -70,6 +63,11 @@ export class Router {
         }
       }
     }
+  }
+
+  start() {
+    window.addEventListener("hashchange", () => this.handleRoute());
+    this.handleRoute();
   }
 
   navigateTo(path) {
