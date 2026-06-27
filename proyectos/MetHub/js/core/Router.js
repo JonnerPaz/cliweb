@@ -19,6 +19,7 @@ export class Router {
 
   handleRoute() {
     let path = window.location.hash.slice(1) || "/";
+    if (!path.startsWith('/')) path = '/' + path;
     path = path.replace(/\/$/, "") || "/";
 
     let matched = false;

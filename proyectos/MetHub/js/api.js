@@ -1,20 +1,25 @@
 const DEFAULT_TIMEOUT_MS = 10000;
 
 export class MetApiService {
-  constructor(baseUrl = 'https://collectionapi.metmuseum.org/public/collection/v1') {
+  constructor(
+    baseUrl = "https://collectionapi.metmuseum.org/public/collection/v1"
+  ) {
     this.baseUrl = baseUrl;
     this.timeoutMs = DEFAULT_TIMEOUT_MS;
   }
 
   buildUrl(endpoint, params = {}) {
     const query = new URLSearchParams(params).toString();
-    return `${this.baseUrl}${endpoint}${query ? `?${query}` : ''}`;
+    return `${this.baseUrl}${endpoint}${query ? `?${query}` : ""}`;
   }
 
   async request(endpoint, params = {}, options = {}) {
     const url = this.buildUrl(endpoint, params);
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), options.timeoutMs ?? this.timeoutMs);
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      options.timeoutMs ?? this.timeoutMs
+    );
 
     try {
       const response = await fetch(url, {
@@ -23,16 +28,18 @@ export class MetApiService {
       });
 
       if (!response.ok) {
-        const error = new Error(`Error ${response.status} al consultar ${endpoint}`);
+        const error = new Error(
+          `Error ${response.status} al consultar ${endpoint}`
+        );
         error.status = response.status;
         throw error;
       }
 
       return await response.json();
     } catch (error) {
-      if (error.name === 'AbortError') {
-        const timeoutError = new Error('La petición tardó demasiado');
-        timeoutError.name = 'TimeoutError';
+      if (error.name === "AbortError") {
+        const timeoutError = new Error("La petición tardó demasiado");
+        timeoutError.name = "TimeoutError";
         throw timeoutError;
       }
       throw error;
@@ -42,12 +49,12 @@ export class MetApiService {
   }
 
   async getDepartments() {
-    const data = await this.request('/departments');
+    const data = await this.request("/departments");
     return Array.isArray(data?.departments) ? data.departments : [];
   }
 
   async searchObjects({
-    q = '',
+    q = "*",
     departmentId = null,
     isHighlight = false,
     hasImages = false,
@@ -58,14 +65,15 @@ export class MetApiService {
     const params = {};
 
     if (q) params.q = q;
-    if (departmentId !== null && departmentId !== '') params.departmentId = departmentId;
-    if (isHighlight) params.isHighlight = 'true';
-    if (hasImages) params.hasImages = 'true';
-    if (artistOrCulture) params.artistOrCulture = 'true';
-    if (dateBegin !== null && dateBegin !== '') params.dateBegin = dateBegin;
-    if (dateEnd !== null && dateEnd !== '') params.dateEnd = dateEnd;
+    if (departmentId !== null && departmentId !== "")
+      params.departmentId = departmentId;
+    if (isHighlight) params.isHighlight = "true";
+    if (hasImages) params.hasImages = "true";
+    if (artistOrCulture) params.artistOrCulture = "true";
+    if (dateBegin !== null && dateBegin !== "") params.dateBegin = dateBegin;
+    if (dateEnd !== null && dateEnd !== "") params.dateEnd = dateEnd;
 
-    const data = await this.request('/search', params);
+    const data = await this.request("/search", params);
 
     return {
       total: Number(data?.total) || 0,
@@ -90,11 +98,11 @@ export class MetApiService {
     );
 
     return settledResults
-      .filter((result) => result.status === 'fulfilled' && result.value)
+      .filter((result) => result.status === "fulfilled" && result.value)
       .map((result) => result.value);
   }
 
-  async getHighlightedObjects({ q = '', limit = 8 } = {}) {
+  async getHighlightedObjects({ q = "", limit = 8 } = {}) {
     const searchResult = await this.searchObjects({
       q,
       isHighlight: true,
