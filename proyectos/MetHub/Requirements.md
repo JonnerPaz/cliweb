@@ -1,10 +1,3 @@
-
-proyecto-2-pareja-methub.md
-Página
-1
-/
-1
-100 %
 # Documento de Requerimientos de Software
 ## MetHub — Explorador de la Colección del Met Museum (Edición en Pareja)
 ---
