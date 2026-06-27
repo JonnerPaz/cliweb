@@ -1,7 +1,5 @@
-/* Contenedor principal de tarjetas (Grid) */
 .card-grid {
     display: grid;
-    /* Esto crea columnas automáticas según el ancho de la pantalla */
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 25px;
     padding: 20px;
@@ -26,22 +24,21 @@
 .card-img-container {
     width: 100%;
     height: 220px;
-    background-color: #f7f7f7; 
+    background-color: #f7f7f7;
     overflow: hidden;
 }
 
 .card-img-container img {
     width: 100%;
     height: 100%;
-    object-fit: cover; 
+    object-fit: cover;
     transition: transform 0.5s ease;
 }
 
 .card:hover .card-img-container img {
-    transform: scale(1.05); 
+    transform: scale(1.05);
 }
 
-/* Cuerpo de la tarjeta */
 .card-body {
     padding: 16px;
     display: flex;
