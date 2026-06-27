@@ -1,58 +1,77 @@
-/**
- * @param {HTMLElement} rootElement - El contenedor principal (ej. #app)
- * @param {Object} routes - Mapa de rutas, ej. { "/": () => new Home() }
- * @description Clase que maneja el enrutamiento de la aplicación. Estas rutas DEBEN tener entre sus métodos mount() y unmount()
- * @example
- * const routes = {
- *   "/": () => new View(),
- }
- */
 export class Router {
   constructor(rootElement, routes) {
     this.rootElement = rootElement;
     this.routes = routes;
-    this.currentView = null; // La vista actual. Monta y desmonta según la ruta
+    this.currentView = null;
 
-    // Inicia el router
-    this._init();
+    this.#init();
   }
 
-  _init() {
-    // El evento "hashchange" se dispara cuando cambia el # de la URL (incluye atrás/adelante)
+  #init() {
     window.addEventListener("hashchange", () => this.handleRoute());
-
-    // Renderiza la ruta inicial al cargar la página
     this.handleRoute();
   }
 
+  /**
+   * @description Converts a pattern (a path) to a regular expression
+   * @param {string} pattern The pattern to convert
+   * @returns {RegExp} The regular expression
+   */
+  #handleParams(pattern) {
+    const regexStr = pattern
+      .replace(/\/$/, "")
+      .replace(/:([^/]+)/g, "(?<$1>[^/]+)");
+    return new RegExp(`^${regexStr}$`);
+  }
+
   handleRoute() {
-    // Obtenemos el hash actual, o por defecto "/"
     let path = window.location.hash.slice(1) || "/";
+    path = path.replace(/\/$/, "") || "/";
 
-    // Obtenemos el handler de la ruta o el home. Es una función
-    const routeHandler = this.routes[path] || this.routes["/"];
+    let matched = false;
+    for (const { pattern, handler } of this.routes) {
+      const regex = this.#handleParams(pattern);
+      const match = path.match(regex);
+      if (match) {
+        const params = match.groups || {};
 
-    // Desmontamos la vista anterior (se borra del DOM)
-    if (this.currentView && typeof this.currentView.unmount === "function") {
-      this.currentView.unmount();
+        if (
+          this.currentView &&
+          typeof this.currentView.unmount === "function"
+        ) {
+          this.currentView.unmount();
+        }
+
+        this.rootElement.innerHTML = "";
+        this.currentView = handler(params);
+
+        if (this.currentView && typeof this.currentView.mount === "function") {
+          this.currentView.mount(this.rootElement);
+        }
+
+        matched = true;
+        break;
+      }
     }
 
-    // Limpiamos el contenedor
-    this.rootElement.innerHTML = "";
-
-    // Instanciamos la nueva vista
-    this.currentView = routeHandler();
-
-    // Montamos la vista en el contenedor
-    if (this.currentView && typeof this.currentView.mount === "function") {
-      this.currentView.mount(this.rootElement);
+    if (!matched) {
+      const homeHandler = this.routes.find((r) => r.pattern === "/");
+      if (homeHandler) {
+        if (
+          this.currentView &&
+          typeof this.currentView.unmount === "function"
+        ) {
+          this.currentView.unmount();
+        }
+        this.rootElement.innerHTML = "";
+        this.currentView = homeHandler.handler({});
+        if (this.currentView && typeof this.currentView.mount === "function") {
+          this.currentView.mount(this.rootElement);
+        }
+      }
     }
   }
 
-  /**
-   * @param {string} path - La ruta a navegar
-   * @description Navega a la ruta indicada y actualiza la URL
-   */
   navigateTo(path) {
     window.location.hash = path;
   }
