@@ -37,8 +37,8 @@ export class DeptCard extends HTMLElement {
 
     card.addEventListener('click', () => {
       if (d.departmentId) {
-        window.location.hash = `#explore?deptId=${d.departmentId}`;
-      }
+      window.location.hash = `#explore/${d.departmentId}`;      
+    }
     });
 
     this.appendChild(card);
