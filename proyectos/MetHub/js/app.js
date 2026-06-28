@@ -19,13 +19,21 @@ const router = new Router(document.getElementById("app"), [
     handler: () => new ExploreView({ api: metApi, router }),
   },
   {
+    pattern: "/departments",
+    handler: () => new DepartmentsView({ api: metApi, router }),
+  },
+  {
     pattern: "/detail/:id",
     handler: (p) => new DetailView({ api: metApi, router, id: p.id }),
   },
-  { 
-    pattern: "/explore/:deptId", 
-    handler: (params) => new ExploreView(params.deptId) 
-  }
+  {
+    pattern: "/explore/:deptId",
+    handler: (params) => {
+      const view = new ExploreView({ api: metApi, router });
+      view.filters.departmentId = params.deptId;
+      return view;
+    },
+  },
 ]);
 
 // Inicia el router (debe iniciar después de configurar las rutas)

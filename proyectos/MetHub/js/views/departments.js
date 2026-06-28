@@ -1,4 +1,5 @@
-import { DeptCard } from './components/dept-card';
+import '../components/dept-card.js';
+
 export class DepartmentsView {
   constructor({ api, router }) {
     this.api = api;

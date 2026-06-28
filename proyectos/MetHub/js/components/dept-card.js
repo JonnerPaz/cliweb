@@ -1,10 +1,10 @@
 export class DeptCard extends HTMLElement {
-    constructor(data, onClick) {
-        super();
-        this._data = null; 
+  constructor() {
+    super();
+    this._data = null;
   }
 
-    set data(value) {
+  set data(value) {
     this._data = value;
     this.render();
   }
@@ -22,11 +22,12 @@ export class DeptCard extends HTMLElement {
 
     const iconDiv = document.createElement('div');
     iconDiv.className = 'dept-icon';
-    
-    /* Icono con la Inicial del departamento 
-    Solucion temporal mientras evaluo si hacer un icono para cada uno*/
+
     const letter = (d.displayName || '?').charAt(0).toUpperCase();
     iconDiv.textContent = letter;
+
+    const cardBody = document.createElement('div');
+    cardBody.className = 'dept-card-body';
 
     const title = document.createElement('h3');
     title.className = 'dept-title';
@@ -34,11 +35,12 @@ export class DeptCard extends HTMLElement {
 
     cardBody.appendChild(title);
     card.appendChild(iconDiv);
+    card.appendChild(cardBody);
 
     card.addEventListener('click', () => {
       if (d.departmentId) {
-      window.location.hash = `#explore/${d.departmentId}`;      
-    }
+        window.location.hash = `#explore/${d.departmentId}`;
+      }
     });
 
     this.appendChild(card);
@@ -48,4 +50,5 @@ export class DeptCard extends HTMLElement {
     if (this._data) this.render();
   }
 }
+
 customElements.define('dept-card', DeptCard);
