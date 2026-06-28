@@ -58,8 +58,12 @@ export class ExploreView {
     layout.appendChild(resultsSection);
     container.appendChild(layout);
 
-    this.#loadDepartments();
-    this.#search();
+    this.#loadDepartments().then(() => {
+      if (this.filters.departmentId) {
+        this.deptSelect.value = this.filters.departmentId;
+      }
+      this.#search();
+    });
   }
 
   #buildFilters(panel) {
