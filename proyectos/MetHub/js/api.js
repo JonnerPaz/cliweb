@@ -111,6 +111,30 @@ export class MetApiService {
 
     return this.getObjectsByIds(searchResult.objectIDs.slice(0, limit));
   }
+
+  async getArtworksByArtist(artistName) {
+    const searchData = await this.request("/search", { 
+      q: artistName, 
+      artistOrCulture: true 
+    });
+
+    if (!searchData.objectIDs || searchData.objectIDs.length === 0) {
+      return { total: 0, artworks: [], bio: '' };
+    }
+
+    const idsToFetch = searchData.objectIDs.slice(0, 12);
+    const artworks = await this.getObjectsByIds(idsToFetch);
+
+    const bio = artworks.find(art => art.artistDisplayBio)?.artistDisplayBio || '';
+
+    return {
+      total: searchData.total,
+      artworks: artworks,
+      bio: bio,
+      allIds: searchData.objectIDs 
+    };
+  }
+
 }
 
 export const metApi = new MetApiService();

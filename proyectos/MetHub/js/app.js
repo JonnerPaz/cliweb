@@ -10,6 +10,7 @@ import { HomeView } from "./views/home.js";
 import { ExploreView } from "./views/explore.js";
 import { DetailView } from "./views/detail.js";
 import { DepartmentsView } from "./views/departments.js";
+import { ByArtistView } from "./views/by-artist.js";
 
 // Configura las rutas del router
 const router = new Router(document.getElementById("app"), [
@@ -34,6 +35,14 @@ const router = new Router(document.getElementById("app"), [
       return view;
     },
   },
+  {
+    pattern: "/artist/:name",
+    handler: (params) => new ByArtistView({ 
+      api: metApi, 
+      router, 
+      name: params.name 
+    }),
+  }
 ]);
 
 // Inicia el router (debe iniciar después de configurar las rutas)
