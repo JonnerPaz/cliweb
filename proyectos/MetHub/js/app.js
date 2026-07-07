@@ -11,6 +11,7 @@ import { ExploreView } from "./views/explore.js";
 import { DetailView } from "./views/detail.js";
 import { DepartmentsView } from "./views/departments.js";
 import { ByArtistView } from "./views/by-artist.js";
+import { CompareView } from "./views/compare.js";
 
 // Configura las rutas del router
 const router = new Router(document.getElementById("app"), [
@@ -41,6 +42,14 @@ const router = new Router(document.getElementById("app"), [
       api: metApi, 
       router, 
       name: params.name 
+    }),
+  },
+  {
+    pattern: "/compare",
+    handler: (params) => new CompareView({
+      api: metApi,
+      router,
+      preselectId: params.preselect || null,
     }),
   }
 ]);

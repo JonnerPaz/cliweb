@@ -18,16 +18,19 @@ export class Router {
   }
 
   handleRoute() {
-    let path = window.location.hash.slice(1) || "/";
-    if (!path.startsWith('/')) path = '/' + path;
-    path = path.replace(/\/$/, "") || "/";
+    let rawPath = window.location.hash.slice(1) || "/";
+    if (!rawPath.startsWith('/')) rawPath = '/' + rawPath;
+
+    const [pathPart, queryString = ""] = rawPath.split("?");
+    const path = pathPart.replace(/\/$/, "") || "/";
+    const queryParams = Object.fromEntries(new URLSearchParams(queryString).entries());
 
     let matched = false;
     for (const { pattern, handler } of this.routes) {
       const regex = this.#handleParams(pattern);
       const match = path.match(regex);
       if (match) {
-        const params = match.groups || {};
+        const params = { ...(match.groups || {}), ...queryParams };
 
         if (
           this.currentView &&
