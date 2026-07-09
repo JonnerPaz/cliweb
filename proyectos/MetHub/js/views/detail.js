@@ -167,11 +167,10 @@ export class DetailView {
       const table = document.createElement("dl");
       table.className = "info-table";
       fields.forEach(({ label, value }) => {
-        if (!value) return;
         const dt = document.createElement("dt");
         dt.textContent = label;
         const dd = document.createElement("dd");
-        dd.textContent = value;
+        dd.textContent = value || "Sin información";
         table.appendChild(dt);
         table.appendChild(dd);
       });

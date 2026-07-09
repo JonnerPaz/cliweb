@@ -56,6 +56,10 @@ export class ByArtistView {
       }
 
       if (bio) this.hero.querySelector(".bio").textContent = bio;
+      const totalInfo = document.createElement("p");
+      totalInfo.className = "artist-total";
+      totalInfo.textContent = `${total} obras encontradas`;
+      this.hero.appendChild(totalInfo);
 
       const backBtn = document.createElement("button");
       backBtn.className = "back-btn";
@@ -70,9 +74,19 @@ export class ByArtistView {
     } catch (e) {
       if (e.name === "AbortError") return;
       console.error("Error al cargar obras:", e);
-      const errorMsg = document.createElement("p");
-      errorMsg.textContent =
-        "Ocurrió un error al cargar las obras. Intenta más tarde.";
+      const errorMsg = document.createElement("error-state");
+      errorMsg.setAttribute("message", "Ocurrio un error al cargar las obras.");
+      errorMsg.setAttribute("retry", "");
+      errorMsg.onRetry(() => {
+        this.viewWrapper.innerHTML = "";
+        const loading = document.createElement("loading-state");
+        loading.setAttribute(
+          "message",
+          `Cargando obras de ${this.artistName}...`
+        );
+        this.viewWrapper.appendChild(loading);
+        this._loadData();
+      });
       this.viewWrapper.appendChild(errorMsg);
     }
   }

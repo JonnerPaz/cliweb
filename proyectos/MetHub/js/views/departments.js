@@ -48,9 +48,19 @@ export class DepartmentsView {
     } catch (e) {
       if (e.name === "AbortError") return;
       console.error("Error al cargar departamentos:", e);
-      const errorMsg = document.createElement("p");
-      errorMsg.textContent =
-        "Ocurrió un error al cargar los departamentos. Intenta más tarde.";
+      const errorMsg = document.createElement("error-state");
+      errorMsg.setAttribute(
+        "message",
+        "Ocurrio un error al cargar los departamentos."
+      );
+      errorMsg.setAttribute("retry", "");
+      errorMsg.onRetry(() => {
+        container.innerHTML = "";
+        const loading = document.createElement("loading-state");
+        loading.setAttribute("message", "Cargando departamentos...");
+        container.appendChild(loading);
+        this._loadData(container);
+      });
       container.appendChild(errorMsg);
     }
   }
