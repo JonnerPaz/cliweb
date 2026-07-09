@@ -111,48 +111,28 @@ export class MetApiService {
   }
 
   async getArtworksByArtist(artistName) {
-    const searchData = await this.request("/search", {
-      q: artistName,
-      artistOrCulture: true,
-    });
-
+    const searchData = await this.request("/search", { q: artistName });
     let ids = Array.isArray(searchData?.objectIDs) ? searchData.objectIDs : [];
 
-    // Aparentemente la api separa a los artistas en diferentes busquedas
-    // fallback en caso de que la api no devuelva el nombre como artista,
-    // pero que aun se muestren las obras
     if (ids.length === 0) {
-      const fallbackData = await this.request("/search", { q: artistName });
-      ids = Array.isArray(fallbackData?.objectIDs)
-        ? fallbackData.objectIDs
-        : [];
+      return { total: 0, artworks: [], bio: "", allIds: [] };
     }
 
+    // Limitamos a 50 para evitar problemas con la api
+    const resolved = await this.getObjectsByIds(ids.slice(0, 50));
+    ids = resolved
+      .filter((art) => art.artistDisplayName === artistName)
+      .map((art) => art.objectID);
+
     if (ids.length === 0) {
-      return {
-        total: 0,
-        artworks: [],
-        bio: "",
-        allIds: [],
-      };
+      return { total: 0, artworks: [], bio: "", allIds: [] };
     }
 
-    // limitamos a 12 la cantidad de obras
-    const rawArtworks = await this.getObjectsByIds(ids.slice(0, 12));
-    const artworks = rawArtworks.filter(
-      (art) => art.artistDisplayName === artistName
-    );
-
+    const artworks = await this.getObjectsByIds(ids.slice(0, 12));
     const bio =
-      artworks.find((art) => art.artistDisplayBio)?.artistDisplayBio ||
-      "No bio attached";
+      artworks.find((art) => art.artistDisplayBio)?.artistDisplayBio || "";
 
-    return {
-      total: ids.length,
-      artworks: artworks,
-      bio,
-      allIds: ids,
-    };
+    return { total: ids.length, artworks, bio, allIds: ids };
   }
 }
 

@@ -5,6 +5,10 @@ export class ByArtistView {
     this.api = api;
     this.router = router;
     this.artistName = decodeURIComponent(name);
+    this.currentPage = 1;
+    this.pageSize = 12;
+    this.allIds = [];
+    this.total = 0;
   }
 
   mount(container) {
@@ -38,7 +42,7 @@ export class ByArtistView {
 
   async _loadData() {
     try {
-      const { artworks, bio, total } = await this.api.getArtworksByArtist(
+      const { bio, total, allIds } = await this.api.getArtworksByArtist(
         this.artistName
       );
 
@@ -59,15 +63,10 @@ export class ByArtistView {
       backBtn.addEventListener("click", () => window.history.back());
       this.viewWrapper.appendChild(backBtn);
 
-      const grid = document.createElement("div");
-      grid.className = "card-grid";
-      this.viewWrapper.appendChild(grid);
-
-      artworks.forEach((art) => {
-        const card = document.createElement("art-card");
-        card.data = art;
-        grid.appendChild(card);
-      });
+      this.allIds = allIds;
+      this.total = total;
+      this.currentPage = 1;
+      this.#renderPage();
     } catch (e) {
       if (e.name === "AbortError") return;
       console.error("Error al cargar obras:", e);
@@ -76,6 +75,82 @@ export class ByArtistView {
         "Ocurrió un error al cargar las obras. Intenta más tarde.";
       this.viewWrapper.appendChild(errorMsg);
     }
+  }
+
+  #renderPage() {
+    const oldGrid = this.viewWrapper.querySelector(".card-grid");
+    const oldPagination = this.viewWrapper.querySelector(".pagination");
+    if (oldGrid) oldGrid.remove();
+    if (oldPagination) oldPagination.remove();
+
+    const startIdx = (this.currentPage - 1) * this.pageSize;
+    const endIdx = startIdx + this.pageSize;
+    const pageIds = this.allIds.slice(startIdx, endIdx);
+
+    if (pageIds.length === 0) {
+      this.currentPage = 1;
+      this.#renderPage();
+      return;
+    }
+
+    const loading = document.createElement("loading-state");
+    loading.setAttribute("message", "Cargando obras...");
+    this.viewWrapper.appendChild(loading);
+
+    this.api.getObjectsByIds(pageIds).then((objects) => {
+      const existingLoading = this.viewWrapper.querySelector("loading-state");
+      if (existingLoading) existingLoading.remove();
+
+      const grid = document.createElement("div");
+      grid.className = "card-grid";
+      objects.forEach((obj) => {
+        const card = document.createElement("art-card");
+        card.data = obj;
+        grid.appendChild(card);
+      });
+      this.viewWrapper.appendChild(grid);
+
+      const totalPages = Math.ceil(this.total / this.pageSize);
+      this.#buildPagination(this.currentPage, totalPages);
+    });
+  }
+
+  #buildPagination(current, total) {
+    const pagDiv = document.createElement("div");
+    pagDiv.className = "pagination";
+
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "page-btn";
+    prevBtn.textContent = "\u2190 Anterior";
+    prevBtn.disabled = current <= 1;
+    prevBtn.addEventListener("click", () => {
+      if (current > 1) {
+        this.currentPage--;
+        this.#renderPage();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
+
+    const info = document.createElement("span");
+    info.className = "page-info";
+    info.textContent = `P\u00e1gina ${current} de ${total}`;
+
+    const nextBtn = document.createElement("button");
+    nextBtn.className = "page-btn";
+    nextBtn.textContent = "Siguiente \u2192";
+    nextBtn.disabled = current >= total;
+    nextBtn.addEventListener("click", () => {
+      if (current < total) {
+        this.currentPage++;
+        this.#renderPage();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    });
+
+    pagDiv.appendChild(prevBtn);
+    pagDiv.appendChild(info);
+    pagDiv.appendChild(nextBtn);
+    this.viewWrapper.appendChild(pagDiv);
   }
 
   unmount() {
