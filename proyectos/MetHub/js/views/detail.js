@@ -19,8 +19,6 @@ export class DetailView {
   }
 
   async _loadData() {
-    const container = this.container;
-
     try {
       const data = await this.api.getObjectById(this.id);
 

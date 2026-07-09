@@ -1,4 +1,4 @@
-import '../components/dept-card.js';
+import "../components/dept-card.js";
 
 export class DepartmentsView {
   constructor({ api, router }) {
@@ -11,12 +11,12 @@ export class DepartmentsView {
     this.container = container;
     this.container.innerHTML = "";
 
-    const viewWrapper = document.createElement('div');
-    viewWrapper.className = 'view-wrapper';
+    const viewWrapper = document.createElement("div");
+    viewWrapper.className = "view-wrapper";
     this.container.appendChild(viewWrapper);
 
     const loading = document.createElement("loading-state");
-    loading.setAttribute("message", "Cargando departamentos\u2026");
+    loading.setAttribute("message", "Cargando departamentos...");
     viewWrapper.appendChild(loading);
 
     this._loadData(viewWrapper);
@@ -27,26 +27,31 @@ export class DepartmentsView {
     backBtn.className = "back-btn";
     backBtn.textContent = "\u2190 Volver";
     backBtn.addEventListener("click", () => window.history.back());
-    
-    const grid = document.createElement('div');
-    grid.className = 'card-grid';
+
+    const grid = document.createElement("div");
+    grid.className = "card-grid";
 
     try {
-      const departments = await this.api.getDepartments({ signal: this.ac.signal });
-      
+      const departments = await this.api.getDepartments({
+        signal: this.ac.signal,
+      });
+
       container.innerHTML = "";
       container.appendChild(backBtn);
       container.appendChild(grid);
 
       departments.forEach((dept) => {
-        const card = document.createElement('dept-card');
+        const card = document.createElement("dept-card");
         card.data = dept;
         grid.appendChild(card);
       });
     } catch (e) {
-      if (e.name === 'AbortError') return; 
+      if (e.name === "AbortError") return;
       console.error("Error al cargar departamentos:", e);
-      container.innerHTML = `<p>Error al cargar los departamentos. Intenta más tarde.</p>`;
+      const errorMsg = document.createElement("p");
+      errorMsg.textContent =
+        "Ocurrió un error al cargar los departamentos. Intenta más tarde.";
+      container.appendChild(errorMsg);
     }
   }
 
