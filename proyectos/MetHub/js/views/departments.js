@@ -44,6 +44,7 @@ export class DepartmentsView {
         const card = document.createElement("dept-card");
         card.data = dept;
         grid.appendChild(card);
+        this._loadDepartmentPreview(dept, card);
       });
     } catch (e) {
       if (e.name === "AbortError") return;
@@ -64,6 +65,23 @@ export class DepartmentsView {
       container.appendChild(errorMsg);
     }
   }
+
+async _loadDepartmentPreview(dept, card) {
+  if (!dept?.departmentId) return;
+
+  try {
+    const imageUrl = await this.api.getDepartmentThumbnail(dept.departmentId, {
+      signal: this.ac.signal 
+    });
+
+    if (imageUrl) {
+      card.data = { ...dept, imageUrl };
+    }
+  } catch (error) {
+    if (error.name === "AbortError") return;
+    console.error("Error al obtener miniatura:", error);
+  }
+}
 
   unmount() {
     this.ac.abort();

@@ -24,7 +24,20 @@ export class DeptCard extends HTMLElement {
     iconDiv.className = 'dept-icon';
 
     const letter = (d.displayName || '?').charAt(0).toUpperCase();
-    iconDiv.textContent = letter;
+
+    if (d.imageUrl) {
+      const img = document.createElement('img');
+      img.src = d.imageUrl;
+      img.alt = d.displayName || 'Departamento';
+      img.loading = 'lazy';
+      img.onerror = () => {
+        iconDiv.innerHTML = '';
+        iconDiv.textContent = letter;
+      };
+      iconDiv.appendChild(img);
+    } else {
+      iconDiv.textContent = letter;
+    }
 
     const cardBody = document.createElement('div');
     cardBody.className = 'dept-card-body';

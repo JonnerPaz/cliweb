@@ -1,5 +1,7 @@
 const DEFAULT_TIMEOUT_MS = 10000;
 
+const deptThumbnailCache = new Map();
+
 export class MetApiService {
   constructor(
     baseUrl = "https://collectionapi.metmuseum.org/public/collection/v1"
@@ -23,7 +25,7 @@ export class MetApiService {
 
     try {
       const response = await fetch(url, {
-        signal: controller.signal,
+        signal: options.signal ?? controller.signal,
         ...options.fetchOptions,
       });
 
@@ -53,6 +55,31 @@ export class MetApiService {
     return Array.isArray(data?.departments) ? data.departments : [];
   }
 
+  async getDepartmentThumbnail(departmentId, options = {}) {
+    if (deptThumbnailCache.has(departmentId)) {
+      return deptThumbnailCache.get(departmentId);
+    }
+
+    const searchResult = await this.searchObjects({ 
+      departmentId, hasImages: true },
+      options
+    );
+
+    const candidates = searchResult.objectIDs.slice(0, 3);
+
+    for (const id of candidates) {
+      const artwork = await this.getObjectById(id, options);
+      const imageUrl = artwork?.primaryImageSmall;
+
+      if (imageUrl) {
+        deptThumbnailCache.set(departmentId, imageUrl);
+        return imageUrl;
+      }
+    }
+
+    return null; 
+  }
+
   async searchObjects({
     q = "*",
     departmentId = null,
@@ -61,7 +88,9 @@ export class MetApiService {
     artistOrCulture = false,
     dateBegin = null,
     dateEnd = null,
-  } = {}) {
+  } = {},
+    options = {}
+  ) {
     const params = {};
 
     if (q) params.q = q;
@@ -73,7 +102,7 @@ export class MetApiService {
     if (dateBegin !== null && dateBegin !== "") params.dateBegin = dateBegin;
     if (dateEnd !== null && dateEnd !== "") params.dateEnd = dateEnd;
 
-    const data = await this.request("/search", params);
+    const data = await this.request("/search", params, options);
 
     return {
       total: Number(data?.total) || 0,
@@ -81,9 +110,9 @@ export class MetApiService {
     };
   }
 
-  async getObjectById(id) {
+  async getObjectById(id, options = {}) {
     try {
-      return await this.request(`/objects/${id}`);
+      return await this.request(`/objects/${id}`, {}, options);
     } catch (err) {
       if (err.status === 404) return null;
       throw err;

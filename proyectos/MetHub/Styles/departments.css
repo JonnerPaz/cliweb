@@ -38,7 +38,7 @@
   box-shadow: 0 6px 12px rgba(184, 134, 11, 0.15);
 }
 
-/* El círculo del ícono con la letra inicial (temporal)*/
+/* El círculo del ícono con la letra inicial o una imagen de preview */
 .dept-icon {
   width: 60px;
   height: 60px;
@@ -51,6 +51,14 @@
   font-size: 1.5rem;
   font-weight: 700;
   font-family: Georgia, serif;
+  overflow: hidden;
+}
+
+.dept-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .dept-title {
