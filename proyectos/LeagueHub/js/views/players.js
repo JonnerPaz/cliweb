@@ -1,3 +1,5 @@
+import db from '../db.js';
+
 export class PlayersView {
   constructor({ router }) {
     this.router = router;
@@ -17,20 +19,19 @@ export class PlayersView {
   }
 
   async render() {
-    const { getActiveLeagueId, getByIndex, getAll } = await import('../db.js');
-    const leagueId = getActiveLeagueId();
+    const leagueId = db.getActiveLeagueId();
 
     if (!leagueId) {
       this.container.innerHTML = `<div class="empty-state"><p>No hay una liga activa.</p></div>`;
       return;
     }
 
-    const teams = await getByIndex('teams', 'leagueId', Number(leagueId));
+    const teams = await db.getByIndex('teams', 'leagueId', Number(leagueId));
     const teamIds = teams.map(t => t.id);
     const allPlayers = [];
 
     for (const teamId of teamIds) {
-      const players = await getByIndex('players', 'teamId', teamId);
+      const players = await db.getByIndex('players', 'teamId', teamId);
       allPlayers.push(...players);
     }
 

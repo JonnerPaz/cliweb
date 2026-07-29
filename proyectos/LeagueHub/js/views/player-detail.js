@@ -1,3 +1,5 @@
+import db from '../db.js';
+
 export class PlayerDetailView {
   constructor({ router, id }) {
     this.router = router;
@@ -16,8 +18,7 @@ export class PlayerDetailView {
   }
 
   async render() {
-    const { getById } = await import('../db.js');
-    const player = await getById('players', Number(this.id));
+    const player = await db.getById('players', Number(this.id));
 
     if (!player) {
       this.container.innerHTML = `<div class="empty-state"><p>Jugador no encontrado.</p></div>`;

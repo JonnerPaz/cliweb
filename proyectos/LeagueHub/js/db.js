@@ -3,166 +3,133 @@ const DB_VERSION = 1;
 
 let dbInstance = null;
 
-// TODO: This needs further refactor, but it works now
-// Creates the indexedDB api for the application
-export function openDB() {
-  return new Promise((resolve, reject) => {
-    if (dbInstance) return resolve(dbInstance);
+class DB {
+  async #getStore(mode, storeName) {
+    const db = await this.open();
+    const tx = db.transaction(storeName, mode);
+    return { tx, store: tx.objectStore(storeName) };
+  }
 
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
-
-      if (!db.objectStoreNames.contains("leagues")) {
-        const leagues = db.createObjectStore("leagues", { keyPath: "id", autoIncrement: true });
-        leagues.createIndex("name", "name", { unique: true });
-        leagues.createIndex("isActive", "isActive", { unique: false });
-      }
-
-      if (!db.objectStoreNames.contains("teams")) {
-        const teams = db.createObjectStore("teams", { keyPath: "id", autoIncrement: true });
-        teams.createIndex("leagueId", "leagueId", { unique: false });
-        teams.createIndex("name", "name", { unique: false });
-      }
-
-      if (!db.objectStoreNames.contains("players")) {
-        const players = db.createObjectStore("players", { keyPath: "id", autoIncrement: true });
-        players.createIndex("teamId", "teamId", { unique: false });
-        players.createIndex("name", "name", { unique: false });
-      }
-
-      if (!db.objectStoreNames.contains("matches")) {
-        const matches = db.createObjectStore("matches", { keyPath: "id", autoIncrement: true });
-        matches.createIndex("leagueId", "leagueId", { unique: false });
-        matches.createIndex("homeTeamId", "homeTeamId", { unique: false });
-        matches.createIndex("awayTeamId", "awayTeamId", { unique: false });
-        matches.createIndex("date", "date", { unique: false });
-        matches.createIndex("status", "status", { unique: false });
-      }
-
-      if (!db.objectStoreNames.contains("events")) {
-        const events = db.createObjectStore("events", { keyPath: "id", autoIncrement: true });
-        events.createIndex("matchId", "matchId", { unique: false });
-        events.createIndex("playerId", "playerId", { unique: false });
-      }
+  async #upgradeDB(event) {
+    const db = event.target.result;
+    const configs = {
+      leagues: { indexes: ["name", "isActive"] },
+      teams: { indexes: ["leagueId", "name"] },
+      players: { indexes: ["teamId", "name"] },
+      matches: { indexes: ["leagueId", "homeTeamId", "awayTeamId", "date", "status"] },
+      events: { indexes: ["matchId", "playerId"] },
     };
 
-    request.onsuccess = (event) => {
-      dbInstance = event.target.result;
-      resolve(dbInstance);
-    };
+    for (const [name, cfg] of Object.entries(configs)) {
+      if (db.objectStoreNames.contains(name)) continue;
+      const store = db.createObjectStore(name, { keyPath: "id", autoIncrement: true });
+      for (const idx of cfg.indexes) {
+        // leagues.name must be unique
+        const unique = idx === "name" && name === "leagues";
+        store.createIndex(idx, idx, { unique });
+      }
+    }
+  }
 
-    request.onerror = (event) => {
-      reject(event.target.error);
-    };
-  });
-}
+  async open() {
+    if (dbInstance) return dbInstance;
+    dbInstance = await new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => this.#upgradeDB(e);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
 
-function getStore(mode, storeName) {
-  return new Promise((resolve, reject) => {
-    openDB()
-      .then((db) => {
-        const tx = db.transaction(storeName, mode);
-        const store = tx.objectStore(storeName);
-        resolve({ tx, store });
-      })
-      .catch(reject);
-  });
-}
+    return dbInstance;
+  }
 
-export async function getAll(storeName) {
-  const { store } = await getStore("readonly", storeName);
-  return new Promise((resolve, reject) => {
-    const request = store.getAll();
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
+  async getAll(storeName) {
+    const { store } = await this.#getStore("readonly", storeName);
+    return new Promise((resolve, reject) => {
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
 
-export async function getById(storeName, id) {
-  const { store } = await getStore("readonly", storeName);
-  return new Promise((resolve, reject) => {
-    const request = store.get(id);
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
+  async getById(storeName, id) {
+    const { store } = await this.#getStore("readonly", storeName);
+    return new Promise((resolve, reject) => {
+      const req = store.get(id);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
 
-export async function getByIndex(storeName, indexName, value) {
-  const { store } = await getStore("readonly", storeName);
-  const index = store.index(indexName);
-  return new Promise((resolve, reject) => {
-    const request = index.getAll(value);
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
+  async getByIndex(storeName, indexName, value) {
+    const { store } = await this.#getStore("readonly", storeName);
+    return new Promise((resolve, reject) => {
+      const req = store.index(indexName).getAll(value);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
 
-export async function add(storeName, data) {
-  const { store } = await getStore("readwrite", storeName);
-  return new Promise((resolve, reject) => {
-    const request = store.add(data);
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
+  async add(storeName, data) {
+    const { store } = await this.#getStore("readwrite", storeName);
+    return new Promise((resolve, reject) => {
+      const req = store.add(data);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
 
-export async function put(storeName, data) {
-  const { store } = await getStore("readwrite", storeName);
-  return new Promise((resolve, reject) => {
-    const request = store.put(data);
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
+  async put(storeName, data) {
+    const { store } = await this.#getStore("readwrite", storeName);
+    return new Promise((resolve, reject) => {
+      const req = store.put(data);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
 
-export async function remove(storeName, id) {
-  const { store } = await getStore("readwrite", storeName);
-  return new Promise((resolve, reject) => {
-    const request = store.delete(id);
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
-}
+  async remove(storeName, id) {
+    const { store } = await this.#getStore("readwrite", storeName);
+    return new Promise((resolve, reject) => {
+      const req = store.delete(id);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  }
 
-export async function clear(storeName) {
-  const { store } = await getStore("readwrite", storeName);
-  return new Promise((resolve, reject) => {
-    const request = store.clear();
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
-}
+  async clear(storeName) {
+    const { store } = await this.#getStore("readwrite", storeName);
+    return new Promise((resolve, reject) => {
+      const req = store.clear();
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(req.error);
+    });
+  }
 
-export function runTransaction(storeNames, mode, callback) {
-  return new Promise((resolve, reject) => {
-    openDB()
-      .then((db) => {
-        const tx = db.transaction(storeNames, mode);
-        const stores = {};
-        storeNames.forEach((name) => {
-          stores[name] = tx.objectStore(name);
-        });
+  async runTransaction(storeNames, mode, callback) {
+    const db = await this.open();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeNames, mode);
+      const stores = {};
+      storeNames.forEach((n) => {
+        stores[n] = tx.objectStore(n);
+      });
+      tx.oncomplete = () => resolve();
+      tx.onerror = (e) => reject(e.target.error);
+      tx.onabort = (e) => reject(e.target.error);
+      callback(stores, tx);
+    });
+  }
 
-        tx.oncomplete = () => resolve();
-        tx.onerror = (event) => reject(event.target.error);
-        tx.onabort = (event) => reject(event.target.error);
+  getActiveLeagueId() {
+    return localStorage.getItem("leaguehub-active-league") || null;
+  }
 
-        callback(stores, tx);
-      })
-      .catch(reject);
-  });
-}
-
-export function getActiveLeagueId() {
-  return localStorage.getItem("leaguehub-active-league") || null;
-}
-
-export function setActiveLeagueId(id) {
-  if (id) {
-    localStorage.setItem("leaguehub-active-league", id);
-  } else {
-    localStorage.removeItem("leaguehub-active-league");
+  setActiveLeagueId(id) {
+    if (id) localStorage.setItem("leaguehub-active-league", id);
+    else localStorage.removeItem("leaguehub-active-league");
   }
 }
+
+const db = new DB();
+export default db;

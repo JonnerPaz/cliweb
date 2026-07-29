@@ -1,3 +1,5 @@
+import db from '../db.js';
+
 export class MatchDetailView {
   constructor({ router, id }) {
     this.router = router;
@@ -16,8 +18,7 @@ export class MatchDetailView {
   }
 
   async render() {
-    const { getById } = await import('../db.js');
-    const match = await getById('matches', Number(this.id));
+    const match = await db.getById('matches', Number(this.id));
 
     if (!match) {
       this.container.innerHTML = `<div class="empty-state"><p>Partido no encontrado.</p></div>`;

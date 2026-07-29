@@ -1,3 +1,5 @@
+import db from '../db.js';
+
 export class MatchesView {
   constructor({ router }) {
     this.router = router;
@@ -17,15 +19,14 @@ export class MatchesView {
   }
 
   async render() {
-    const { getActiveLeagueId, getByIndex } = await import("../db.js");
-    const leagueId = getActiveLeagueId();
+    const leagueId = db.getActiveLeagueId();
 
     if (!leagueId) {
       this.container.innerHTML = `<div class="empty-state"><p>No hay una liga activa.</p></div>`;
       return;
     }
 
-    const matches = await getByIndex("matches", "leagueId", Number(leagueId));
+    const matches = await db.getByIndex("matches", "leagueId", Number(leagueId));
 
     const loader = this.container.querySelector("loading-state");
     if (loader) loader.remove();
@@ -59,21 +60,3 @@ export class MatchesView {
     this.container = null;
   }
 }
-
-import { LeaguesView } from "./views/leagues.js";
-import { TeamsView } from "./views/teams.js";
-import { TeamDetailView } from "./views/team-detail.js";
-import { PlayersView } from "./views/players.js";
-import { PlayerDetailView } from "./views/player-detail.js";
-import { MatchesView } from "./views/matches.js";
-import { MatchDetailView } from "./views/match-detail.js";
-import { StatsView } from "./views/stats.js";
-
-    { pattern: "/leagues", handler: () => new LeaguesView({ router }) },
-    { pattern: "/teams", handler: () => new TeamsView({ router }) },
-    { pattern: "/team/:id", handler: (p) => new TeamDetailView({ router, id: p.id }) },
-    { pattern: "/players", handler: () => new PlayersView({ router }) },
-    { pattern: "/player/:id", handler: (p) => new PlayerDetailView({ router, id: p.id }) },
-    { pattern: "/matches", handler: () => new MatchesView({ router }) },
-    { pattern: "/match/:id", handler: (p) => new MatchDetailView({ router, id: p.id }) },
-    { pattern: "/stats", handler: () => new StatsView({ router }) },
