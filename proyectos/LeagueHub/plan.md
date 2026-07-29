@@ -8,27 +8,31 @@
 
 ## Fase 0 — Fundación (Día 1) — HACER JUNTOS
 
-- [ ] Crear estructura de carpetas:
+- [x] Crear estructura de carpetas:
   ```
   LeagueHub/
   ├── index.html
   ├── css/
-  │   └── styles.css
+  │   ├── styles.css
+  │   └── components.css
   ├── js/
-  │   ├── app.js          (entry point, router)
-  │   ├── db.js            (capa IndexedDB)
-  │   ├── sports-terms.js  (mapa de terminología)
-  │   ├── router.js        (hash router)
-  │   ├── components/      (Custom Elements)
-  │   └── views/           (lógica de cada vista)
+  │   ├── app.js            (entry point, router)
+  │   ├── db.js             (capa IndexedDB)
+  │   ├── sports-terms.js   (mapa de terminología)
+  │   ├── core/
+  │   │   └── Router.js     (hash router)
+  │   ├── utils/
+  │   │   └── helpers.js    (utilidades)
+  │   ├── components/       (Custom Elements)
+  │   └── views/            (lógica de cada vista)
   └── assets/
   ```
-- [ ] `index.html` básico: navbar placeholder, `<main id="app">`, footer
-- [ ] Implementar **NavBar** (Custom Element) con logo, liga activa, enlaces
-- [ ] Implementar **Footer** (Custom Element) con créditos y estado IndexedDB
-- [ ] Implementar **Toast**, **ConfirmDialog**, **LoadingState** como Custom Elements
-- [ ] Implementar **hash router** básico que cargue vistas según `window.location.hash`
-- [ ] Definir estructura de los 3 deportes en `sports-terms.js`:
+- [x] `index.html` básico: navbar placeholder, `<main id="app">`, footer
+- [x] Implementar **NavBar** (Custom Element) con logo, liga activa, enlaces
+- [/] Implementar **Footer** (Custom Element) con créditos y estado IndexedDB (inline en HTML, no Custom Element)
+- [x] Implementar **Toast**, **ConfirmDialog**, **LoadingState** como Custom Elements
+- [x] Implementar **hash router** básico que cargue vistas según `window.location.hash`
+- [x] Definir estructura de los 3 deportes en `sports-terms.js`:
   - **Fútbol:** `eventName: "Gol"`, `gf: "GF"`, `gc: "GC"`, `scorers: "Goleadores"`
   - **Básquet:** `eventName: "Canasta"`, `gf: "PF"`, `gc: "PC"`, `scorers: "Encestadores"`
   - **Tenis:** `eventName: "Punto"`, `gf: "PF"`, `gc: "PC"`, `scorers: "Punteadores"`
@@ -37,32 +41,32 @@
 
 ## Fase 1 — Capa de Datos (Día 1-2) — HACER JUNTOS
 
-- [ ] Abrir DB `leaguehub-db` con versionado (`onupgradeneeded`)
-- [ ] Crear 5 object stores con índices:
+- [x] Abrir DB `leaguehub-db` con versionado (`onupgradeneeded`)
+- [x] Crear 5 object stores con índices:
   - `leagues`: índice por `name` (único), `isActive`
   - `teams`: índices por `leagueId`, `name`
   - `players`: índices por `teamId`, `name`
   - `matches`: índices por `leagueId`, `homeTeamId`, `awayTeamId`, `date`, `status`
   - `events`: índices por `matchId`, `playerId`
-- [ ] Implementar funciones helper en `db.js`:
-  - `openDB()` → instancia única
+- [x] Implementar funciones helper en `db.js`:
+  - `db.open()` → instancia única
   - `getAll(storeName)`, `getById(storeName, id)`, `getByIndex(storeName, index, value)`
-  - `add(storeName, data)`, `put(storeName, data)`, `delete(storeName, id)`
+  - `add(storeName, data)`, `put(storeName, data)`, `remove(storeName, id)`, `clear(storeName)`
   - `runTransaction(stores, mode, callback)` → para operaciones de integridad
-  - `getActiveLeague()`, `setActiveLeague(id)` (con LocalStorage)
+  - `getActiveLeagueId()`, `setActiveLeagueId(id)` (con LocalStorage)
 
 ---
 
 ## Fase 2A — Estudiante A: Ligas, Partidos, Transacciones (Días 2-5)
 
-- [ ] **Vista `#leagues`:**
-  - [ ] Listado de ligas (tarjetas con nombre, deporte, temporada, #equipos, #partidos)
-  - [ ] Crear liga (formulario con nombre, deporte, modalidad, vueltas o #equipos, temporada)
-  - [ ] Editar liga (nombre, temporada, descripción — modalidad bloqueada)
-  - [ ] Activar liga (transaccional, desactiva la anterior, persiste en LocalStorage)
+- [x] **Vista `#leagues`:**
+  - [x] Listado de ligas (tarjetas con nombre, deporte, temporada, #equipos, #partidos)
+  - [x] Crear liga (formulario con nombre, deporte, modalidad, vueltas o #equipos, temporada)
+  - [x] Editar liga (nombre, temporada, descripción — modalidad bloqueada)
+  - [x] Activar liga (transaccional, desactiva la anterior, persiste en LocalStorage)
   - [ ] Eliminar liga (con confirmación, borra en cascada todo)
-  - [ ] Botón "Generar fixture" (liga) → algoritmo round-robin
-  - [ ] Botón "Generar bracket" (eliminación directa) → bracket con slots
+  - [x] Botón "Programar partidos" (liga) → algoritmo round-robin
+  - [x] Botón "Generar bracket" (eliminación directa) → bracket con slots
   - [ ] Exportar liga a JSON
   - [ ] Importar liga desde JSON (validación + transacción)
 - [ ] **Vista `#matches`:**
@@ -115,9 +119,9 @@
 
 ## Fase 3 — Dashboard (Días 5-6) — ESTUDIANTE B
 
-- [ ] **Vista `#dashboard`:**
-  - [ ] Cabecera con nombre de liga, deporte, temporada
-  - [ ] Mensaje vacío si no hay ligas + botón "Crear primera liga"
+- [x] **Vista `#dashboard`:**
+  - [x] Cabecera con nombre de liga, deporte, temporada
+  - [x] Mensaje vacío si no hay ligas + botón "Ir a Ligas"
   - [ ] Tarjeta de próximo partido y último resultado
   - [ ] Mini tabla top 5 (liga) o resumen de bracket (eliminación directa)
   - [ ] 3 gráficos Chart.js:
@@ -130,7 +134,7 @@
 
 ## Fase 4 — Integración y Pruebas (Días 6-7) — AMBOS
 
-- [ ] Integrar vistas de ambos estudiantes, probar navegación completa
+- [x] Integrar vistas de ambos estudiantes (router configurado con todas las rutas)
 - [ ] Verificar que el router de hash funciona con botones atrás/adelante
 - [ ] Probar los 12 escenarios de prueba manual (sección 9 del documento)
 - [ ] Verificar que los cambios de liga activa redirigen al dashboard
