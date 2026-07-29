@@ -1,4 +1,5 @@
 import db from '../db.js';
+import '../components/league-form.js';
 
 export class LeaguesView {
   constructor({ router }) {
@@ -15,6 +16,11 @@ export class LeaguesView {
       </div>
       <loading-state message="Cargando ligas..."></loading-state>
     `;
+    container.querySelector('#create-league').addEventListener('click', () => {
+      const form = document.createElement('league-form');
+      form.addEventListener('league-created', () => this.render());
+      this.container.appendChild(form);
+    });
     this.render();
   }
 
