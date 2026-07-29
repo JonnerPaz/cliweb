@@ -33,15 +33,13 @@ export class TeamsView {
     if (teams.length === 0) {
       list.innerHTML = `<div class="empty-state"><p>No hay equipos en esta liga.</p></div>`;
     } else {
-      list.innerHTML = teams.map(t => `
-        <div class="card" data-id="${t.id}">
-          <h3>${t.name}</h3>
-        </div>
-      `).join('');
-
-      list.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('click', () => this.router.navigateTo(`/team/${card.dataset.id}`));
-      });
+      for (const t of teams) {
+        const players = await getByIndex('players', 'teamId', t.id);
+        const card = document.createElement('team-card');
+        card.data = { ...t, playerCount: players.length };
+        card.addEventListener('click', () => this.router.navigateTo(`/team/${t.id}`));
+        list.appendChild(card);
+      }
     }
 
     const loader = this.container.querySelector('loading-state');
