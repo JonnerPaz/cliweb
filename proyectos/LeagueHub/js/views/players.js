@@ -17,7 +17,7 @@ export class PlayersView {
   }
 
   async render() {
-    const { getActiveLeagueId, getByIndex, getAll } = await import('../db.js');
+    const { getActiveLeagueId, getByIndex } = await import('../db.js');
     const leagueId = getActiveLeagueId();
 
     if (!leagueId) {
@@ -26,12 +26,15 @@ export class PlayersView {
     }
 
     const teams = await getByIndex('teams', 'leagueId', Number(leagueId));
-    const teamIds = teams.map(t => t.id);
-    const allPlayers = [];
+    const teamMap = {};
+    teams.forEach(t => {
+      teamMap[t.id] = t;
+    });
 
-    for (const teamId of teamIds) {
-      const players = await getByIndex('players', 'teamId', teamId);
-      allPlayers.push(...players);
+    const allPlayers = [];
+    for (const team of teams) {
+      const players = await getByIndex('players', 'teamId', team.id);
+      allPlayers.push(...players.map(p => ({ ...p, teamId: team.id })));
     }
 
     const loader = this.container.querySelector('loading-state');
@@ -44,16 +47,20 @@ export class PlayersView {
 
     const grid = document.createElement('div');
     grid.className = 'card-grid';
-    grid.innerHTML = allPlayers.map(p => `
-      <div class="card" data-id="${p.id}">
-        <h3>${p.name}</h3>
-        <p>#${p.number} — ${p.position || ''}</p>
-      </div>
-    `).join('');
 
-    grid.querySelectorAll('.card').forEach(card => {
-      card.addEventListener('click', () => this.router.navigateTo(`/player/${card.dataset.id}`));
-    });
+    for (const p of allPlayers) {
+      const team = teamMap[p.teamId] || {};
+      const card = document.createElement('player-card');
+      card.data = {
+        ...p,
+        teamName: team.name,
+        teamEscudo: team.escudo,
+        teamColor: team.colorPrincipal,
+        teamColorSecundario: team.colorSecundario,
+      };
+      card.addEventListener('click', () => this.router.navigateTo(`/player/${p.id}`));
+      grid.appendChild(card);
+    }
 
     this.container.appendChild(grid);
   }
