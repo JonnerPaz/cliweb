@@ -89,3 +89,14 @@ fieldset.form-group legend {
   border-color: #6c5ce7;
   box-shadow: 0 0 16px rgba(108, 92, 231, 0.4);
 }
+
+.form-input:disabled,
+.form-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.radio-label input[type="radio"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

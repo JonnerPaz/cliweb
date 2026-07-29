@@ -65,6 +65,16 @@ export class LeaguesView {
         });
       });
 
+      list.querySelectorAll('.js-edit').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const form = document.createElement('league-form');
+          form.setAttribute('edit-id', btn.dataset.id);
+          form.addEventListener('league-updated', () => this.render());
+          this.container.appendChild(form);
+        });
+      });
+
       list.querySelectorAll('.js-delete').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           e.stopPropagation();
