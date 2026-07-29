@@ -3,8 +3,8 @@ import "./components/loading-state.js";
 import "./components/error-state.js";
 import "./components/confirm-dialog.js";
 
+import db from "./db.js";
 import { Router } from "./core/Router.js";
-import { openDB } from "./db.js";
 import { DashboardView } from "./views/dashboard.js";
 import { LeaguesView } from "./views/leagues.js";
 import { TeamsView } from "./views/teams.js";
@@ -17,8 +17,7 @@ import { MatchDetailView } from "./views/match-detail.js";
 
 async function init() {
   try {
-    await openDB();
-    document.querySelector(".db-status").textContent = "IndexedDB: Conectado";
+    await db.open();
   } catch (err) {
     console.error("Error al abrir IndexedDB:", err);
   }

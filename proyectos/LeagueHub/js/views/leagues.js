@@ -1,3 +1,5 @@
+import db from '../db.js';
+
 export class LeaguesView {
   constructor({ router }) {
     this.router = router;
@@ -17,9 +19,8 @@ export class LeaguesView {
   }
 
   async render() {
-    const { getAll, getActiveLeagueId, setActiveLeagueId } = await import('../db.js');
-    const leagues = await getAll('leagues');
-    const activeId = getActiveLeagueId();
+    const leagues = await db.getAll('leagues');
+    const activeId = db.getActiveLeagueId();
 
     const list = this.container.querySelector('#league-list') || document.createElement('div');
     list.id = 'league-list';
@@ -45,8 +46,7 @@ export class LeaguesView {
         btn.addEventListener('click', async (e) => {
           e.stopPropagation();
           const id = Number(btn.dataset.id);
-          const { getAll, put } = await import('../db.js');
-          await runTransaction(['leagues'], 'readwrite', (stores) => {
+          await db.runTransaction(['leagues'], 'readwrite', (stores) => {
             const all = stores.leagues.getAll();
             all.onsuccess = () => {
               all.result.forEach(l => {
@@ -54,7 +54,7 @@ export class LeaguesView {
               });
             };
           });
-          setActiveLeagueId(id);
+          db.setActiveLeagueId(id);
           this.router.navigateTo('/dashboard');
         });
       });
@@ -66,8 +66,7 @@ export class LeaguesView {
           const confirmed = await ConfirmDialog.show('Eliminar liga', '¿Eliminar esta liga y todos sus datos? Se borrarán equipos, jugadores, partidos y eventos asociados.');
           if (confirmed) {
             const id = Number(btn.dataset.id);
-            const { remove } = await import('../db.js');
-            await remove('leagues', id);
+            await db.remove('leagues', id);
             this.render();
           }
         });

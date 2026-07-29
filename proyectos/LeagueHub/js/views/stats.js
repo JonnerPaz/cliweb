@@ -1,3 +1,5 @@
+import db from '../db.js';
+
 export class StatsView {
   constructor({ router }) {
     this.router = router;
@@ -16,15 +18,14 @@ export class StatsView {
   }
 
   async render() {
-    const { getActiveLeagueId, getById } = await import('../db.js');
-    const leagueId = getActiveLeagueId();
+    const leagueId = db.getActiveLeagueId();
 
     if (!leagueId) {
       this.container.innerHTML = `<div class="empty-state"><p>No hay una liga activa.</p></div>`;
       return;
     }
 
-    const league = await getById('leagues', Number(leagueId));
+    const league = await db.getById('leagues', Number(leagueId));
     const loader = this.container.querySelector('loading-state');
     if (loader) loader.remove();
 

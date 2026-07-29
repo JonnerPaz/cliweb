@@ -1,3 +1,5 @@
+import db from '../db.js';
+
 export class TeamsView {
   constructor({ router }) {
     this.router = router;
@@ -17,15 +19,14 @@ export class TeamsView {
   }
 
   async render() {
-    const { getActiveLeagueId, getByIndex } = await import('../db.js');
-    const leagueId = getActiveLeagueId();
+    const leagueId = db.getActiveLeagueId();
 
     if (!leagueId) {
       this.container.innerHTML = `<div class="empty-state"><p>No hay una liga activa. Selecciona una desde Ligas.</p></div>`;
       return;
     }
 
-    const teams = await getByIndex('teams', 'leagueId', Number(leagueId));
+    const teams = await db.getByIndex('teams', 'leagueId', Number(leagueId));
     const list = document.createElement('div');
     list.className = 'card-grid';
 

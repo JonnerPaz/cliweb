@@ -1,3 +1,5 @@
+import db from '../db.js';
+
 export class DashboardView {
   constructor({ router }) {
     this.router = router;
@@ -16,8 +18,7 @@ export class DashboardView {
   }
 
   async render() {
-    const { getActiveLeagueId, getById } = await import("../db.js");
-    const leagueId = getActiveLeagueId();
+    const leagueId = db.getActiveLeagueId();
 
     if (!leagueId) {
       this.container.innerHTML = `
@@ -33,7 +34,7 @@ export class DashboardView {
       return;
     }
 
-    const league = await getById("leagues", Number(leagueId));
+    const league = await db.getById("leagues", Number(leagueId));
     if (!league) {
       this.container.innerHTML = `<div class="empty-state"><p>La liga activa no existe.</p></div>`;
       return;
