@@ -1,7 +1,7 @@
 import db from "../db.js";
 import "../components/league-form.js";
 import { showToast } from "../components/toast.js";
-import { generateRoundRobin } from "../utils/helpers.js";
+import { generateRoundRobin, generateBracket } from "../utils/helpers.js";
 
 export class LeaguesView {
   constructor({ router }) {
@@ -54,6 +54,7 @@ export class LeaguesView {
             <button class="btn btn-sm btn-primary js-activate" data-id="${l.id}">Activar</button>
             <button class="btn btn-sm btn-secondary js-edit" data-id="${l.id}">Editar</button>
             ${l.modalidad === "league" && !hasMatches[l.id] ? `<button class="btn btn-sm btn-secondary js-schedule" data-id="${l.id}">Programar partidos</button>` : ""}
+            ${l.modalidad === "tournament" && !hasMatches[l.id] ? `<button class="btn btn-sm btn-secondary js-bracket" data-id="${l.id}">Generar bracket</button>` : ""}
             <button class="btn btn-sm btn-danger js-delete" data-id="${l.id}">Eliminar</button>
           </div>
         </div>
@@ -128,6 +129,49 @@ export class LeaguesView {
           });
 
           showToast(`Calendario generado con ${matches.length} partidos`, "success");
+          this.render();
+        });
+      });
+
+      list.querySelectorAll(".js-bracket").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const leagueId = Number(btn.dataset.id);
+          btn.disabled = true;
+
+          const existing = await db.getByIndex("matches", "leagueId", leagueId);
+          if (existing.length > 0) {
+            showToast("Esta liga ya tiene un bracket generado", "info");
+            btn.disabled = false;
+            return;
+          }
+
+          const teams = await db.getByIndex("teams", "leagueId", leagueId);
+          if (teams.length < 2) {
+            showToast("Se necesitan al menos 2 equipos", "error");
+            btn.disabled = false;
+            return;
+          }
+
+          const matches = generateBracket(teams);
+
+          await db.runTransaction(["matches"], "readwrite", (stores) => {
+            matches.forEach((m) => {
+              stores.matches.add({
+                leagueId,
+                round: m.round,
+                position: m.position,
+                homeTeamId: m.homeTeamId,
+                awayTeamId: m.awayTeamId,
+                date: null,
+                status: "pending",
+                homeScore: null,
+                awayScore: null,
+              });
+            });
+          });
+
+          showToast(`Bracket generado con ${matches.length} partidos`, "success");
           this.render();
         });
       });

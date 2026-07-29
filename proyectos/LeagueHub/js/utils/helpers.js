@@ -52,3 +52,52 @@ export function generateRoundRobin(teams, totalRounds = 1) {
 
   return matches;
 }
+
+export function generateBracket(teams) {
+  if (teams.length < 2) return [];
+
+  const teamIds = teams.map((t) => t.id);
+  const n = teamIds.length;
+  const totalSlots = Math.pow(2, Math.ceil(Math.log2(n)));
+  const numRounds = Math.log2(totalSlots);
+  const byes = totalSlots - n;
+
+  const matches = [];
+
+  const round1Teams = teamIds.slice(byes);
+  for (let i = 0; i < round1Teams.length / 2; i++) {
+    matches.push({
+      round: 1,
+      position: i,
+      homeTeamId: round1Teams[i],
+      awayTeamId: round1Teams[round1Teams.length - 1 - i],
+      status: "pending",
+      homeScore: null,
+      awayScore: null,
+    });
+  }
+
+  for (let r = 1; r < numRounds; r++) {
+    const matchesInRound = totalSlots / Math.pow(2, r + 1);
+    for (let p = 0; p < matchesInRound; p++) {
+      let home = null;
+      let away = null;
+      if (r === 1) {
+        const slotIdx = p * 2;
+        if (slotIdx < byes) home = teamIds[slotIdx];
+        if (slotIdx + 1 < byes) away = teamIds[slotIdx + 1];
+      }
+      matches.push({
+        round: r + 1,
+        position: p,
+        homeTeamId: home,
+        awayTeamId: away,
+        status: "pending",
+        homeScore: null,
+        awayScore: null,
+      });
+    }
+  }
+
+  return matches;
+}
