@@ -90,20 +90,20 @@
 
 ## Fase 2B — Estudiante B: Equipos, Jugadores, Estadísticas (Días 2-5)
 
-- [ ] **Vista `#teams`:**
-  - [ ] Galería de tarjetas de equipos con escudo
-  - [ ] Crear/editar equipo (nombre, escudo URL, colores, ciudad)
-  - [ ] Eliminar equipo (bloqueado si tiene partidos; en cascada con jugadores si no)
+- [x] **Vista `#teams`:**
+  - [x] Galería de tarjetas de equipos con escudo
+  - [x] Crear/editar equipo (nombre, escudo URL, colores, ciudad)
+  - [x] Eliminar equipo (bloqueado si tiene partidos; en cascada con jugadores si no)
 - [ ] **Vista `#team/:id`:**
   - [ ] Cabecera con estadísticas (PJ, PG, PE, PP, PF, PC, DIF, Pts)
   - [ ] Plantilla de jugadores
   - [ ] Próximos partidos y partidos jugados
   - [ ] Mini gráfico de líneas (evolución de puntos)
-- [ ] **Vista `#players`:**
-  - [ ] Filtros: búsqueda con debounce, por equipo, por posición
-  - [ ] Galería de tarjetas
-  - [ ] Crear/editar jugador
-  - [ ] Eliminar jugador (bloqueado si tiene eventos)
+- [x] **Vista `#players`:**
+  - [x] Filtros: búsqueda con debounce, por equipo, por posición
+  - [x] Galería de tarjetas
+  - [x] Crear/editar jugador
+  - [x] Eliminar jugador (bloqueado si tiene eventos)
 - [ ] **Vista `#player/:id`:**
   - [ ] Cabecera con foto, nombre, equipo, número
   - [ ] Estadísticas: PJ, anotaciones, promedio
@@ -135,11 +135,11 @@
 ## Fase 4 — Integración y Pruebas (Días 6-7) — AMBOS
 
 - [x] Integrar vistas de ambos estudiantes (router configurado con todas las rutas)
-- [ ] Verificar que el router de hash funciona con botones atrás/adelante
+- [x] Verificar que el router de hash funciona con botones atrás/adelante
 - [ ] Probar los 12 escenarios de prueba manual (sección 9 del documento)
 - [ ] Verificar que los cambios de liga activa redirigen al dashboard
 - [ ] Verificar que la terminología cambia según el deporte de la liga activa
-- [ ] Verificar persistencia: cerrar/abrir navegador
+- [x] Verificar persistencia: cerrar/abrir navegador
 
 ---
 
