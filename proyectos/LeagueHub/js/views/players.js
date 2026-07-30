@@ -1,39 +1,9 @@
-/*V-05 — Jugadores (`#players`)
-
-**Propósito:** Gestionar los jugadores de todos los equipos de la liga activa.
-
-#### 4.5.1 Sección: Filtros y búsqueda
-
-- Campo de búsqueda por nombre con **debounce** (300–500 ms).
-- Filtro por equipo (selector).
-- Filtro por posición (selector con las posiciones registradas en la liga).
-- Botón "Limpiar filtros".
-
-#### 4.5.2 Listado
-
-- Galería de tarjetas con foto, nombre, equipo (con escudo pequeño), número y posición.
-- Al hacer clic, navega a `#player/:id`.
-
-#### 4.5.3 Crear / Editar Jugador
-
-Formulario con:
-
-- **Nombre** (obligatorio).
-- **Foto** (opcional, URL).
-- **Posición** (texto libre — la pareja decide si maneja un catálogo o lo deja abierto).
-- **Número** (numérico, único dentro del equipo).
-- **Equipo** (selector obligatorio de los equipos de la liga activa).
-
-#### 4.5.4 Eliminar Jugador
-
-- Si el jugador tiene eventos registrados en partidos, se debe **bloquear la eliminación** y mostrar un mensaje explicativo.
-- Si no tiene eventos, se elimina con confirmación.
-*/
-
 import db from "../db.js";
 import "../components/player-form.js";
 import "../components/player-card.js";
 import { showToast } from "../components/toast.js";
+import { debounce } from "../utils/helpers.js";
+import { getPositions } from "../sports-terms.js";
 
 export class PlayersView {
   constructor({ router }) {
@@ -43,18 +13,107 @@ export class PlayersView {
 
   mount(container) {
     this.container = container;
-    container.innerHTML = `
-      <div class="page-header">
-        <h1>Jugadores</h1>
-        <button class="btn btn-primary" id="create-player">+ Nuevo Jugador</button>
-      </div>
-      <loading-state message="Cargando jugadores..."></loading-state>
-    `;
-    container.querySelector("#create-player").addEventListener("click", () => {
+
+    const layout = document.createElement("div");
+    layout.className = "players-layout";
+
+    const filterPanel = document.createElement("aside");
+    filterPanel.className = "filter-panel";
+    filterPanel.id = "player-filters";
+    filterPanel.style.display = "none";
+
+    const filterTitle = document.createElement("h2");
+    filterTitle.textContent = "Filtros";
+    filterPanel.appendChild(filterTitle);
+
+    const clearBtn = document.createElement("button");
+    clearBtn.id = "filter-clear";
+    clearBtn.className = "btn btn-secondary btn-sm";
+    clearBtn.textContent = "Limpiar filtros";
+    clearBtn.addEventListener("click", () => {
+      this.container.querySelector("#filter-search").value = "";
+      this.container.querySelector("#filter-team").value = "";
+      this.container.querySelector("#filter-position").value = "";
+      this.render();
+    });
+    filterPanel.appendChild(clearBtn);
+
+    const searchGroup = document.createElement("div");
+    searchGroup.className = "filter-group";
+    const searchLabel = document.createElement("label");
+    searchLabel.textContent = "Buscar";
+    searchGroup.appendChild(searchLabel);
+    const searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.id = "filter-search";
+    searchInput.className = "filter-input";
+    searchInput.placeholder = "Por nombre...";
+    searchInput.addEventListener("input", debounce(() => this.render(), 400));
+    searchGroup.appendChild(searchInput);
+    filterPanel.appendChild(searchGroup);
+
+    const teamGroup = document.createElement("div");
+    teamGroup.className = "filter-group";
+    const teamLabel = document.createElement("label");
+    teamLabel.textContent = "Equipo";
+    teamGroup.appendChild(teamLabel);
+    const teamSelect = document.createElement("select");
+    teamSelect.id = "filter-team";
+    teamSelect.className = "filter-select";
+    const teamDefault = document.createElement("option");
+    teamDefault.value = "";
+    teamDefault.textContent = "Todos los equipos";
+    teamSelect.appendChild(teamDefault);
+    teamSelect.addEventListener("change", () => this.render());
+    teamGroup.appendChild(teamSelect);
+    filterPanel.appendChild(teamGroup);
+
+    const posGroup = document.createElement("div");
+    posGroup.className = "filter-group";
+    const posLabel = document.createElement("label");
+    posLabel.textContent = "Posición";
+    posGroup.appendChild(posLabel);
+    const posSelect = document.createElement("select");
+    posSelect.id = "filter-position";
+    posSelect.className = "filter-select";
+    const posDefault = document.createElement("option");
+    posDefault.value = "";
+    posDefault.textContent = "Todas las posiciones";
+    posSelect.appendChild(posDefault);
+    posSelect.addEventListener("change", () => this.render());
+    posGroup.appendChild(posSelect);
+    filterPanel.appendChild(posGroup);
+
+    const resultsSection = document.createElement("section");
+    resultsSection.className = "results-section";
+    this.resultsSection = resultsSection;
+
+    const header = document.createElement("div");
+    header.className = "page-header";
+
+    const title = document.createElement("h1");
+    title.textContent = "Jugadores";
+    header.appendChild(title);
+
+    const createBtn = document.createElement("button");
+    createBtn.className = "btn btn-primary";
+    createBtn.id = "create-player";
+    createBtn.textContent = "+ Nuevo Jugador";
+    createBtn.addEventListener("click", () => {
       const form = document.createElement("player-form");
       form.addEventListener("player-created", () => this.render());
       this.container.appendChild(form);
     });
+    header.appendChild(createBtn);
+
+    const loader = document.createElement("loading-state");
+    loader.setAttribute("message", "Cargando jugadores...");
+
+    resultsSection.appendChild(header);
+    resultsSection.appendChild(loader);
+    layout.appendChild(filterPanel);
+    layout.appendChild(resultsSection);
+    container.appendChild(layout);
     this.render();
   }
 
@@ -62,7 +121,13 @@ export class PlayersView {
     const leagueId = db.getActiveLeagueId();
 
     if (!leagueId) {
-      this.container.innerHTML = `<div class="empty-state"><p>No hay una liga activa.</p></div>`;
+      this.container.textContent = "";
+      const msg = document.createElement("div");
+      msg.className = "empty-state";
+      const p = document.createElement("p");
+      p.textContent = "No hay una liga activa.";
+      msg.appendChild(p);
+      this.container.appendChild(msg);
       return;
     }
 
@@ -81,14 +146,65 @@ export class PlayersView {
     const loader = this.container.querySelector("loading-state");
     if (loader) loader.remove();
 
+    const filters = this.container.querySelector("#player-filters");
+    const teamFilter = this.container.querySelector("#filter-team");
+    const positionFilter = this.container.querySelector("#filter-position");
+
+    if (filters && teams.length > 0) {
+      filters.style.display = "block";
+
+      const currentTeamValue = teamFilter.value;
+      teamFilter.textContent = "";
+      const teamDefault = document.createElement("option");
+      teamDefault.value = "";
+      teamDefault.textContent = "Todos los equipos";
+      teamFilter.appendChild(teamDefault);
+      teams.forEach((t) => {
+        const opt = document.createElement("option");
+        opt.value = t.id;
+        opt.textContent = t.name;
+        if (t.id == currentTeamValue) opt.selected = true;
+        teamFilter.appendChild(opt);
+      });
+
+      const league = await db.getById("leagues", Number(leagueId));
+      const currentPosValue = positionFilter.value;
+      positionFilter.textContent = "";
+      const posDefault = document.createElement("option");
+      posDefault.value = "";
+      posDefault.textContent = "Todas las posiciones";
+      positionFilter.appendChild(posDefault);
+      if (league) {
+        getPositions(league.sport).forEach((p) => {
+          const opt = document.createElement("option");
+          opt.value = p;
+          opt.textContent = p;
+          if (p === currentPosValue) opt.selected = true;
+          positionFilter.appendChild(opt);
+        });
+      }
+    }
+
+    const searchVal = this.container.querySelector("#filter-search")?.value?.toLowerCase() || "";
+    const teamVal = this.container.querySelector("#filter-team")?.value || "";
+    const posVal = this.container.querySelector("#filter-position")?.value || "";
+
+    const filtered = this.#filterPlayers(allPlayers, searchVal, teamVal, posVal);
+
     this.container.querySelectorAll("#player-list, #player-empty").forEach((el) => el.remove());
 
-    if (allPlayers.length === 0) {
+    if (filtered.length === 0) {
       const msg = document.createElement("div");
       msg.id = "player-empty";
       msg.className = "empty-state";
-      msg.innerHTML = "<p>No hay jugadores en esta liga.</p>";
-      this.container.appendChild(msg);
+      const p = document.createElement("p");
+      if (allPlayers.length === 0) {
+        p.textContent = "No hay jugadores en esta liga.";
+      } else {
+        p.textContent = "No se encontraron jugadores con los filtros aplicados.";
+      }
+      msg.appendChild(p);
+      this.resultsSection.appendChild(msg);
       return;
     }
 
@@ -103,11 +219,11 @@ export class PlayersView {
       list = document.createElement("div");
       list.id = "player-list";
     } else {
-      list.innerHTML = "";
+      while (list.firstChild) list.removeChild(list.firstChild);
     }
     list.className = "card-grid";
 
-    for (const p of allPlayers) {
+    for (const p of filtered) {
       const team = teamMap[p.teamId] || {};
       const card = document.createElement("player-card");
       card.data = {
@@ -144,7 +260,16 @@ export class PlayersView {
       card.appendChild(actions);
     }
 
-    this.container.appendChild(list);
+    this.resultsSection.appendChild(list);
+  }
+
+  #filterPlayers(players, search, teamId, position) {
+    return players.filter((p) => {
+      if (search && !p.name?.toLowerCase().includes(search)) return false;
+      if (teamId && p.teamId != teamId) return false;
+      if (position && p.position !== position) return false;
+      return true;
+    });
   }
 
   async #deletePlayer(e, playerId, playerHasEvents) {

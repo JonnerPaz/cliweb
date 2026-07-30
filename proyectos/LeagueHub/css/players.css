@@ -114,3 +114,66 @@
   margin-bottom: 1rem;
   color: #a29bfe;
 }
+
+.players-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.filter-panel {
+  width: 240px;
+  flex-shrink: 0;
+  background: #14141f;
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid #2a2a40;
+  position: sticky;
+  top: 72px;
+}
+
+.filter-panel h2 {
+  font-size: 1rem;
+  color: #c8bfff;
+  margin-bottom: 0.75rem;
+}
+
+.filter-panel .btn-sm {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.filter-group {
+  margin-bottom: 1rem;
+}
+
+.filter-group label {
+  display: block;
+  color: #a29bfe;
+  font-size: 0.8rem;
+  margin-bottom: 0.35rem;
+}
+
+.filter-input,
+.filter-select {
+  width: 100%;
+  padding: 0.45rem 0.65rem;
+  background: #0a0a0f;
+  border: 1px solid #2a2a40;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 0.85rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+  outline: none;
+  border-color: #6c5ce7;
+  box-shadow: 0 0 8px rgba(108, 92, 231, 0.3);
+}
+
+.results-section {
+  flex: 1;
+  min-width: 0;
+}

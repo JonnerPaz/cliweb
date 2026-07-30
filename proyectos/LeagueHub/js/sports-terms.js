@@ -49,10 +49,20 @@ export const SPORTS = {
   },
 };
 
+const POSITIONS = {
+  football: ["Portero", "Defensa", "Centrocampista", "Delantero"],
+  basketball: ["Base", "Escolta", "Alero", "Ala-Pívot", "Pívot"],
+  tennis: ["Individual", "Dobles"],
+};
+
 export function getSportTerms(sportId) {
   return SPORTS[sportId] || SPORTS.football;
 }
 
 export function getSportList() {
   return Object.values(SPORTS);
+}
+
+export function getPositions(sportId) {
+  return POSITIONS[sportId] || [];
 }

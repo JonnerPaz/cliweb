@@ -67,7 +67,7 @@ class TeamForm extends HTMLElement {
     color1.type = "color";
     color1.id = "team-color-principal";
     color1.name = "colorPrincipal";
-    color1.value = "#6c5ce7";
+    color1.value = "#2f5bed";
     color1Group.appendChild(label1);
     color1Group.appendChild(color1);
 
@@ -81,7 +81,7 @@ class TeamForm extends HTMLElement {
     color2.type = "color";
     color2.id = "team-color-secundario";
     color2.name = "colorSecundario";
-    color2.value = "#4834b0";
+    color2.value = "#f02323";
     color2Group.appendChild(label2);
     color2Group.appendChild(color2);
 
