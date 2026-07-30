@@ -12,10 +12,9 @@ export class TeamCard extends HTMLElement {
     this.innerHTML = '';
     const d = this.team || {};
 
-    const card = document.createElement('article');
-    card.className = 'card team-card';
+    this.className = 'card team-card';
     if (d.colorPrincipal) {
-      card.style.borderLeftColor = d.colorPrincipal;
+      this.style.borderLeftColor = d.colorPrincipal;
     }
 
     const imgContainer = document.createElement('div');
@@ -70,9 +69,8 @@ export class TeamCard extends HTMLElement {
 
     info.appendChild(name);
     info.appendChild(meta);
-    card.appendChild(imgContainer);
-    card.appendChild(info);
-    this.appendChild(card);
+    this.appendChild(imgContainer);
+    this.appendChild(info);
   }
 }
 customElements.define('team-card', TeamCard);
