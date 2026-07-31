@@ -120,8 +120,11 @@
 ## Fase 3 — Dashboard (Días 5-6) — ESTUDIANTE B
 
 - [x] **Vista `#dashboard`:**
+  - [x] Landing page (`/`) con descripción de la app y acciones rápidas (crear liga, ligas, equipos, jugadores, partidos, estadísticas)
+  - [x] Al abrir con liga activa redirige a `#dashboard`; el logo lleva siempre a la landing
   - [x] Cabecera con nombre de liga, deporte, temporada
-  - [x] Mensaje vacío si no hay ligas + botón "Ir a Ligas"
+  - [x] Botón "Cambiar liga" (modal `league-switcher`) y "+ Crear Liga"
+  - [x] Mensaje vacío si no hay ligas + botones "Crear Liga" / "Ir a Ligas"
   - [ ] Tarjeta de próximo partido y último resultado
   - [ ] Mini tabla top 5 (liga) o resumen de bracket (eliminación directa)
   - [ ] 3 gráficos Chart.js:

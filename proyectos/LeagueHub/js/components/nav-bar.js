@@ -12,7 +12,7 @@ export class NavBar extends HTMLElement {
     const logo = document.createElement("div");
     logo.className = "logo";
     const logoLink = document.createElement("a");
-    logoLink.href = "#dashboard";
+    logoLink.href = "#/";
     logoLink.textContent = "LeagueHub";
     logo.appendChild(logoLink);
 
@@ -26,6 +26,7 @@ export class NavBar extends HTMLElement {
     const ul = document.createElement("ul");
     ul.className = "nav-links";
     const links = [
+      { href: "#dashboard", label: "Dashboard" },
       { href: "#leagues", label: "Ligas" },
       { href: "#teams", label: "Equipos" },
       { href: "#players", label: "Jugadores" },

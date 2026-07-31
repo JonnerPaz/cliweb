@@ -5,6 +5,7 @@ import "./components/confirm-dialog.js";
 
 import db from "./db.js";
 import { Router } from "./core/Router.js";
+import { HomeView } from "./views/home.js";
 import { DashboardView } from "./views/dashboard.js";
 import { LeaguesView } from "./views/leagues.js";
 import { TeamsView } from "./views/teams.js";
@@ -25,7 +26,8 @@ async function init() {
   const app = document.getElementById("app");
 
   const router = new Router(app, [
-    { pattern: "/", handler: () => new DashboardView({ router }) },
+    { pattern: "/", handler: () => new HomeView({ router }) },
+    { pattern: "/dashboard", handler: () => new DashboardView({ router }) },
     { pattern: "/leagues", handler: () => new LeaguesView({ router }) },
     { pattern: "/teams", handler: () => new TeamsView({ router }) },
     { pattern: "/team/:id", handler: (p) => new TeamDetailView({ router, id: p.id }) },
@@ -35,6 +37,17 @@ async function init() {
     { pattern: "/match/:id", handler: (p) => new MatchDetailView({ router, id: p.id }) },
     { pattern: "/stats", handler: () => new StatsView({ router }) },
   ]);
+
+  // Al abrir la app por primera vez (sin hash), si ya hay una liga activa
+  // se muestra directamente el dashboard. El logo (enlace a "/") siempre
+  // permite volver a la landing.
+  const initialHash = window.location.hash;
+  if (
+    (initialHash === "" || initialHash === "#" || initialHash === "#/") &&
+    db.getActiveLeagueId()
+  ) {
+    window.location.hash = "/dashboard";
+  }
 
   router.start();
 }
