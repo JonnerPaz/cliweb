@@ -104,11 +104,12 @@
   - [x] Galería de tarjetas
   - [x] Crear/editar jugador
   - [x] Eliminar jugador (bloqueado si tiene eventos)
-- [ ] **Vista `#player/:id`:**
-  - [ ] Cabecera con foto, nombre, equipo, número
-  - [ ] Estadísticas: PJ, anotaciones, promedio
-  - [ ] Historial de partidos donde anotó
-  - [ ] Mini gráfico de barras (anotaciones por partido)
+- [x] **Vista `#player/:id`:**
+  - [x] Cabecera con foto, nombre, equipo, número
+  - [x] Estadísticas: PJ, anotaciones, promedio
+  - [x] Historial de partidos donde anotó
+  - [x] Mini gráfico de barras (anotaciones por partido)
+  - [x] Base compartida de estilos para vistas de detalle (`css/detail.css`)
 - [ ] **Vista `#stats`:**
   - [ ] **StandingsTable** (liga) — ordenado por pts, DIF, PF
   - [ ] **BracketView** (eliminación directa) — árbol visual de rondas
