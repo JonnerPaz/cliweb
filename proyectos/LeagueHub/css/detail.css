@@ -73,6 +73,20 @@
   color: #a29bfe;
 }
 
+/* Team color dots */
+.team-color-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.team-color-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid #2a2a40;
+}
+
 .detail-team {
   display: inline-flex;
   align-items: center;
@@ -149,11 +163,30 @@
   text-shadow: 0 0 6px rgba(108, 92, 231, 0.2);
 }
 
+.detail-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.detail-section-head h2 {
+  margin-bottom: 0;
+}
+
 .detail-panel {
   background: #14141f;
   border: 1px solid #2a2a40;
   border-radius: 10px;
   padding: 1rem;
+}
+
+/* Roster grid */
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 1rem;
 }
 
 /* History rows */

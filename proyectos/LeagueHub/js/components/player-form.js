@@ -4,6 +4,7 @@ import { getPositions } from "../sports-terms.js";
 class PlayerForm extends HTMLElement {
   async connectedCallback() {
     this.editId = this.getAttribute("edit-id");
+    this.presetTeamId = this.getAttribute("team-id");
     this.buildDOM();
     await this.#loadTeams();
     await this.#loadPositions();
@@ -146,6 +147,9 @@ class PlayerForm extends HTMLElement {
       const opt = document.createElement("option");
       opt.value = t.id;
       opt.textContent = t.name;
+      if (this.presetTeamId && Number(this.presetTeamId) === t.id) {
+        opt.selected = true;
+      }
       select.appendChild(opt);
     });
   }

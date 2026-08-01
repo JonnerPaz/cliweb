@@ -94,11 +94,11 @@
   - [x] Galería de tarjetas de equipos con escudo
   - [x] Crear/editar equipo (nombre, escudo URL, colores, ciudad)
   - [x] Eliminar equipo (bloqueado si tiene partidos; en cascada con jugadores si no)
-- [ ] **Vista `#team/:id`:**
-  - [ ] Cabecera con estadísticas (PJ, PG, PE, PP, PF, PC, DIF, Pts)
-  - [ ] Plantilla de jugadores
-  - [ ] Próximos partidos y partidos jugados
-  - [ ] Mini gráfico de líneas (evolución de puntos)
+- [x] **Vista `#team/:id`:**
+  - [x] Cabecera con estadísticas (PJ, PG, PE, PP, PF, PC, DIF, Pts)
+  - [x] Plantilla de jugadores
+  - [x] Próximos partidos y partidos jugados
+  - [x] Mini gráfico de líneas (evolución de puntos)
 - [x] **Vista `#players`:**
   - [x] Filtros: búsqueda con debounce, por equipo, por posición
   - [x] Galería de tarjetas
