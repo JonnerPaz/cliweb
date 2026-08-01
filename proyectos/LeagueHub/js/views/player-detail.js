@@ -68,131 +68,254 @@ export class PlayerDetailView {
       return b.match.id - a.match.id;
     });
 
-    container.innerHTML = `
-      <div class="detail-header">
-        <div class="detail-avatar">${this.#renderAvatar(player, team)}</div>
-        <div class="detail-header-info">
-          <h1>${player.name}</h1>
-          <div class="detail-meta">
-            <span class="detail-number">#${player.number ?? "?"}</span>
-            ${player.position ? `<span>${player.position}</span>` : ""}
-          </div>
-          ${team ? this.#renderTeamLink(team) : ""}
-        </div>
-      </div>
+    const section = document.createElement("section");
+    section.className = "player-detail";
 
-      <div class="stat-grid">
-        <div class="stat-card">
-          <div class="stat-value">${played}</div>
-          <div class="stat-label">Partidos jugados</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">${totalGoals}</div>
-          <div class="stat-label">${terms.eventNamePlural}</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">${average}</div>
-          <div class="stat-label">Promedio por partido</div>
-        </div>
-      </div>
+    section.appendChild(this.#buildHeader(player, team));
+    section.appendChild(this.#buildStats(played, totalGoals, average, terms));
+    section.appendChild(this.#buildHistory(history, terms));
+    section.appendChild(this.#buildChart(history, team, terms));
 
-      <section class="detail-section">
-        <h2>${terms.scorers} — historial</h2>
-        <div class="detail-panel" id="player-history"></div>
-      </section>
+    const loader = container.querySelector("loading-state");
+    if (loader) loader.remove();
+    container.appendChild(section);
+  }
 
-      <section class="detail-section">
-        <h2>${terms.eventNamePlural} por partido</h2>
-        <div class="detail-panel">
-          <div class="chart-wrapper" id="player-chart"></div>
-        </div>
-      </section>
-    `;
+  #buildHeader(player, team) {
+    const header = document.createElement("div");
+    header.className = "detail-header";
 
-    this.#renderHistory(container, history);
-    this.#renderChart(container, history, team, terms);
+    const avatar = document.createElement("div");
+    avatar.className = "detail-avatar";
+    avatar.appendChild(this.#renderAvatar(player, team));
+
+    const info = document.createElement("div");
+    info.className = "detail-header-info";
+
+    const h1 = document.createElement("h1");
+    h1.textContent = player.name;
+
+    const meta = document.createElement("div");
+    meta.className = "detail-meta";
+
+    const number = document.createElement("span");
+    number.className = "detail-number";
+    number.textContent = `#${player.number ?? "?"}`;
+    meta.appendChild(number);
+
+    if (player.position) {
+      const position = document.createElement("span");
+      position.textContent = player.position;
+      meta.appendChild(position);
+    }
+
+    info.appendChild(h1);
+    info.appendChild(meta);
+
+    if (team) {
+      info.appendChild(this.#renderTeamLink(team));
+    }
+
+    header.appendChild(avatar);
+    header.appendChild(info);
+    return header;
+  }
+
+  #buildStats(played, totalGoals, average, terms) {
+    const grid = document.createElement("div");
+    grid.className = "stat-grid";
+
+    const items = [
+      ["Partidos jugados", played],
+      [terms.eventNamePlural, totalGoals],
+      ["Promedio por partido", average],
+    ];
+
+    items.forEach(([label, value]) => {
+      const card = document.createElement("div");
+      card.className = "stat-card";
+      const val = document.createElement("div");
+      val.className = "stat-value";
+      val.textContent = value;
+      const lab = document.createElement("div");
+      lab.className = "stat-label";
+      lab.textContent = label;
+      card.appendChild(val);
+      card.appendChild(lab);
+      grid.appendChild(card);
+    });
+
+    return grid;
   }
 
   #renderAvatar(player, team) {
     if (player.photo) {
-      return `<img src="${player.photo}" alt="${player.name}" />`;
+      const img = document.createElement("img");
+      img.src = player.photo;
+      img.alt = player.name || "Jugador";
+      return img;
     }
-    const initials = (player.name || "?")
+    const placeholder = document.createElement("div");
+    placeholder.className = "avatar-placeholder";
+    placeholder.textContent = (player.name || "?")
       .split(" ")
       .map((w) => w[0])
       .join("")
       .slice(0, 2)
       .toUpperCase();
-    return `<div class="avatar-placeholder" style="background:${team ? team.colorPrincipal : "#6c5ce7"}">${initials}</div>`;
+    if (team?.colorPrincipal) {
+      placeholder.style.background = team.colorPrincipal;
+    }
+    return placeholder;
   }
 
   #renderTeamLink(team) {
-    const initials = (team.name || "?")
-      .split(" ")
-      .map((w) => w[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-    return `
-      <a class="detail-team" href="#/team/${team.id}" data-team-link>
-        <span class="team-badge" style="background:${team.colorSecundario || "#6c5ce7"}">
-          ${team.escudo ? `<img src="${team.escudo}" alt="${team.name}" />` : initials}
-        </span>
-        ${team.name}
-      </a>
-    `;
+    const link = document.createElement("a");
+    link.className = "detail-team";
+    link.href = `#/team/${team.id}`;
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.router.navigateTo(`/team/${team.id}`);
+    });
+
+    const badge = document.createElement("span");
+    badge.className = "team-badge";
+    if (team.colorSecundario) {
+      badge.style.background = team.colorSecundario;
+    }
+    if (team.escudo) {
+      const img = document.createElement("img");
+      img.src = team.escudo;
+      img.alt = team.name || "Equipo";
+      badge.appendChild(img);
+    } else {
+      badge.textContent = (team.name || "?")
+        .split(" ")
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase();
+    }
+
+    const name = document.createElement("span");
+    name.textContent = team.name;
+
+    link.appendChild(badge);
+    link.appendChild(name);
+    return link;
   }
 
-  #renderHistory(container, history) {
-    const panel = container.querySelector("#player-history");
-    if (!panel) return;
+  #buildHistory(history, terms) {
+    const section = document.createElement("section");
+    section.className = "detail-section";
+
+    const h2 = document.createElement("h2");
+    h2.textContent = `${terms.scorers} — historial`;
+
+    const panel = document.createElement("div");
+    panel.className = "detail-panel";
 
     if (history.length === 0) {
-      panel.innerHTML = `<div class="empty-state"><p>Este jugador aún no ha anotado en ningún partido.</p></div>`;
-      return;
+      const empty = document.createElement("div");
+      empty.className = "empty-state";
+      const p = document.createElement("p");
+      p.textContent = "Este jugador aún no ha anotado en ningún partido.";
+      empty.appendChild(p);
+      panel.appendChild(empty);
+      section.appendChild(h2);
+      section.appendChild(panel);
+      return section;
     }
 
     const list = document.createElement("ul");
     list.className = "history-list";
 
     history.forEach(({ match, rival, goals }) => {
-      const result = this.#resultOf(match);
-      const isFinalized = result !== null;
-      const li = document.createElement("li");
-      li.className = "history-row";
-      li.innerHTML = `
-        <span class="history-rival">${rival?.name || "Por definir"}</span>
-        <span class="history-goals">${goals} ${goals === 1 ? this.terms.eventName : this.terms.eventNamePlural}</span>
-        <span class="history-date">${match.date ? formatDate(match.date) : "Sin fecha"}</span>
-        ${
-          isFinalized
-            ? `<span class="history-score">${match.homeScore} - ${match.awayScore}</span>
-               <span class="result result-${result.key.toLowerCase()}">${result.label}</span>`
-            : `<span class="history-score">Programado</span>`
-        }
-      `;
-      li.addEventListener("click", () => this.router.navigateTo(`/match/${match.id}`));
-      list.appendChild(li);
+      list.appendChild(this.#historyRow(match, rival, goals));
     });
 
     panel.appendChild(list);
+    section.appendChild(h2);
+    section.appendChild(panel);
+    return section;
   }
 
-  #renderChart(container, history, team, terms) {
-    const wrapper = container.querySelector("#player-chart");
-    if (!wrapper) return;
+  #historyRow(match, rival, goals) {
+    const result = this.#resultOf(match);
+    const isFinalized = result !== null;
+
+    const li = document.createElement("li");
+    li.className = "history-row";
+    li.addEventListener("click", () => this.router.navigateTo(`/match/${match.id}`));
+
+    const rivalName = document.createElement("span");
+    rivalName.className = "history-rival";
+    rivalName.textContent = rival?.name || "Por definir";
+
+    const goalsSpan = document.createElement("span");
+    goalsSpan.className = "history-goals";
+    goalsSpan.textContent = `${goals} ${goals === 1 ? this.terms.eventName : this.terms.eventNamePlural}`;
+
+    const date = document.createElement("span");
+    date.className = "history-date";
+    date.textContent = match.date ? formatDate(match.date) : "Sin fecha";
+
+    li.appendChild(rivalName);
+    li.appendChild(goalsSpan);
+    li.appendChild(date);
+
+    if (isFinalized) {
+      const score = document.createElement("span");
+      score.className = "history-score";
+      score.textContent = `${match.homeScore} - ${match.awayScore}`;
+      li.appendChild(score);
+
+      const badge = document.createElement("span");
+      badge.className = `result result-${result.key.toLowerCase()}`;
+      badge.textContent = result.label;
+      li.appendChild(badge);
+    } else {
+      const score = document.createElement("span");
+      score.className = "history-score";
+      score.textContent = "Programado";
+      li.appendChild(score);
+    }
+
+    return li;
+  }
+
+  #buildChart(history, team, terms) {
+    const section = document.createElement("section");
+    section.className = "detail-section";
+
+    const h2 = document.createElement("h2");
+    h2.textContent = `${terms.eventNamePlural} por partido`;
+
+    const panel = document.createElement("div");
+    panel.className = "detail-panel";
+    const wrapper = document.createElement("div");
+    wrapper.className = "chart-wrapper";
 
     if (history.length === 0) {
-      wrapper.innerHTML = `<div class="empty-state"><p>No hay datos suficientes.</p></div>`;
-      return;
+      const empty = document.createElement("div");
+      empty.className = "empty-state";
+      const p = document.createElement("p");
+      p.textContent = "No hay datos suficientes.";
+      empty.appendChild(p);
+      wrapper.appendChild(empty);
+      panel.appendChild(wrapper);
+      section.appendChild(h2);
+      section.appendChild(panel);
+      return section;
     }
 
     const chartEl = document.createElement("chart-container");
     wrapper.appendChild(chartEl);
+    panel.appendChild(wrapper);
 
     const labels = history.map(({ match, rival }) =>
       match.date
-        ? `${new Date(match.date).toLocaleDateString("es-ES")}`
+        ? new Date(match.date).toLocaleDateString("es-ES")
         : rival?.name || `Partido #${match.id}`,
     );
     const data = history.map((h) => h.goals);
@@ -221,6 +344,10 @@ export class PlayerDetailView {
         },
       },
     });
+
+    section.appendChild(h2);
+    section.appendChild(panel);
+    return section;
   }
 
   #resultOf(match) {
