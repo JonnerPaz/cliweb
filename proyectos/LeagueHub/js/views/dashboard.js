@@ -89,6 +89,11 @@ export class DashboardView {
     const content = container.querySelector("#dashboard-content");
     if (content) {
       content.appendChild(this.#buildNextLast(matches, this.#teamById(teams), terms));
+      content.appendChild(
+        league.modalidad === "tournament"
+          ? this.#buildBracketSummary(matches, this.#teamById(teams))
+          : this.#buildMiniStandings(teams, matches, terms)
+      );
     }
   }
 
@@ -261,6 +266,248 @@ export class DashboardView {
     card.classList.add("clickable");
     card.addEventListener("click", () => this.router.navigateTo(`/match/${match.id}`));
     return card;
+  }
+
+  #computeStats(matches, teamId) {
+    const stats = { pj: 0, pg: 0, pe: 0, pp: 0, pf: 0, pc: 0, dif: 0, pts: 0 };
+    matches
+      .filter((m) => this.#isFinalized(m) && m.homeScore != null && m.awayScore != null)
+      .forEach((m) => {
+        const isHome = m.homeTeamId === teamId;
+        const own = isHome ? m.homeScore : m.awayScore;
+        const rival = isHome ? m.awayScore : m.homeScore;
+        stats.pj += 1;
+        stats.pf += own;
+        stats.pc += rival;
+        if (own > rival) {
+          stats.pg += 1;
+          stats.pts += 3;
+        } else if (own < rival) {
+          stats.pp += 1;
+        } else {
+          stats.pe += 1;
+          stats.pts += 1;
+        }
+      });
+    stats.dif = stats.pf - stats.pc;
+    return stats;
+  }
+
+  #sectionTitle(text) {
+    const h2 = document.createElement("h2");
+    h2.textContent = text;
+    return h2;
+  }
+
+  #viewAllLink(href, text) {
+    const link = document.createElement("a");
+    link.className = "btn btn-sm btn-secondary dash-link";
+    link.href = `#${href}`;
+    link.textContent = text;
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.router.navigateTo(href);
+    });
+    return link;
+  }
+
+  #teamCell(team) {
+    const cell = document.createElement("td");
+
+    const wrapper = document.createElement("div");
+    wrapper.className = "st-team";
+
+    const avatar = document.createElement("span");
+    avatar.className = "st-avatar";
+    if (team.escudo) {
+      const img = document.createElement("img");
+      img.src = team.escudo;
+      img.alt = team.name || "Equipo";
+      avatar.appendChild(img);
+    } else {
+      avatar.textContent = this.#initials(team.name);
+      if (team.colorPrincipal) avatar.style.background = team.colorPrincipal;
+    }
+
+    const name = document.createElement("span");
+    name.className = "st-name";
+    name.textContent = team.name || "Sin nombre";
+
+    wrapper.appendChild(avatar);
+    wrapper.appendChild(name);
+    cell.appendChild(wrapper);
+    return cell;
+  }
+
+  #buildMiniStandings(teams, matches, terms) {
+    const section = document.createElement("section");
+    section.className = "detail-section";
+    section.appendChild(this.#sectionTitle("Top 5"));
+
+    const panel = document.createElement("div");
+    panel.className = "detail-panel";
+
+    if (teams.length === 0) {
+      panel.appendChild(this.#emptyMsg("Aún no hay equipos en esta liga."));
+      section.appendChild(panel);
+      return section;
+    }
+
+    const rows = teams
+      .map((team) => ({ team, stats: this.#computeStats(matches, team.id) }))
+      .sort(
+        (a, b) =>
+          b.stats.pts - a.stats.pts ||
+          b.stats.dif - a.stats.dif ||
+          b.stats.pf - a.stats.pf
+      )
+      .slice(0, 5);
+
+    const wrap = document.createElement("div");
+    wrap.className = "standings-wrap";
+
+    const table = document.createElement("table");
+    table.className = "standings-table";
+
+    const thead = document.createElement("thead");
+    const headRow = document.createElement("tr");
+    ["#", "Equipo", "PJ", "Pts"].forEach((label, i) => {
+      const th = document.createElement("th");
+      th.textContent = label;
+      if (i > 1) th.classList.add("st-num");
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    rows.forEach(({ team, stats }, index) => {
+      const tr = document.createElement("tr");
+      tr.addEventListener("click", () => this.router.navigateTo(`/team/${team.id}`));
+
+      const posTd = document.createElement("td");
+      posTd.className = "st-pos";
+      posTd.textContent = index + 1;
+      if (index < 3) posTd.classList.add("top");
+      tr.appendChild(posTd);
+
+      tr.appendChild(this.#teamCell(team));
+
+      const pjTd = document.createElement("td");
+      pjTd.className = "st-num";
+      pjTd.textContent = stats.pj;
+      tr.appendChild(pjTd);
+
+      const ptsTd = document.createElement("td");
+      ptsTd.className = "st-num pts";
+      ptsTd.textContent = stats.pts;
+      tr.appendChild(ptsTd);
+
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    panel.appendChild(wrap);
+
+    panel.appendChild(this.#viewAllLink("/stats", "Ver tabla completa"));
+    section.appendChild(panel);
+    return section;
+  }
+
+  #buildBracketSummary(matches, teamById) {
+    const section = document.createElement("section");
+    section.className = "detail-section";
+    section.appendChild(this.#sectionTitle("Bracket"));
+
+    const panel = document.createElement("div");
+    panel.className = "detail-panel";
+
+    if (matches.length === 0) {
+      panel.appendChild(this.#emptyMsg("Aún no hay bracket en esta liga."));
+      section.appendChild(panel);
+      return section;
+    }
+
+    const byRound = new Map();
+    matches.forEach((m) => {
+      const r = m.round || 1;
+      if (!byRound.has(r)) byRound.set(r, []);
+      byRound.get(r).push(m);
+    });
+
+    const rounds = Array.from(byRound.keys()).sort((a, b) => a - b);
+
+    let lastFinalized = null;
+    rounds.forEach((r) => {
+      const list = byRound.get(r);
+      if (list.length > 0 && list.every((m) => this.#isFinalized(m))) {
+        lastFinalized = r;
+      }
+    });
+
+    if (lastFinalized != null) {
+      panel.appendChild(
+        this.#roundBlock(`Ronda ${lastFinalized} finalizada`, byRound.get(lastFinalized), teamById)
+      );
+    }
+
+    const nextRound =
+      lastFinalized == null ? rounds[0] : rounds[rounds.indexOf(lastFinalized) + 1];
+
+    if (nextRound != null) {
+      const isFirst = nextRound === rounds[0];
+      panel.appendChild(
+        this.#roundBlock(
+          isFirst ? `Ronda ${nextRound} por jugarse` : `Ronda ${nextRound} (próxima)`,
+          byRound.get(nextRound),
+          teamById
+        )
+      );
+    }
+
+    panel.appendChild(this.#viewAllLink("/stats", "Ver bracket completo"));
+    section.appendChild(panel);
+    return section;
+  }
+
+  #roundBlock(title, roundMatches, teamById) {
+    const block = document.createElement("div");
+    block.className = "dash-round";
+
+    const h4 = document.createElement("h4");
+    h4.textContent = title;
+    block.appendChild(h4);
+
+    const list = document.createElement("ul");
+    list.className = "dash-round-list";
+
+    roundMatches.forEach((m) => {
+      const li = document.createElement("li");
+      li.className = "dash-round-item";
+      li.addEventListener("click", () => this.router.navigateTo(`/match/${m.id}`));
+
+      const played = this.#isFinalized(m) && m.homeScore != null && m.awayScore != null;
+
+      li.appendChild(this.#teamChip(teamById[m.homeTeamId]));
+
+      if (played) {
+        const score = document.createElement("span");
+        score.className = "dash-score dash-score-sm";
+        score.textContent = `${m.homeScore} - ${m.awayScore}`;
+        li.appendChild(score);
+      } else {
+        const vs = document.createElement("span");
+        vs.className = "dash-vs";
+        vs.textContent = "vs";
+        li.appendChild(vs);
+      }
+
+      li.appendChild(this.#teamChip(teamById[m.awayTeamId]));
+      list.appendChild(li);
+    });
+
+    block.appendChild(list);
+    return block;
   }
 
   openLeagueSwitcher() {

@@ -279,3 +279,52 @@
 .dash-card .empty-state {
   padding: 1rem 0;
 }
+
+/* Mini standings / bracket summary */
+.dash-link {
+  margin-top: 0.75rem;
+}
+
+.dash-round + .dash-round {
+  margin-top: 1rem;
+}
+
+.dash-round h4 {
+  font-size: 0.8rem;
+  color: var(--accent-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.dash-round-list {
+  list-style: none;
+}
+
+.dash-round-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dash-round-item:last-child {
+  border-bottom: none;
+}
+
+.dash-round-item:hover {
+  background: var(--surface-hover);
+}
+
+.dash-round-item .dash-team-name {
+  font-size: 0.85rem;
+}
+
+.dash-score-sm {
+  font-size: 0.95rem;
+}

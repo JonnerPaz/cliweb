@@ -126,8 +126,8 @@
   - [x] Cabecera con nombre de liga, deporte, temporada
   - [x] Botón "Cambiar liga" (modal `league-switcher`) y "+ Crear Liga"
   - [x] Mensaje vacío si no hay ligas + botones "Crear Liga" / "Ir a Ligas"
-  - [ ] Tarjeta de próximo partido y último resultado
-  - [ ] Mini tabla top 5 (liga) o resumen de bracket (eliminación directa)
+  - [x] Tarjeta de próximo partido y último resultado
+  - [x] Mini tabla top 5 (liga) o resumen de bracket (eliminación directa)
   - [ ] 3 gráficos Chart.js:
     - Barras/radar: equipos con más puntos a favor
     - Torta/anillo: distribución resultados (V/E/D)
