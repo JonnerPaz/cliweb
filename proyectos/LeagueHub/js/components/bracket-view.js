@@ -41,9 +41,9 @@ export class BracketView extends HTMLElement {
     avatar.className = "brk-avatar";
     const team = teamId != null ? this.#teamById()[teamId] : null;
 
-    if (team?.logo) {
+    if (team?.escudo) {
       const img = document.createElement("img");
-      img.src = team.logo;
+      img.src = team.escudo;
       img.alt = team.name || "Equipo";
       avatar.appendChild(img);
     } else {
