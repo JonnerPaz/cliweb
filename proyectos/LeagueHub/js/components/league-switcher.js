@@ -1,5 +1,6 @@
 import db from "../db.js";
 import "../components/league-form.js";
+import { getSportTerms } from "../sports-terms.js";
 
 class LeagueSwitcher extends HTMLElement {
   connectedCallback() {
@@ -39,12 +40,13 @@ class LeagueSwitcher extends HTMLElement {
     }
 
     list.innerHTML = leagues
-      .map(
-        (l) => `
+      .map((l) => {
+        const terms = getSportTerms(l.sport);
+        return `
       <div class="switcher-item ${Number(activeId) === l.id ? "active" : ""}" data-id="${l.id}">
         <div class="switcher-item-info">
-          <strong>${l.name}</strong>
-          <span>${l.sport} — ${l.temporada || ""}</span>
+          <strong>${terms.icon} ${l.name}</strong>
+          <span>${terms.name} — ${l.temporada || ""}</span>
         </div>
         ${
           Number(activeId) === l.id
@@ -52,8 +54,8 @@ class LeagueSwitcher extends HTMLElement {
             : `<button class="btn btn-sm btn-primary js-activate" data-id="${l.id}">Activar</button>`
         }
       </div>
-    `,
-      )
+    `;
+      })
       .join("");
 
     list.querySelectorAll(".js-activate").forEach((btn) => {

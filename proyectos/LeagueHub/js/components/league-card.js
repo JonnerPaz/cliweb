@@ -1,3 +1,5 @@
+import { getSportTerms } from "../sports-terms.js";
+
 export class LeagueCard extends HTMLElement {
   set data(league) {
     this.league = league;
@@ -5,10 +7,11 @@ export class LeagueCard extends HTMLElement {
   }
 
   buildDOM() {
+    const terms = getSportTerms(this.league.sport);
     this.className = 'card';
     this.innerHTML = `
-      <h3>${this.league.name}</h3>
-      <p>${this.league.sport} — ${this.league.temporada || ''}</p>
+      <h3>${terms.icon} ${this.league.name}</h3>
+      <p>${terms.name} — ${this.league.temporada || ''}</p>
     `;
   }
 }

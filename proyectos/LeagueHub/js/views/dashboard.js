@@ -1,6 +1,7 @@
 import db from "../db.js";
 import "../components/league-form.js";
 import "../components/league-switcher.js";
+import { getSportTerms } from "../sports-terms.js";
 
 export class DashboardView {
   constructor({ router }) {
@@ -58,11 +59,13 @@ export class DashboardView {
     const navBar = document.querySelector("nav-bar");
     if (navBar) navBar.setActiveLeague(league.name, league.sport);
 
+    const terms = getSportTerms(league.sport);
+
     container.innerHTML = `
       <div class="page-header">
         <div>
-          <h1>${league.name}</h1>
-          <span class="dashboard-subtitle">${league.sport} — ${league.temporada}</span>
+          <h1>${terms.icon} ${league.name}</h1>
+          <span class="dashboard-subtitle">${terms.name} — ${league.temporada}</span>
         </div>
         <div class="dashboard-actions">
           <button class="btn btn-secondary" id="change-league">Cambiar liga</button>

@@ -1,5 +1,6 @@
 import db from "../db.js";
 import "../components/league-form.js";
+import { getSportTerms } from "../sports-terms.js";
 
 export class HomeView {
   constructor({ router }) {
@@ -36,11 +37,12 @@ export class HomeView {
     const hero = this.container.querySelector(".hero");
 
     if (activeLeague) {
+      const terms = getSportTerms(activeLeague.sport);
       const leagueCard = document.createElement("div");
       leagueCard.className = "card league-summary";
       leagueCard.innerHTML = `
-        <h3>${activeLeague.name}</h3>
-        <p>${activeLeague.sport} — ${activeLeague.temporada}</p>
+        <h3>${terms.icon} ${activeLeague.name}</h3>
+        <p>${terms.name} — ${activeLeague.temporada}</p>
         <p>${activeLeague.modalidad === "league" ? "Liga" : "Eliminación Directa"}</p>
         <button class="btn btn-primary" id="go-dashboard">Ver Dashboard</button>
       `;

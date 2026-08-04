@@ -2,6 +2,7 @@ import db from "../db.js";
 import "../components/league-form.js";
 import { showToast } from "../components/toast.js";
 import { generateRoundRobin, generateBracket } from "../utils/helpers.js";
+import { getSportTerms } from "../sports-terms.js";
 
 export class LeaguesView {
   constructor({ router }) {
@@ -44,11 +45,12 @@ export class LeaguesView {
     } else {
       list.className = "card-grid";
       list.innerHTML = leagues
-        .map(
-          (l) => `
+        .map((l) => {
+          const t = getSportTerms(l.sport);
+          return `
         <div class="card ${Number(activeId) === l.id ? "active" : ""}" data-id="${l.id}">
-          <h3>${l.name}</h3>
-          <p>${l.sport} — ${l.temporada || ""}</p>
+          <h3>${t.icon} ${l.name}</h3>
+          <p>${t.name} — ${l.temporada || ""}</p>
           <p>${l.modalidad === "league" ? "Liga" : "Eliminación Directa"}</p>
           <div style="margin-top:0.5rem;display:flex;gap:0.25rem;flex-wrap:wrap">
             <button class="btn btn-sm btn-primary js-activate" data-id="${l.id}">Activar</button>
@@ -58,8 +60,8 @@ export class LeaguesView {
             <button class="btn btn-sm btn-danger js-delete" data-id="${l.id}">Eliminar</button>
           </div>
         </div>
-      `,
-        )
+      `;
+        })
         .join("");
 
       list.querySelectorAll(".js-activate").forEach((btn) => {

@@ -1,8 +1,31 @@
+import db from "../db.js";
+import { getSportTerms } from "../sports-terms.js";
+import { applySportTheme } from "../utils/theme.js";
+
 export class NavBar extends HTMLElement {
   connectedCallback() {
     this.buildDOM();
     this.updateActiveLink();
     window.addEventListener("hashchange", () => this.updateActiveLink());
+    document.addEventListener("league:changed", () => this.#syncLeague());
+    this.#syncLeague();
+  }
+
+  /**
+   * Refleja la liga activa (nombre, deporte e icono) en el navbar y
+   * aplica el tema visual del deporte a todo el documento.
+   */
+  async #syncLeague() {
+    try {
+      await db.open();
+      const activeId = db.getActiveLeagueId();
+      const league = activeId
+        ? await db.getById("leagues", Number(activeId))
+        : null;
+      this.setActiveLeague(league?.name, league?.sport);
+    } catch {
+      this.setActiveLeague(null, null);
+    }
   }
 
   buildDOM() {
@@ -64,9 +87,15 @@ export class NavBar extends HTMLElement {
 
   setActiveLeague(name, sport) {
     const indicator = this.querySelector("#league-indicator");
-    if (indicator) {
-      indicator.textContent = name ? `${name} (${sport})` : "Sin liga activa";
+    if (name && sport) {
+      const terms = getSportTerms(sport);
+      indicator.textContent = `${terms.icon} ${name} — ${terms.name}`;
+      indicator.title = `${terms.name} (liga activa)`;
+    } else {
+      indicator.textContent = "Sin liga activa";
+      indicator.title = "Liga activa";
     }
+    applySportTheme(name && sport ? sport : "");
   }
 }
 
