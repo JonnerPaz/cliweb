@@ -1,8 +1,11 @@
 import db from "../db.js";
 import "../components/league-form.js";
 import "../components/league-switcher.js";
+import "../components/chart-container.js";
 import { getSportTerms } from "../sports-terms.js";
 import { formatDate } from "../utils/helpers.js";
+
+const PALETTE = ["#6c5ce7", "#22c55e", "#60a5fa", "#f97316", "#eab308", "#ef4444", "#ec4899", "#14b8a6"];
 
 export class DashboardView {
   constructor({ router }) {
@@ -94,6 +97,7 @@ export class DashboardView {
           ? this.#buildBracketSummary(matches, this.#teamById(teams))
           : this.#buildMiniStandings(teams, matches, terms)
       );
+      content.appendChild(this.#buildCharts(teams, matches, terms));
     }
   }
 
@@ -508,6 +512,202 @@ export class DashboardView {
 
     block.appendChild(list);
     return block;
+  }
+
+  #buildCharts(teams, matches, terms) {
+    const section = document.createElement("section");
+    section.className = "detail-section";
+    section.appendChild(this.#sectionTitle("Gráficos"));
+
+    const grid = document.createElement("div");
+    grid.className = "charts-grid";
+
+    grid.appendChild(this.#pointsForChart(teams, matches, terms));
+    grid.appendChild(this.#resultsChart(matches));
+    grid.appendChild(this.#pointsTimelineChart(teams, matches));
+
+    section.appendChild(grid);
+    return section;
+  }
+
+  #buildChartCard(title, config, empty) {
+    const card = document.createElement("div");
+    card.className = "stats-chart";
+
+    const head = document.createElement("div");
+    head.className = "stats-chart-head";
+    const h3 = document.createElement("h3");
+    h3.textContent = title;
+    head.appendChild(h3);
+    card.appendChild(head);
+
+    const panel = document.createElement("div");
+    panel.className = "chart-panel";
+
+    if (empty) {
+      const e = document.createElement("div");
+      e.className = "empty-state";
+      const p = document.createElement("p");
+      p.textContent = empty;
+      e.appendChild(p);
+      panel.appendChild(e);
+    } else {
+      const wrapper = document.createElement("div");
+      wrapper.className = "chart-wrapper";
+      const chartEl = document.createElement("chart-container");
+      wrapper.appendChild(chartEl);
+      panel.appendChild(wrapper);
+      chartEl.render(config);
+    }
+
+    card.appendChild(panel);
+    return card;
+  }
+
+  #pointsForChart(teams, matches, terms) {
+    const title = "Puntos a favor por equipo";
+
+    const rows = teams
+      .map((team) => ({ team, pf: this.#computeStats(matches, team.id).pf }))
+      .filter((r) => r.pf > 0)
+      .sort((a, b) => b.pf - a.pf)
+      .slice(0, 10);
+
+    if (rows.length === 0) {
+      return this.#buildChartCard(title, null, "No hay datos suficientes.");
+    }
+
+    return this.#buildChartCard(title, {
+      type: "bar",
+      data: {
+        labels: rows.map((r) => r.team.name),
+        datasets: [
+          {
+            label: terms.gf || "PF",
+            data: rows.map((r) => r.pf),
+            backgroundColor: rows.map((r) => r.team.colorPrincipal || PALETTE[0]),
+            borderRadius: 6,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+      },
+    }, null);
+  }
+
+  #resultsChart(matches) {
+    const title = "Distribución de resultados";
+
+    const totals = { wins: 0, draws: 0, losses: 0 };
+    matches
+      .filter((m) => this.#isFinalized(m) && m.homeScore != null && m.awayScore != null)
+      .forEach((m) => {
+        if (m.homeScore === m.awayScore) {
+          totals.draws += 2;
+        } else {
+          totals.wins += 1;
+          totals.losses += 1;
+        }
+      });
+
+    const data = [totals.wins, totals.draws, totals.losses];
+    if (data.every((v) => v === 0)) {
+      return this.#buildChartCard(title, null, "No hay datos suficientes.");
+    }
+
+    return this.#buildChartCard(title, {
+      type: "doughnut",
+      data: {
+        labels: ["Victorias", "Empates", "Derrotas"],
+        datasets: [
+          {
+            data,
+            backgroundColor: ["#22c55e", "#eab308", "#ef4444"],
+            borderColor: "#0a0a0f",
+            borderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: true, position: "right", labels: { color: "#8888aa", boxWidth: 12 } },
+        },
+      },
+    }, null);
+  }
+
+  #pointsTimelineChart(teams, matches) {
+    const title = "Evolución de puntos a favor";
+
+    const played = matches
+      .filter((m) => this.#isFinalized(m) && m.homeScore != null && m.awayScore != null)
+      .sort((a, b) => (a.date || "").localeCompare(b.date || "") || a.id - b.id);
+
+    if (played.length === 0) {
+      return this.#buildChartCard(title, null, "No hay datos suficientes.");
+    }
+
+    const labels = played.map((m, i) =>
+      m.date ? new Date(m.date).toLocaleDateString("es-ES") : `P${i + 1}`
+    );
+
+    const teamIds = new Set();
+    played.forEach((m) => {
+      teamIds.add(m.homeTeamId);
+      teamIds.add(m.awayTeamId);
+    });
+
+    const teamById = {};
+    teams.forEach((t) => (teamById[t.id] = t));
+
+    const series = Array.from(teamIds)
+      .map((teamId) => {
+        let cum = 0;
+        const values = played.map((m) => {
+          if (m.homeTeamId === teamId) {
+            cum += m.homeScore;
+          } else if (m.awayTeamId === teamId) {
+            cum += m.awayScore;
+          }
+          return cum;
+        });
+        return { teamId, values };
+      })
+      .sort((a, b) => b.values[b.values.length - 1] - a.values[a.values.length - 1])
+      .slice(0, 6);
+
+    const datasets = series.map((s, i) => {
+      const team = teamById[s.teamId];
+      const color = team?.colorPrincipal || PALETTE[i % PALETTE.length];
+      return {
+        label: team?.name || `Equipo ${i + 1}`,
+        data: s.values,
+        borderColor: color,
+        backgroundColor: color,
+        tension: 0.3,
+        fill: false,
+        pointRadius: 2,
+      };
+    });
+
+    return this.#buildChartCard(title, {
+      type: "line",
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: true, labels: { color: "#8888aa", boxWidth: 12 } },
+        },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+      },
+    }, null);
   }
 
   openLeagueSwitcher() {

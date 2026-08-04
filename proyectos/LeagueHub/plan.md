@@ -128,11 +128,11 @@
   - [x] Mensaje vacío si no hay ligas + botones "Crear Liga" / "Ir a Ligas"
   - [x] Tarjeta de próximo partido y último resultado
   - [x] Mini tabla top 5 (liga) o resumen de bracket (eliminación directa)
-  - [ ] 3 gráficos Chart.js:
-    - Barras/radar: equipos con más puntos a favor
-    - Torta/anillo: distribución resultados (V/E/D)
-    - Líneas: evolución de puntos por fecha
-  - [ ] Manejo de "No hay datos suficientes" en gráficos
+  - [x] 3 gráficos Chart.js:
+    - [x] Barras/radar: equipos con más puntos a favor
+    - [x] Torta/anillo: distribución resultados (V/E/D)
+    - [x] Líneas: evolución de puntos por fecha
+  - [x] Manejo de "No hay datos suficientes" en gráficos
 
 ---
 
