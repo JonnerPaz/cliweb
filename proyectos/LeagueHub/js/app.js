@@ -23,6 +23,10 @@ async function init() {
     console.error("Error al abrir IndexedDB:", err);
   }
 
+  // Si la base está vacía, se siembran las ligas de ejemplo para poder
+  // probar todas las vistas y estadísticas sin configurar datos a mano.
+  await seedSampleDataIfEmpty();
+
   const app = document.getElementById("app");
 
   const router = new Router(app, [
@@ -50,6 +54,33 @@ async function init() {
   }
 
   router.start();
+}
+
+async function seedSampleDataIfEmpty() {
+  try {
+    const leagues = await db.getAll("leagues");
+    if (leagues.length > 0) return;
+
+    const { loadSampleData } = await import("./sample-data.js");
+    const result = await loadSampleData();
+    if (!result.loaded || db.getActiveLeagueId()) return;
+
+    const sample = (await db.getAll("leagues")).find((l) => l.name === "Liga Fútbol Ejemplo");
+    if (!sample) return;
+
+    await db.runTransaction(["leagues"], "readwrite", (stores) => {
+      const all = stores.leagues.getAll();
+      all.onsuccess = () => {
+        all.result.forEach((l) => {
+          stores.leagues.put({ ...l, isActive: l.id === sample.id });
+        });
+      };
+    });
+    db.setActiveLeagueId(sample.id);
+    document.dispatchEvent(new CustomEvent("league:changed"));
+  } catch (err) {
+    console.error("Error al sembrar ligas de ejemplo:", err);
+  }
 }
 
 await init();
