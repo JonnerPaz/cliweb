@@ -104,3 +104,115 @@
   font-weight: 700;
   color: var(--accent);
 }
+
+/* ===== RankingTable ===== */
+.ranking-wrap {
+  overflow-x: auto;
+}
+
+.ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  font-size: 0.9rem;
+}
+
+.ranking-table th,
+.ranking-table td {
+  padding: 0.55rem 0.7rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.ranking-table th {
+  color: var(--accent-soft);
+  background: var(--surface-hover);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ranking-table td {
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+}
+
+.ranking-table tbody tr {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ranking-table tbody tr:hover {
+  background: var(--surface-hover);
+}
+
+.ranking-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ranking-table .rk-num {
+  text-align: center;
+}
+
+.ranking-table .rk-pos {
+  width: 2.5rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.ranking-table .rk-pos.top {
+  color: var(--accent);
+  text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.4);
+}
+
+.ranking-table .rk-player {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.ranking-table .rk-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--on-accent);
+  background: var(--accent);
+}
+
+.ranking-table .rk-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ranking-table .rk-name {
+  color: var(--text);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-table .rk-team {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.ranking-table .rk-num.rk-goals {
+  font-weight: 700;
+  color: var(--accent);
+}
