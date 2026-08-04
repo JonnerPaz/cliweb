@@ -182,3 +182,100 @@
   font-weight: 600;
   flex-shrink: 0;
 }
+
+/* Dashboard summary cards */
+.dash-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.dash-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+}
+
+.dash-card.clickable {
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.dash-card.clickable:hover {
+  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.3);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.dash-card h3 {
+  font-size: 0.95rem;
+  color: var(--accent-soft);
+  text-shadow: 0 0 6px rgba(var(--accent-rgb), 0.2);
+}
+
+.dash-matchup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.dash-team {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.dash-team-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--on-accent);
+  background: var(--accent);
+}
+
+.dash-team-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dash-team-name {
+  color: var(--text);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dash-vs {
+  color: var(--text-faint);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.dash-score {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--accent-text);
+  text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.3);
+  white-space: nowrap;
+}
+
+.dash-date {
+  color: var(--text-faint);
+  font-size: 0.8rem;
+}
+
+.dash-card .empty-state {
+  padding: 1rem 0;
+}
