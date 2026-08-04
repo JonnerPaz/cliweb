@@ -110,11 +110,11 @@
   - [x] Historial de partidos donde anotó
   - [x] Mini gráfico de barras (anotaciones por partido)
   - [x] Base compartida de estilos para vistas de detalle (`css/detail.css`)
-- [ ] **Vista `#stats`:**
-  - [ ] **StandingsTable** (liga) — ordenado por pts, DIF, PF
-  - [ ] **BracketView** (eliminación directa) — árbol visual de rondas
-  - [ ] **RankingTable** — top 10 anotadores
-  - [ ] 3 gráficos avanzados con Chart.js (barras top 10, líneas multi-equipo, +1 a elección)
+- [x] **Vista `#stats`:**
+  - [x] **StandingsTable** (liga) — ordenado por pts, DIF, PF
+  - [x] **BracketView** (eliminación directa) — árbol visual de rondas
+  - [x] **RankingTable** — top 10 anotadores
+  - [x] 3 gráficos avanzados con Chart.js (barras top 10, líneas multi-equipo, +1 a elección)
 
 ---
 
@@ -149,7 +149,7 @@
 
 ## Fase 5 — Pulido (Días 7-8 si hay tiempo)
 
-- [ ] Identidad visual por deporte (paletas de colores, iconos, tipografía)
+- [x] Identidad visual por deporte (paletas de colores, iconos, tipografía)
 - [ ] Ligas plantilla de ejemplo precargadas para test rápido
 - [ ] README.md completo (nombres, división de trabajo, deportes, instrucciones, capturas, esquema DB, decisiones técnicas)
 - [ ] Capturas de pantalla de las 9 vistas con 2+ deportes
