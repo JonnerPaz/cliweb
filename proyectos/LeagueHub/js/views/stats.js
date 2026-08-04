@@ -29,6 +29,7 @@ export class StatsView {
 
   #pointsIn(match, teamId) {
     if (!this.#isFinalized(match) || match.homeScore == null || match.awayScore == null) return 0;
+    if (match.homeTeamId !== teamId && match.awayTeamId !== teamId) return 0;
     const isHome = match.homeTeamId === teamId;
     const own = isHome ? match.homeScore : match.awayScore;
     const rival = isHome ? match.awayScore : match.homeScore;
