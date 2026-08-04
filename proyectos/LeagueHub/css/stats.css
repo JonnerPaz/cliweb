@@ -315,3 +315,46 @@
   border-top: 1px dashed var(--border);
   padding-top: 0.3rem;
 }
+
+/* ===== Stats view ===== */
+.stats-view .detail-panel {
+  padding: 0.75rem;
+}
+
+.stats-view .chart-wrapper {
+  height: 280px;
+  padding: 0.25rem 0;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.stats-chart {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  min-width: 0;
+}
+
+.stats-chart-head h3 {
+  font-size: 0.95rem;
+  color: var(--accent-soft);
+  margin-bottom: 0.75rem;
+  text-shadow: 0 0 6px rgba(var(--accent-rgb), 0.2);
+}
+
+.chart-panel {
+  min-width: 0;
+}
+
+.chart-panel .empty-state {
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}

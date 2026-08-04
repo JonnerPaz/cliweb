@@ -1,12 +1,23 @@
 export class ChartContainer extends HTMLElement {
   connectedCallback() {
-    const canvas = document.createElement('canvas');
-    this.appendChild(canvas);
-    this.canvas = canvas;
-    this.chart = null;
+    if (!this.canvas) {
+      const canvas = document.createElement('canvas');
+      this.appendChild(canvas);
+      this.canvas = canvas;
+      this.chart = null;
+    }
+    if (this.pendingConfig) {
+      const config = this.pendingConfig;
+      this.pendingConfig = null;
+      this.render(config);
+    }
   }
 
   render(config) {
+    if (!this.canvas) {
+      this.pendingConfig = config;
+      return;
+    }
     if (this.chart) {
       this.chart.destroy();
     }
