@@ -97,6 +97,32 @@ class DB {
     });
   }
 
+  // Borra todos los registros de un store cuyo índice coincida con el valor.
+  // Usado por las operaciones en cascada (eliminar liga, etc.).
+  async removeByIndex(storeName, indexName, value) {
+    const { store } = await this.#getStore("readwrite", storeName);
+    return new Promise((resolve, reject) => {
+      const req = store.index(indexName).openCursor(value);
+      const pending = [];
+      req.onsuccess = () => {
+        const cursor = req.result;
+        if (cursor) {
+          pending.push(
+            new Promise((res, rej) => {
+              const del = cursor.delete();
+              del.onsuccess = () => res();
+              del.onerror = () => rej(del.error);
+            }),
+          );
+          cursor.continue();
+        } else {
+          Promise.all(pending).then(resolve).catch(reject);
+        }
+      };
+      req.onerror = () => reject(req.error);
+    });
+  }
+
   async clear(storeName) {
     const { store } = await this.#getStore("readwrite", storeName);
     return new Promise((resolve, reject) => {
