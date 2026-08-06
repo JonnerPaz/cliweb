@@ -57,6 +57,12 @@ export class LeaguesView {
       hasMatches[m.leagueId] = true;
     });
 
+    const allTeams = await db.getAll("teams");
+    const teamCountByLeague = {};
+    allTeams.forEach((t) => {
+      teamCountByLeague[t.leagueId] = (teamCountByLeague[t.leagueId] || 0) + 1;
+    });
+
     const list = this.container.querySelector("#league-list") || document.createElement("div");
     list.id = "league-list";
 
@@ -67,16 +73,23 @@ export class LeaguesView {
       list.innerHTML = leagues
         .map((l) => {
           const t = getSportTerms(l.sport);
+          const teamCount = teamCountByLeague[l.id] || 0;
+          const requiredTeams = l.tournamentTeams;
+          const bracketDisabled =
+            l.modalidad === "tournament" &&
+            requiredTeams != null &&
+            teamCount !== requiredTeams;
           return `
         <div class="card ${Number(activeId) === l.id ? "active" : ""}" data-id="${l.id}">
           <h3>${t.icon} ${l.name}</h3>
           <p>${t.name} — ${l.temporada || ""}</p>
-          <p>${l.modalidad === "league" ? "Liga" : "Eliminación Directa"}</p>
+          <p>${l.modalidad === "league" ? "Liga" : "Eliminación Directa"}${l.modalidad === "tournament" && requiredTeams ? ` — ${requiredTeams} equipos` : ""}</p>
           <div style="margin-top:0.5rem;display:flex;gap:0.25rem;flex-wrap:wrap">
             <button class="btn btn-sm btn-primary js-activate" data-id="${l.id}">Activar</button>
             <button class="btn btn-sm btn-secondary js-edit" data-id="${l.id}">Editar</button>
             ${l.modalidad === "league" && !hasMatches[l.id] ? `<button class="btn btn-sm btn-secondary js-schedule" data-id="${l.id}">Programar partidos</button>` : ""}
-            ${l.modalidad === "tournament" && !hasMatches[l.id] ? `<button class="btn btn-sm btn-secondary js-bracket" data-id="${l.id}">Generar bracket</button>` : ""}
+            ${l.modalidad === "tournament" && !hasMatches[l.id] ? `<button class="btn btn-sm btn-secondary js-bracket" data-id="${l.id}" ${bracketDisabled ? "disabled" : ""} title="${bracketDisabled ? `Se requieren exactamente ${requiredTeams} equipos (hay ${teamCount})` : ""}">Generar bracket</button>` : ""}
+            ${bracketDisabled ? `<p class="bracket-hint">Requiere ${requiredTeams} equipos (hay ${teamCount})</p>` : ""}
             <button class="btn btn-sm btn-secondary js-export" data-id="${l.id}">Exportar</button>
             <button class="btn btn-sm btn-danger js-delete" data-id="${l.id}">Eliminar</button>
           </div>
@@ -170,13 +183,27 @@ export class LeaguesView {
           }
 
           const teams = await db.getByIndex("teams", "leagueId", leagueId);
-          if (teams.length < 2) {
-            showToast("Se necesitan al menos 2 equipos", "error");
+          const league = await db.getById("leagues", leagueId);
+          const required = league?.tournamentTeams;
+          if (required != null && teams.length !== required) {
+            showToast(`Se requieren exactamente ${required} equipos para generar el bracket (hay ${teams.length})`, "error");
+            btn.disabled = false;
+            return;
+          }
+          if (teams.length < 4) {
+            showToast("Se necesitan al menos 4 equipos", "error");
             btn.disabled = false;
             return;
           }
 
-          const matches = generateBracket(teams);
+          let matches;
+          try {
+            matches = generateBracket(teams);
+          } catch (err) {
+            showToast(err.message, "error");
+            btn.disabled = false;
+            return;
+          }
 
           await db.runTransaction(["matches"], "readwrite", (stores) => {
             matches.forEach((m) => {

@@ -38,6 +38,14 @@ class LeagueForm extends HTMLElement {
                 <label class="form-label" for="league-rounds">Vueltas</label>
                 <input class="form-input" id="league-rounds" name="rounds" type="number" min="1" value="1" />
               </div>
+              <div class="form-group" id="teams-group">
+                <label class="form-label" for="league-teams">Nº de equipos</label>
+                <select class="form-select" id="league-teams" name="tournamentTeams">
+                  <option value="4">4</option>
+                  <option value="8">8</option>
+                  <option value="16">16</option>
+                </select>
+              </div>
               <div class="form-group">
                 <label class="form-label" for="league-season">Temporada</label>
                 <input class="form-input" id="league-season" name="temporada" placeholder="2026" />
@@ -57,9 +65,9 @@ class LeagueForm extends HTMLElement {
     `;
 
     this.querySelectorAll('input[name="modalidad"]').forEach((r) => {
-      r.addEventListener("change", () => this.#toggleRoundsField());
+      r.addEventListener("change", () => this.#toggleModeFields());
     });
-    this.#toggleRoundsField();
+    this.#toggleModeFields();
 
     this.querySelector("#form-cancel").addEventListener("click", () => this.close());
     this.querySelector("#league-form").addEventListener("submit", (e) => this.#handleSubmit(e));
@@ -78,15 +86,18 @@ class LeagueForm extends HTMLElement {
     const modalidad = this.querySelector(`input[name="modalidad"][value="${league.modalidad}"]`);
     if (modalidad) modalidad.checked = true;
     form.rounds.value = league.rounds || 1;
+    form.tournamentTeams.value = league.tournamentTeams || 4;
     form.temporada.value = league.temporada || "";
     form.description.value = league.description || "";
-    this.#toggleRoundsField();
+    this.#toggleModeFields();
   }
 
-  #toggleRoundsField() {
+  // Muestra vueltas (modo liga) o número de equipos (eliminación directa).
+  #toggleModeFields() {
     const checked = this.querySelector('input[name="modalidad"]:checked');
     const isLeague = checked && checked.value === "league";
     this.querySelector("#rounds-group").style.display = isLeague ? "block" : "none";
+    this.querySelector("#teams-group").style.display = isLeague ? "none" : "block";
   }
 
   async #handleSubmit(e) {
@@ -102,6 +113,8 @@ class LeagueForm extends HTMLElement {
 
     if (data.modalidad === "league") {
       data.rounds = Number(form.rounds.value) || 1;
+    } else {
+      data.tournamentTeams = Number(form.tournamentTeams.value) || 4;
     }
 
     if (!data.name || !data.sport) return;

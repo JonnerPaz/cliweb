@@ -69,9 +69,15 @@ export function generateBracket(teams) {
 
   const teamIds = teams.map((t) => t.id);
   const n = teamIds.length;
-  const totalSlots = Math.pow(2, Math.ceil(Math.log2(n)));
+
+  // El bracket requiere un número de equipos potencia de 2 (4, 8 o 16).
+  if (!Number.isInteger(Math.log2(n)) || n < 4) {
+    throw new Error("El número de equipos debe ser potencia de 2 (4, 8 o 16).");
+  }
+
+  const totalSlots = n;
   const numRounds = Math.log2(totalSlots);
-  const byes = totalSlots - n;
+  const byes = 0;
 
   const matches = [];
 
