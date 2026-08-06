@@ -22,6 +22,17 @@ export function formatDate(dateStr) {
   });
 }
 
+// Nombre de la ronda según el número de equipos del torneo
+// (16 → Octavos/Cuartos/Semifinal/Final, 8 → Cuartos/..., 4 → Semifinal/Final).
+export function roundLabel(round, totalTeams) {
+  if (round == null || !totalTeams) return "";
+  const names = ["Octavos", "Cuartos", "Semifinal", "Final"];
+  const totalRounds = Math.log2(totalTeams);
+  if (!Number.isInteger(totalRounds) || totalRounds > names.length) return `Ronda ${round}`;
+  const idx = round - 1 + (names.length - totalRounds);
+  return names[idx] || `Ronda ${round}`;
+}
+
 export function generateRoundRobin(teams, totalRounds = 1) {
   if (teams.length < 2) return [];
 

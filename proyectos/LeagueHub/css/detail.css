@@ -269,3 +269,145 @@
   height: 260px;
   padding: 1rem;
 }
+
+/* Match detail (V-08) */
+.match-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.match-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.match-header h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.match-meta {
+  margin: 0;
+  color: var(--text);
+  opacity: 0.8;
+  font-size: 0.85rem;
+}
+
+.match-hero {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--accent-soft);
+  margin-top: 0.5rem;
+}
+
+.match-winner {
+  margin: 0;
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.match-live-score {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-soft);
+}
+
+/* Registro de eventos */
+.events-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.events-section h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.event-column {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+
+.event-column h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.event-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.event-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  background: var(--surface);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.event-empty {
+  color: var(--text);
+  opacity: 0.6;
+  font-size: 0.85rem;
+  padding: 0.35rem 0;
+}
+
+/* Acciones: finalizar / deshacer */
+.match-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.match-actions .btn {
+  align-self: flex-start;
+}
+
+.winner-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.winner-picker p {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.winner-picker .btn {
+  align-self: flex-end;
+}
