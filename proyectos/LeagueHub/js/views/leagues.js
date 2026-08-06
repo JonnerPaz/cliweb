@@ -123,7 +123,7 @@ export class LeaguesView {
                 awayTeamId: m.away,
                 round: m.round,
                 date: null,
-                status: "pending",
+                status: "Programado",
                 homeScore: null,
                 awayScore: null,
               });
@@ -166,7 +166,7 @@ export class LeaguesView {
                 homeTeamId: m.homeTeamId,
                 awayTeamId: m.awayTeamId,
                 date: null,
-                status: "pending",
+                status: "Programado",
                 homeScore: null,
                 awayScore: null,
               });

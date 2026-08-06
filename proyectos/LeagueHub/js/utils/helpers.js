@@ -71,7 +71,7 @@ export function generateBracket(teams) {
       position: i,
       homeTeamId: round1Teams[i],
       awayTeamId: round1Teams[round1Teams.length - 1 - i],
-      status: "pending",
+      status: "Programado",
       homeScore: null,
       awayScore: null,
     });
@@ -92,7 +92,7 @@ export function generateBracket(teams) {
         position: p,
         homeTeamId: home,
         awayTeamId: away,
-        status: "pending",
+        status: "Programado",
         homeScore: null,
         awayScore: null,
       });
