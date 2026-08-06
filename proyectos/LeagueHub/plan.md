@@ -29,7 +29,7 @@
   ```
 - [x] `index.html` básico: navbar placeholder, `<main id="app">`, footer
 - [x] Implementar **NavBar** (Custom Element) con logo, liga activa, enlaces
-- [/] Implementar **Footer** (Custom Element) con créditos y estado IndexedDB (inline en HTML, no Custom Element)
+- [x] Implementar **Footer** (Custom Element) con créditos y estado IndexedDB (inline en HTML, no Custom Element) — créditos con nombres de los integrantes; sin indicador de estado por decisión de la pareja
 - [x] Implementar **Toast**, **ConfirmDialog**, **LoadingState** como Custom Elements
 - [x] Implementar **hash router** básico que cargue vistas según `window.location.hash`
 - [x] Definir estructura de los 3 deportes en `sports-terms.js`:
@@ -64,27 +64,28 @@
   - [x] Crear liga (formulario con nombre, deporte, modalidad, vueltas o #equipos, temporada)
   - [x] Editar liga (nombre, temporada, descripción — modalidad bloqueada)
   - [x] Activar liga (transaccional, desactiva la anterior, persiste en LocalStorage)
-  - [ ] Eliminar liga (con confirmación, borra en cascada todo)
+  - [x] Eliminar liga (con confirmación, borra en cascada todo)
   - [x] Botón "Programar partidos" (liga) → algoritmo round-robin
   - [x] Botón "Generar bracket" (eliminación directa) → bracket con slots
-  - [ ] Exportar liga a JSON
-  - [ ] Importar liga desde JSON (validación + transacción)
-- [ ] **Vista `#matches`:**
-  - [ ] Listado con filtros (estado, equipo, fecha, ronda)
-  - [ ] Crear/editar partido (solo modalidad liga) con validaciones
-- [ ] **Vista `#match/:id`:**
-  - [ ] Cabecera con equipos, fecha, estado
-  - [ ] **EventForm** (Custom Element) — registrar anotaciones por equipo
-  - [ ] Acumulador visual de eventos (local | visitante)
-  - [ ] **Operación: Finalizar partido** — transacción que:
+  - [x] Validación del bracket: conteo exacto de equipos declarado + potencia de 2
+  - [x] Exportar liga a JSON
+  - [x] Importar liga desde JSON (validación + transacción)
+- [x] **Vista `#matches`:**
+  - [x] Listado con filtros (estado, equipo, fecha, ronda)
+  - [x] Crear/editar partido (solo modalidad liga) con validaciones
+- [x] **Vista `#match/:id`:**
+  - [x] Cabecera con equipos, fecha, estado
+  - [x] **EventForm** (Custom Element) — registrar anotaciones por equipo
+  - [x] Acumulador visual de eventos (local | visitante)
+  - [x] **Operación: Finalizar partido** — transacción que:
     1. Actualiza match a "Finalizado" con marcador
-    2. Actualiza estadísticas de ambos equipos
-    3. Actualiza estadísticas de jugadores anotadores
+    2. Actualiza estadísticas de ambos equipos (derivadas por la vista)
+    3. Actualiza estadísticas de jugadores anotadores (derivadas por la vista)
     4. Persiste eventos
     5. En eliminación directa: avanza ganador al siguiente partido
-  - [ ] **Operación: Deshacer partido** — transacción inversa
-  - [ ] Validación: no deshacer si el siguiente partido ya está finalizado
-  - [ ] Manejo de empate en eliminación directa (selector de ganador)
+  - [x] **Operación: Deshacer partido** — transacción inversa
+  - [x] Validación: no deshacer si el siguiente partido ya está finalizado
+  - [x] Manejo de empate en eliminación directa (selector de ganador)
 
 ---
 
@@ -141,8 +142,8 @@
 - [x] Integrar vistas de ambos estudiantes (router configurado con todas las rutas)
 - [x] Verificar que el router de hash funciona con botones atrás/adelante
 - [ ] Probar los 12 escenarios de prueba manual (sección 9 del documento)
-- [ ] Verificar que los cambios de liga activa redirigen al dashboard
-- [ ] Verificar que la terminología cambia según el deporte de la liga activa
+- [x] Verificar que los cambios de liga activa redirigen al dashboard
+- [x] Verificar que la terminología cambia según el deporte de la liga activa
 - [x] Verificar persistencia: cerrar/abrir navegador
 
 ---
@@ -150,6 +151,6 @@
 ## Fase 5 — Pulido (Días 7-8 si hay tiempo)
 
 - [x] Identidad visual por deporte (paletas de colores, iconos, tipografía)
-- [ ] Ligas plantilla de ejemplo precargadas para test rápido
+- [x] Ligas plantilla de ejemplo precargadas para test rápido
 - [ ] README.md completo (nombres, división de trabajo, deportes, instrucciones, capturas, esquema DB, decisiones técnicas)
 - [ ] Capturas de pantalla de las 9 vistas con 2+ deportes
