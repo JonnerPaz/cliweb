@@ -217,3 +217,22 @@ fieldset.form-group legend {
   color: var(--accent-soft);
   white-space: nowrap;
 }
+
+/* Matches view (V-07) */
+.matches-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.match-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.match-item-actions {
+  display: flex;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
