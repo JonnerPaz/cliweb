@@ -143,7 +143,18 @@ class DB {
       tx.oncomplete = () => resolve();
       tx.onerror = (e) => reject(e.target.error);
       tx.onabort = (e) => reject(e.target.error);
-      callback(stores, tx);
+      // Si el callback lanza un error (validación, lógica), se aborta la
+      // transacción para revertir todo y se propaga el error al caller.
+      Promise.resolve()
+        .then(() => callback(stores, tx))
+        .catch((err) => {
+          try {
+            tx.abort();
+          } catch {
+            /* transacción ya finalizada */
+          }
+          reject(err);
+        });
     });
   }
 
