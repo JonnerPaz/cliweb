@@ -91,3 +91,55 @@ export async function finalizeMatch(matchId, { declaredWinnerId } = {}) {
 
   return finalized;
 }
+
+/**
+ * Operación de integridad inversa: deshace un partido finalizado en una sola
+ * transacción. Revierte el estado y el marcador, conserva los eventos para
+ * poder volver a finalizarlo y, en eliminación directa, limpia el slot del
+ * partido de la siguiente ronda (vuelve a "Por definir") si aún está
+ * programado. Se rechaza si el partido siguiente ya está finalizado.
+ *
+ * @param {number} matchId
+ * @returns {Promise<object>} El partido restablecido a programado.
+ */
+export async function undoMatch(matchId) {
+  let undone;
+
+  await db.runTransaction(["leagues", "matches"], "readwrite", async (stores) => {
+    const match = await q(stores.matches, "get", matchId);
+    if (!match) throw new Error("El partido no existe.");
+    if (match.status !== "Finalizado") throw new Error("El partido no está finalizado.");
+
+    const league = await q(stores.leagues, "get", match.leagueId);
+    const isTournament = league?.modalidad === "tournament";
+
+    const updated = { ...match, status: "Programado", homeScore: null, awayScore: null };
+    delete updated.winnerId;
+
+    if (isTournament) {
+      const nextMatch = await findNextMatch(stores.matches, match);
+
+      // Restricción: no se puede deshacer si el partido de la siguiente
+      // ronda ya fue finalizado (rompería la cadena del bracket).
+      if (nextMatch && nextMatch.status === "Finalizado") {
+        throw new Error(
+          "No se puede deshacer este partido porque el partido de la siguiente ronda ya está finalizado. Deshaz primero ese partido.",
+        );
+      }
+
+      await q(stores.matches, "put", updated);
+
+      // Limpiar el slot del siguiente partido (volver a "Por definir").
+      if (nextMatch) {
+        const slot = match.position % 2 === 0 ? "homeTeamId" : "awayTeamId";
+        await q(stores.matches, "put", { ...nextMatch, [slot]: null });
+      }
+    } else {
+      await q(stores.matches, "put", updated);
+    }
+
+    undone = updated;
+  });
+
+  return undone;
+}
