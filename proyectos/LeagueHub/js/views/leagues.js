@@ -3,6 +3,7 @@ import "../components/league-form.js";
 import { showToast } from "../components/toast.js";
 import { generateRoundRobin, generateBracket } from "../utils/helpers.js";
 import { getSportTerms } from "../sports-terms.js";
+import { exportLeague } from "../core/league-io.js";
 
 export class LeaguesView {
   constructor({ router }) {
@@ -57,6 +58,7 @@ export class LeaguesView {
             <button class="btn btn-sm btn-secondary js-edit" data-id="${l.id}">Editar</button>
             ${l.modalidad === "league" && !hasMatches[l.id] ? `<button class="btn btn-sm btn-secondary js-schedule" data-id="${l.id}">Programar partidos</button>` : ""}
             ${l.modalidad === "tournament" && !hasMatches[l.id] ? `<button class="btn btn-sm btn-secondary js-bracket" data-id="${l.id}">Generar bracket</button>` : ""}
+            <button class="btn btn-sm btn-secondary js-export" data-id="${l.id}">Exportar</button>
             <button class="btn btn-sm btn-danger js-delete" data-id="${l.id}">Eliminar</button>
           </div>
         </div>
@@ -175,6 +177,18 @@ export class LeaguesView {
 
           showToast(`Bracket generado con ${matches.length} partidos`, "success");
           this.render();
+        });
+      });
+
+      list.querySelectorAll(".js-export").forEach((btn) => {
+        btn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          try {
+            await exportLeague(Number(btn.dataset.id));
+            showToast("Liga exportada", "success");
+          } catch (err) {
+            showToast(err.message || "No se pudo exportar la liga", "error");
+          }
         });
       });
 
