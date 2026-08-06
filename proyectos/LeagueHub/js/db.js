@@ -3,6 +3,49 @@ const DB_VERSION = 1;
 
 let dbInstance = null;
 
+// Envuelve un request de IndexedDB en una promesa manteniendo la transacción viva.
+function idbQ(store, method, ...args) {
+  return new Promise((resolve, reject) => {
+    const req = store[method](...args);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Consulta un store por índice dentro de una transacción abierta.
+function idbQIndex(store, indexName, value) {
+  return new Promise((resolve, reject) => {
+    const req = store.index(indexName).getAll(value);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Borra todos los registros de un store cuyo índice coincida con el valor
+// (cursor dentro de una transacción abierta).
+function idbDeleteByIndex(store, indexName, value) {
+  return new Promise((resolve, reject) => {
+    const req = store.index(indexName).openCursor(value);
+    const pending = [];
+    req.onsuccess = () => {
+      const cursor = req.result;
+      if (cursor) {
+        pending.push(
+          new Promise((res, rej) => {
+            const del = cursor.delete();
+            del.onsuccess = () => res();
+            del.onerror = () => rej(del.error);
+          }),
+        );
+        cursor.continue();
+      } else {
+        Promise.all(pending).then(resolve).catch(reject);
+      }
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
 class DB {
   async #getStore(mode, storeName) {
     const db = await this.open();
@@ -165,6 +208,61 @@ class DB {
   setActiveLeagueId(id) {
     if (id) localStorage.setItem("leaguehub-active-league", id);
     else localStorage.removeItem("leaguehub-active-league");
+  }
+
+  /**
+   * Elimina una liga y todos sus datos asociados (equipos, jugadores,
+   * partidos y eventos) en una sola transacción. Si la liga eliminada era
+   * la activa, la siguiente liga disponible pasa a ser la activa.
+   *
+   * @returns {Promise<{activeChanged: boolean, nextActiveId: number|null}>}
+   */
+  async deleteLeagueCascade(leagueId) {
+    const result = { activeChanged: false, nextActiveId: null };
+
+    await this.runTransaction(
+      ["leagues", "teams", "players", "matches", "events"],
+      "readwrite",
+      async (stores) => {
+        const league = await idbQ(stores.leagues, "get", leagueId);
+        if (!league) throw new Error("La liga no existe.");
+
+        // 1) Eventos de los partidos de la liga.
+        const matches = await idbQIndex(stores.matches, "leagueId", leagueId);
+        for (const m of matches) {
+          await idbDeleteByIndex(stores.events, "matchId", m.id);
+        }
+
+        // 2) Partidos.
+        await idbDeleteByIndex(stores.matches, "leagueId", leagueId);
+
+        // 3) Jugadores de los equipos de la liga.
+        const teams = await idbQIndex(stores.teams, "leagueId", leagueId);
+        for (const t of teams) {
+          await idbDeleteByIndex(stores.players, "teamId", t.id);
+        }
+
+        // 4) Equipos.
+        await idbDeleteByIndex(stores.teams, "leagueId", leagueId);
+
+        // 5) La liga.
+        await idbQ(stores.leagues, "delete", leagueId);
+
+        // Si la liga eliminada era la activa, la siguiente pasa a serlo.
+        const wasActive = league.isActive || Number(this.getActiveLeagueId()) === leagueId;
+        if (wasActive) {
+          const remaining = await idbQ(stores.leagues, "getAll");
+          const next = remaining[0] || null;
+          if (next) {
+            await idbQ(stores.leagues, "put", { ...next, isActive: true });
+          }
+          result.activeChanged = true;
+          result.nextActiveId = next ? next.id : null;
+        }
+      },
+    );
+
+    return result;
   }
 }
 

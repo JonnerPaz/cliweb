@@ -188,8 +188,17 @@ export class LeaguesView {
           );
           if (confirmed) {
             const id = Number(btn.dataset.id);
-            await db.remove("leagues", id);
-            this.render();
+            try {
+              const result = await db.deleteLeagueCascade(id);
+              if (result.activeChanged) {
+                db.setActiveLeagueId(result.nextActiveId);
+                document.dispatchEvent(new CustomEvent("league:changed"));
+              }
+              showToast("Liga eliminada", "success");
+              this.render();
+            } catch (err) {
+              showToast(err.message || "No se pudo eliminar la liga", "error");
+            }
           }
         });
       });
