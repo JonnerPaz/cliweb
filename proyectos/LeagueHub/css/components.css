@@ -225,6 +225,11 @@ fieldset.form-group legend {
   align-items: flex-start;
 }
 
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .match-item {
   display: flex;
   flex-direction: column;

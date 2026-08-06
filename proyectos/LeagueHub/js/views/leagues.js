@@ -3,7 +3,7 @@ import "../components/league-form.js";
 import { showToast } from "../components/toast.js";
 import { generateRoundRobin, generateBracket } from "../utils/helpers.js";
 import { getSportTerms } from "../sports-terms.js";
-import { exportLeague } from "../core/league-io.js";
+import { exportLeague, importLeague } from "../core/league-io.js";
 
 export class LeaguesView {
   constructor({ router }) {
@@ -16,7 +16,10 @@ export class LeaguesView {
     container.innerHTML = `
       <div class="page-header">
         <h1>Ligas</h1>
-        <button class="btn btn-primary" id="create-league">+ Nueva Liga</button>
+        <div class="header-actions">
+          <button class="btn btn-secondary" id="import-league">Importar</button>
+          <button class="btn btn-primary" id="create-league">+ Nueva Liga</button>
+        </div>
       </div>
       <loading-state message="Cargando ligas..."></loading-state>
     `;
@@ -24,6 +27,22 @@ export class LeaguesView {
       const form = document.createElement("league-form");
       form.addEventListener("league-created", () => this.render());
       this.container.appendChild(form);
+    });
+    container.querySelector("#import-league").addEventListener("click", () => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "application/json,.json";
+      input.addEventListener("change", async () => {
+        const file = input.files[0];
+        if (!file) return;
+        try {
+          const json = JSON.parse(await file.text());
+          await this.#handleImport(json);
+        } catch (err) {
+          showToast(err.message || "El archivo no es un JSON válido", "error");
+        }
+      });
+      input.click();
     });
     this.render();
   }
@@ -225,5 +244,30 @@ export class LeaguesView {
 
   unmount() {
     this.container = null;
+  }
+
+  // Importa una liga; si el nombre ya existe, pide uno nuevo (o cancela).
+  async #handleImport(json) {
+    let rename;
+    for (;;) {
+      try {
+        await importLeague(json, rename ? { rename } : {});
+        showToast("Liga importada", "success");
+        this.render();
+        return;
+      } catch (err) {
+        if (err.code !== "NAME_CONFLICT") {
+          showToast(err.message || "No se pudo importar la liga", "error");
+          return;
+        }
+        rename = window.prompt(
+          "Ya existe una liga con ese nombre. Ingresa un nombre nuevo para importarla:",
+          "",
+        );
+        if (!rename) return; // el usuario canceló
+        rename = rename.trim();
+        if (!rename) return;
+      }
+    }
   }
 }
