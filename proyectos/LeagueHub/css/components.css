@@ -100,3 +100,22 @@ fieldset.form-group legend {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* EventForm */
+.event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.event-form .btn {
+  align-self: flex-end;
+}
+
+.event-player-group {
+  flex: 2;
+}
+
+.event-minute-group {
+  flex: 0 0 90px;
+}
