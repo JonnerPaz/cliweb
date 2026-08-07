@@ -28,10 +28,63 @@ async function findNextMatch(store, match) {
   return matches.find((m) => m.round === nextRound && m.position === nextPosition) || null;
 }
 
+// Suma el resultado de un partido a las estadísticas acumuladas de un equipo.
+// `own` y `rival` son los puntos del equipo y de su oponente respectivamente.
+// Puntuación: 3 por victoria, 1 por empate, 0 por derrota.
+function applyTeamResult(team, own, rival) {
+  const t = { ...team };
+  t.pj = (t.pj || 0) + 1;
+  t.pf = (t.pf || 0) + own;
+  t.pc = (t.pc || 0) + rival;
+  if (own > rival) {
+    t.pg = (t.pg || 0) + 1;
+    t.pts = (t.pts || 0) + 3;
+  } else if (own < rival) {
+    t.pp = (t.pp || 0) + 1;
+  } else {
+    t.pe = (t.pe || 0) + 1;
+    t.pts = (t.pts || 0) + 1;
+  }
+  t.dif = t.pf - t.pc;
+  return t;
+}
+
+// Operación inversa a applyTeamResult: resta el resultado del partido de las
+// estadísticas acumuladas de un equipo (al deshacer un partido finalizado).
+function revertTeamResult(team, own, rival) {
+  const t = { ...team };
+  t.pj = Math.max(0, (t.pj || 0) - 1);
+  t.pf = Math.max(0, (t.pf || 0) - own);
+  t.pc = Math.max(0, (t.pc || 0) - rival);
+  if (own > rival) {
+    t.pg = Math.max(0, (t.pg || 0) - 1);
+    t.pts = Math.max(0, (t.pts || 0) - 3);
+  } else if (own < rival) {
+    t.pp = Math.max(0, (t.pp || 0) - 1);
+  } else {
+    t.pe = Math.max(0, (t.pe || 0) - 1);
+    t.pts = Math.max(0, (t.pts || 0) - 1);
+  }
+  t.dif = t.pf - t.pc;
+  return t;
+}
+
+// Cuenta las anotaciones de cada jugador en una lista de eventos.
+// Devuelve un mapa `{ playerId: cantidad }`.
+function countPlayerGoals(events) {
+  const goals = {};
+  events.forEach((ev) => {
+    if (ev.playerId == null) return;
+    goals[ev.playerId] = (goals[ev.playerId] || 0) + 1;
+  });
+  return goals;
+}
+
 /**
  * Operación de integridad: finaliza un partido en una sola transacción de
  * IndexedDB. Calcula el marcador a partir de los eventos registrados,
- * actualiza el partido y, en modalidad eliminación directa, avanza al
+ * actualiza el partido, acumula las estadísticas de ambos equipos y de los
+ * jugadores anotadores y, en modalidad eliminación directa, avanza al
  * ganador al slot correspondiente del partido de la siguiente ronda.
  *
  * @param {number} matchId
@@ -42,7 +95,7 @@ async function findNextMatch(store, match) {
 export async function finalizeMatch(matchId, { declaredWinnerId } = {}) {
   let finalized;
 
-  await db.runTransaction(["leagues", "matches", "events", "players"], "readwrite", async (stores) => {
+  await db.runTransaction(["leagues", "matches", "events", "players", "teams"], "readwrite", async (stores) => {
     const match = await q(stores.matches, "get", matchId);
     if (!match) throw new Error("El partido no existe.");
     if (match.status === "Finalizado") throw new Error("El partido ya está finalizado.");
@@ -86,6 +139,25 @@ export async function finalizeMatch(matchId, { declaredWinnerId } = {}) {
       await q(stores.matches, "put", updated);
     }
 
+    // 1) Acumular estadísticas de ambos equipos.
+    const homeTeam = match.homeTeamId != null ? await q(stores.teams, "get", match.homeTeamId) : null;
+    const awayTeam = match.awayTeamId != null ? await q(stores.teams, "get", match.awayTeamId) : null;
+    if (homeTeam) await q(stores.teams, "put", applyTeamResult(homeTeam, homeScore, awayScore));
+    if (awayTeam) await q(stores.teams, "put", applyTeamResult(awayTeam, awayScore, homeScore));
+
+    // 2) Acumular estadísticas de los jugadores anotadores: +1 partido jugado
+    //    y +1 punto por cada anotación del jugador en este partido.
+    const playerGoals = countPlayerGoals(events);
+    for (const [playerId, goals] of Object.entries(playerGoals)) {
+      const player = await q(stores.players, "get", Number(playerId));
+      if (!player) continue;
+      await q(stores.players, "put", {
+        ...player,
+        pj: (player.pj || 0) + 1,
+        points: (player.points || 0) + goals,
+      });
+    }
+
     finalized = updated;
   });
 
@@ -94,10 +166,11 @@ export async function finalizeMatch(matchId, { declaredWinnerId } = {}) {
 
 /**
  * Operación de integridad inversa: deshace un partido finalizado en una sola
- * transacción. Revierte el estado y el marcador, conserva los eventos para
- * poder volver a finalizarlo y, en eliminación directa, limpia el slot del
- * partido de la siguiente ronda (vuelve a "Por definir") si aún está
- * programado. Se rechaza si el partido siguiente ya está finalizado.
+ * transacción. Revierte el estado, el marcador y las estadísticas acumuladas
+ * de equipos y jugadores; conserva los eventos para poder volver a finalizarlo
+ * y, en eliminación directa, limpia el slot del partido de la siguiente ronda
+ * (vuelve a "Por definir") si aún está programado. Se rechaza si el partido
+ * siguiente ya está finalizado.
  *
  * @param {number} matchId
  * @returns {Promise<object>} El partido restablecido a programado.
@@ -105,7 +178,7 @@ export async function finalizeMatch(matchId, { declaredWinnerId } = {}) {
 export async function undoMatch(matchId) {
   let undone;
 
-  await db.runTransaction(["leagues", "matches"], "readwrite", async (stores) => {
+  await db.runTransaction(["leagues", "matches", "events", "players", "teams"], "readwrite", async (stores) => {
     const match = await q(stores.matches, "get", matchId);
     if (!match) throw new Error("El partido no existe.");
     if (match.status !== "Finalizado") throw new Error("El partido no está finalizado.");
@@ -136,6 +209,27 @@ export async function undoMatch(matchId) {
       }
     } else {
       await q(stores.matches, "put", updated);
+    }
+
+    // 1) Restar las estadísticas acumuladas a ambos equipos.
+    const homeScore = match.homeScore ?? 0;
+    const awayScore = match.awayScore ?? 0;
+    const homeTeam = match.homeTeamId != null ? await q(stores.teams, "get", match.homeTeamId) : null;
+    const awayTeam = match.awayTeamId != null ? await q(stores.teams, "get", match.awayTeamId) : null;
+    if (homeTeam) await q(stores.teams, "put", revertTeamResult(homeTeam, homeScore, awayScore));
+    if (awayTeam) await q(stores.teams, "put", revertTeamResult(awayTeam, awayScore, homeScore));
+
+    // 2) Restar las anotaciones y el partido jugado de cada anotador.
+    const events = await qIndex(stores.events, "matchId", matchId);
+    const playerGoals = countPlayerGoals(events);
+    for (const [playerId, goals] of Object.entries(playerGoals)) {
+      const player = await q(stores.players, "get", Number(playerId));
+      if (!player) continue;
+      await q(stores.players, "put", {
+        ...player,
+        pj: Math.max(0, (player.pj || 0) - 1),
+        points: Math.max(0, (player.points || 0) - goals),
+      });
     }
 
     undone = updated;
