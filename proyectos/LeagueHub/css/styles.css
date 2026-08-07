@@ -213,6 +213,11 @@ footer .db-status {
   text-shadow: 0 0 6px rgba(74, 222, 128, 0.4);
 }
 
+footer .db-status.error {
+  color: #f87171;
+  text-shadow: 0 0 6px rgba(248, 113, 113, 0.4);
+}
+
 .btn {
   display: inline-flex;
   align-items: center;

@@ -2,6 +2,11 @@ const DB_NAME = "leaguehub-db";
 const DB_VERSION = 1;
 
 let dbInstance = null;
+let dbStatus = "connecting";
+
+function emitStatus() {
+  document.dispatchEvent(new CustomEvent("db:status", { detail: { status: dbStatus } }));
+}
 
 // Envuelve un request de IndexedDB en una promesa manteniendo la transacción viva.
 function idbQ(store, method, ...args) {
@@ -79,11 +84,24 @@ class DB {
     dbInstance = await new Promise((resolve, reject) => {
       const req = indexedDB.open(DB_NAME, DB_VERSION);
       req.onupgradeneeded = (e) => this.#upgradeDB(e);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
+      req.onsuccess = () => {
+        dbStatus = "connected";
+        emitStatus();
+        resolve(req.result);
+      };
+      req.onerror = () => {
+        dbInstance = null;
+        dbStatus = "error";
+        emitStatus();
+        reject(req.error);
+      };
     });
 
     return dbInstance;
+  }
+
+  getConnectionStatus() {
+    return dbStatus;
   }
 
   async getAll(storeName) {

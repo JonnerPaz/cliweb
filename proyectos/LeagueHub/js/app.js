@@ -2,6 +2,7 @@ import "./components/nav-bar.js";
 import "./components/loading-state.js";
 import "./components/error-state.js";
 import "./components/confirm-dialog.js";
+import { initDbStatus } from "./components/db-status.js";
 
 import db from "./db.js";
 import { Router } from "./core/Router.js";
@@ -17,6 +18,7 @@ import { PlayerDetailView } from "./views/player-detail.js";
 import { MatchDetailView } from "./views/match-detail.js";
 
 async function init() {
+  initDbStatus();
   try {
     await db.open();
   } catch (err) {
