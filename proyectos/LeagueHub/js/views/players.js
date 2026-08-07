@@ -4,7 +4,6 @@ import "../components/player-card.js";
 import { showToast } from "../components/toast.js";
 import { debounce } from "../utils/helpers.js";
 import { saveListState, readListState, clearListState } from "../utils/nav-state.js";
-import { getPositions } from "../sports-terms.js";
 
 export class PlayersView {
   constructor({ router }) {
@@ -181,7 +180,9 @@ export class PlayersView {
         teamFilter.appendChild(opt);
       });
 
-      const league = await db.getById("leagues", Number(leagueId));
+      // El filtro de posición lista las posiciones realmente registradas
+      // en los jugadores de la liga activa (req 4.5.1), no el catálogo del
+      // deporte, para que cada opción filtre resultados reales.
       const pendingPos = this.pendingFilters?.position;
       const currentPosValue = pendingPos != null ? pendingPos : positionFilter.value;
       positionFilter.textContent = "";
@@ -189,15 +190,16 @@ export class PlayersView {
       posDefault.value = "";
       posDefault.textContent = "Todas las posiciones";
       positionFilter.appendChild(posDefault);
-      if (league) {
-        getPositions(league.sport).forEach((p) => {
-          const opt = document.createElement("option");
-          opt.value = p;
-          opt.textContent = p;
-          if (p === currentPosValue) opt.selected = true;
-          positionFilter.appendChild(opt);
-        });
-      }
+      const registered = Array.from(
+        new Set(allPlayers.map((p) => p.position).filter(Boolean)),
+      ).sort((a, b) => a.localeCompare(b, "es"));
+      registered.forEach((p) => {
+        const opt = document.createElement("option");
+        opt.value = p;
+        opt.textContent = p;
+        if (p === currentPosValue) opt.selected = true;
+        positionFilter.appendChild(opt);
+      });
     }
 
     // Los filtros pendientes solo se aplican en el primer render tras volver.
