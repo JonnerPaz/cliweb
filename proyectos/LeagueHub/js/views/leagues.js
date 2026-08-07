@@ -2,6 +2,7 @@ import db from "../db.js";
 import "../components/league-form.js";
 import { showToast } from "../components/toast.js";
 import { generateRoundRobin, generateBracket } from "../utils/helpers.js";
+import { saveListState, readListState, clearListState } from "../utils/nav-state.js";
 import { getSportTerms } from "../sports-terms.js";
 import { exportLeague, importLeague } from "../core/league-io.js";
 
@@ -13,6 +14,12 @@ export class LeaguesView {
 
   mount(container) {
     this.container = container;
+
+    // Restaura el scroll guardado al volver desde el dashboard.
+    const saved = readListState("/leagues");
+    this.pendingScroll = saved?.scrollTop ?? null;
+    clearListState("/leagues");
+
     container.innerHTML = `
       <div class="page-header">
         <h1>Ligas</h1>
@@ -44,7 +51,7 @@ export class LeaguesView {
       });
       input.click();
     });
-    this.render();
+    this.render().then(() => this.#restoreScroll());
   }
 
   async render() {
@@ -111,6 +118,8 @@ export class LeaguesView {
             };
           });
           db.setActiveLeagueId(id);
+          // Guarda el scroll antes de ir al dashboard.
+          saveListState("/leagues", { scrollTop: window.scrollY });
           this.router.navigateTo("/dashboard");
         });
       });
@@ -295,6 +304,14 @@ export class LeaguesView {
         rename = rename.trim();
         if (!rename) return;
       }
+    }
+  }
+
+  // Restaura el scroll guardado tras terminar de renderizar (req 2.3).
+  #restoreScroll() {
+    if (this.pendingScroll != null) {
+      window.scrollTo(0, this.pendingScroll);
+      this.pendingScroll = null;
     }
   }
 }

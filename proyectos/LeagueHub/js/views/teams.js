@@ -1,6 +1,7 @@
 import db from "../db.js";
 import "../components/team-card.js";
 import "../components/team-form.js";
+import { saveListState, readListState, clearListState } from "../utils/nav-state.js";
 import { showToast } from "../components/toast.js";
 
 export class TeamsView {
@@ -11,6 +12,12 @@ export class TeamsView {
 
   mount(container) {
     this.container = container;
+
+    // Restaura el scroll guardado al volver desde #team/:id.
+    const saved = readListState("/teams");
+    this.pendingScroll = saved?.scrollTop ?? null;
+    clearListState("/teams");
+
     container.innerHTML = `
       <div class="page-header">
         <h1>Equipos</h1>
@@ -23,7 +30,7 @@ export class TeamsView {
       form.addEventListener("team-created", () => this.render());
       this.container.appendChild(form);
     });
-    this.render();
+    this.render().then(() => this.#restoreScroll());
   }
 
   async render() {
@@ -52,7 +59,11 @@ export class TeamsView {
         const players = await db.getByIndex("players", "teamId", t.id);
         const card = document.createElement("team-card");
         card.data = { ...t, playerCount: players.length };
-        card.addEventListener("click", () => this.router.navigateTo(`/team/${t.id}`));
+        card.addEventListener("click", () => {
+          // Guarda el scroll antes de ir al detalle.
+          saveListState("/teams", { scrollTop: window.scrollY });
+          this.router.navigateTo(`/team/${t.id}`);
+        });
         list.appendChild(card);
 
         const actions = document.createElement("div");
@@ -129,5 +140,13 @@ export class TeamsView {
 
   unmount() {
     this.container = null;
+  }
+
+  // Restaura el scroll guardado tras terminar de renderizar.
+  #restoreScroll() {
+    if (this.pendingScroll != null) {
+      window.scrollTo(0, this.pendingScroll);
+      this.pendingScroll = null;
+    }
   }
 }

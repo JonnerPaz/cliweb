@@ -3,6 +3,7 @@ import "../components/player-form.js";
 import "../components/player-card.js";
 import { showToast } from "../components/toast.js";
 import { debounce } from "../utils/helpers.js";
+import { saveListState, readListState, clearListState } from "../utils/nav-state.js";
 import { getPositions } from "../sports-terms.js";
 
 export class PlayersView {
@@ -114,7 +115,19 @@ export class PlayersView {
     layout.appendChild(filterPanel);
     layout.appendChild(resultsSection);
     container.appendChild(layout);
-    this.render();
+
+    // Restaura filtros y scroll guardados al volver desde #player/:id.
+    // El texto de búsqueda se restaura directo; equipo/posición se aplican en
+    // render(), cuando ya existen las opciones de los selects.
+    const saved = readListState("/players");
+    this.pendingFilters = saved?.filters || null;
+    if (this.pendingFilters?.search != null) {
+      searchInput.value = this.pendingFilters.search;
+    }
+    this.pendingScroll = saved?.scrollTop ?? null;
+    clearListState("/players");
+
+    this.render().then(() => this.#restoreScroll());
   }
 
   async render() {
@@ -153,7 +166,8 @@ export class PlayersView {
     if (filters && teams.length > 0) {
       filters.style.display = "block";
 
-      const currentTeamValue = teamFilter.value;
+      const pendingTeam = this.pendingFilters?.team;
+      const currentTeamValue = pendingTeam != null ? pendingTeam : teamFilter.value;
       teamFilter.textContent = "";
       const teamDefault = document.createElement("option");
       teamDefault.value = "";
@@ -168,7 +182,8 @@ export class PlayersView {
       });
 
       const league = await db.getById("leagues", Number(leagueId));
-      const currentPosValue = positionFilter.value;
+      const pendingPos = this.pendingFilters?.position;
+      const currentPosValue = pendingPos != null ? pendingPos : positionFilter.value;
       positionFilter.textContent = "";
       const posDefault = document.createElement("option");
       posDefault.value = "";
@@ -184,6 +199,9 @@ export class PlayersView {
         });
       }
     }
+
+    // Los filtros pendientes solo se aplican en el primer render tras volver.
+    this.pendingFilters = null;
 
     const searchVal = this.container.querySelector("#filter-search")?.value?.toLowerCase() || "";
     const teamVal = this.container.querySelector("#filter-team")?.value || "";
@@ -233,7 +251,18 @@ export class PlayersView {
         teamColor: team.colorPrincipal,
         teamColorSecundario: team.colorSecundario,
       };
-      card.addEventListener("click", () => this.router.navigateTo(`/player/${p.id}`));
+      card.addEventListener("click", () => {
+        // Guarda filtros y scroll antes de ir al detalle.
+        saveListState("/players", {
+          filters: {
+            search: this.container.querySelector("#filter-search")?.value || "",
+            team: this.container.querySelector("#filter-team")?.value || "",
+            position: this.container.querySelector("#filter-position")?.value || "",
+          },
+          scrollTop: window.scrollY,
+        });
+        this.router.navigateTo(`/player/${p.id}`);
+      });
       list.appendChild(card);
 
       const actions = document.createElement("div");
@@ -297,5 +326,13 @@ export class PlayersView {
 
   unmount() {
     this.container = null;
+  }
+
+  // Restaura el scroll guardado tras terminar de renderizar.
+  #restoreScroll() {
+    if (this.pendingScroll != null) {
+      window.scrollTo(0, this.pendingScroll);
+      this.pendingScroll = null;
+    }
   }
 }

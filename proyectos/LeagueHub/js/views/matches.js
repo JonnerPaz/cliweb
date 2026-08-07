@@ -4,6 +4,7 @@ import "../components/confirm-dialog.js";
 import { ConfirmDialog } from "../components/confirm-dialog.js";
 import { getSportTerms } from "../sports-terms.js";
 import { roundLabel } from "../utils/helpers.js";
+import { saveListState, readListState, clearListState } from "../utils/nav-state.js";
 import { showToast } from "../components/toast.js";
 
 /**
@@ -20,8 +21,15 @@ export class MatchesView {
 
   mount(container) {
     this.container = container;
+
+    // Restaura filtros y scroll guardados al volver desde #match/:id (req 2.3).
+    const saved = readListState("/matches");
+    if (saved?.filters) this.filters = { ...this.filters, ...saved.filters };
+    this.pendingScroll = saved?.scrollTop ?? null;
+    clearListState("/matches");
+
     container.innerHTML = `<loading-state message="Cargando partidos..."></loading-state>`;
-    this.render();
+    this.render().then(() => this.#restoreScroll());
   }
 
   async render() {
@@ -249,7 +257,11 @@ export class MatchesView {
       awayTeam: this.teamById[match.awayTeamId] || {},
       roundLabel: this.isTournament ? roundLabel(match.round, this.teams.length) : null,
     };
-    card.addEventListener("click", () => this.router.navigateTo(`/match/${match.id}`));
+    card.addEventListener("click", () => {
+      // Guarda filtros y scroll antes de ir al detalle.
+      saveListState("/matches", { filters: { ...this.filters }, scrollTop: window.scrollY });
+      this.router.navigateTo(`/match/${match.id}`);
+    });
     wrap.appendChild(card);
 
     if (match.status !== "Finalizado") {
@@ -487,6 +499,14 @@ export class MatchesView {
       this.render();
     } catch (err) {
       showToast("No se pudo guardar el partido", "error");
+    }
+  }
+
+  // Restaura el scroll guardado tras terminar de renderizar.
+  #restoreScroll() {
+    if (this.pendingScroll != null) {
+      window.scrollTo(0, this.pendingScroll);
+      this.pendingScroll = null;
     }
   }
 }
