@@ -36,7 +36,7 @@ export class NavBar extends HTMLElement {
     logo.className = "logo";
     const logoLink = document.createElement("a");
     logoLink.href = "#/";
-    logoLink.textContent = "LeagueHub";
+    logoLink.textContent = "PanaLeague";
     logo.appendChild(logoLink);
 
     const leagueIndicator = document.createElement("div");

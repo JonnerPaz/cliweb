@@ -18,7 +18,7 @@ function safeFilename(name) {
 function validateStructure(json) {
   if (!json || typeof json !== "object") throw new Error("Archivo inválido.");
   if (json.app !== "leaguehub" || !json.league) {
-    throw new Error("El archivo no es una liga exportada de LeagueHub.");
+    throw new Error("El archivo no es una liga exportada de PanaLeague.");
   }
   for (const key of ["teams", "players", "matches", "events"]) {
     if (!Array.isArray(json[key])) {

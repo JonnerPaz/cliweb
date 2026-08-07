@@ -1,6 +1,6 @@
 # Documento de Requerimientos de Software
 
-## LeagueHub — Gestor de Liga Deportiva (Edición en Pareja)
+## PanaLeague — Gestor de Liga Deportiva (Edición en Pareja)
 
 ---
 
@@ -8,11 +8,11 @@
 
 ### 1.1 Propósito
 
-Este documento describe los requerimientos funcionales, las vistas y el flujo de navegación de la aplicación web **LeagueHub**. Está dirigido a la pareja de estudiantes desarrolladores como guía de construcción del sistema.
+Este documento describe los requerimientos funcionales, las vistas y el flujo de navegación de la aplicación web **PanaLeague**. Está dirigido a la pareja de estudiantes desarrolladores como guía de construcción del sistema.
 
 ### 1.2 Alcance
 
-LeagueHub es una aplicación web de página única (SPA) construida con HTML, CSS y JavaScript vanilla que permite gestionar **ligas deportivas amateur**. Toda la información se guarda **localmente en el navegador** usando IndexedDB. La aplicación pone énfasis en el manejo de operaciones con integridad relacional, el dashboard de estadísticas con visualizaciones gráficas, y la coordinación de dos desarrolladores trabajando sobre la misma base de código.
+PanaLeague es una aplicación web de página única (SPA) construida con HTML, CSS y JavaScript vanilla que permite gestionar **ligas deportivas amateur**. Toda la información se guarda **localmente en el navegador** usando IndexedDB. La aplicación pone énfasis en el manejo de operaciones con integridad relacional, el dashboard de estadísticas con visualizaciones gráficas, y la coordinación de dos desarrolladores trabajando sobre la misma base de código.
 
 ### 1.3 Sistema Multi-Deporte
 
@@ -92,7 +92,7 @@ La aplicación debe soportar **dos modalidades** de torneo. La modalidad se elig
 
 ## 2. Descripción General del Sistema
 
-LeagueHub funciona como una SPA: existe un único archivo `index.html` que actúa como contenedor. Las vistas se intercambian dinámicamente mediante JavaScript, sin redirigir a otros archivos HTML. La navegación se gestiona internamente a través del fragmento de la URL (`#dashboard`, `#teams`, etc.).
+PanaLeague funciona como una SPA: existe un único archivo `index.html` que actúa como contenedor. Las vistas se intercambian dinámicamente mediante JavaScript, sin redirigir a otros archivos HTML. La navegación se gestiona internamente a través del fragmento de la URL (`#dashboard`, `#teams`, etc.).
 
 ### 2.1 Vistas del sistema
 

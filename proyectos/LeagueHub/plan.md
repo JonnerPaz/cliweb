@@ -1,4 +1,4 @@
-# Plan de Desarrollo — LeagueHub
+# Plan de Desarrollo — PanaLeague
 
 > **Deportes:** Fútbol, Básquet, Tenis
 > **Plazo:** 1-2 semanas

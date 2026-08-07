@@ -1,4 +1,4 @@
-# LeagueHub
+# PanaLeague
 
 Gestor de ligas deportivas amateur. Aplicación web de una sola página (SPA) construida con HTML, CSS y **JavaScript vanilla**, sin frameworks, que guarda toda la información **localmente en el navegador** usando **IndexedDB**. Solo requiere abrir `index.html` para funcionar.
 

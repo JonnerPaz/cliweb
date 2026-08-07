@@ -12,7 +12,7 @@ export class HomeView {
     this.container = container;
     container.innerHTML = `
       <section class="hero">
-        <h1>LeagueHub</h1>
+        <h1>PanaLeague</h1>
         <p>
           Gestiona tus ligas deportivas amateur en un solo lugar. Crea ligas,
           organiza equipos y jugadores, programa partidos, sigue los resultados
