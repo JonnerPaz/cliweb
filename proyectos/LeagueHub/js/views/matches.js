@@ -252,40 +252,45 @@ export class MatchesView {
     card.addEventListener("click", () => this.router.navigateTo(`/match/${match.id}`));
     wrap.appendChild(card);
 
-    if (!this.isTournament && match.status !== "Finalizado") {
+    if (match.status !== "Finalizado") {
       const actions = document.createElement("div");
       actions.className = "match-item-actions";
 
+      // En modalidad liga se editan equipos y fecha; en eliminación directa
+      // solo se puede editar la fecha (req 4.7.3).
       const editBtn = document.createElement("button");
       editBtn.className = "btn btn-sm btn-secondary";
-      editBtn.textContent = "Editar";
+      editBtn.textContent = this.isTournament ? "Editar fecha" : "Editar";
       editBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        this.#openForm(match);
+        this.#openForm(match, this.isTournament);
       });
-
-      const delBtn = document.createElement("button");
-      delBtn.className = "btn btn-sm btn-danger";
-      delBtn.textContent = "Eliminar";
-      delBtn.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        const confirmed = await ConfirmDialog.show(
-          "Eliminar partido",
-          "¿Eliminar este partido programado? Esta acción no se puede deshacer.",
-        );
-        if (!confirmed) return;
-        try {
-          await db.remove("matches", match.id);
-          showToast("Partido eliminado", "success");
-          this.matches = this.matches.filter((m) => m.id !== match.id);
-          this.#refreshResults();
-        } catch (err) {
-          showToast("No se pudo eliminar el partido", "error");
-        }
-      });
-
       actions.appendChild(editBtn);
-      actions.appendChild(delBtn);
+
+      // Eliminar partido solo aplica en modalidad liga (req 4.7.4).
+      if (!this.isTournament) {
+        const delBtn = document.createElement("button");
+        delBtn.className = "btn btn-sm btn-danger";
+        delBtn.textContent = "Eliminar";
+        delBtn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const confirmed = await ConfirmDialog.show(
+            "Eliminar partido",
+            "¿Eliminar este partido programado? Esta acción no se puede deshacer.",
+          );
+          if (!confirmed) return;
+          try {
+            await db.remove("matches", match.id);
+            showToast("Partido eliminado", "success");
+            this.matches = this.matches.filter((m) => m.id !== match.id);
+            this.#refreshResults();
+          } catch (err) {
+            showToast("No se pudo eliminar el partido", "error");
+          }
+        });
+        actions.appendChild(delBtn);
+      }
+
       wrap.appendChild(actions);
     }
 
@@ -299,8 +304,9 @@ export class MatchesView {
     slot.replaceChildren(this.#buildResults());
   }
 
-  // Diálogo crear/editar partido (solo modalidad liga).
-  #openForm(match) {
+  // Diálogo crear/editar partido (solo modalidad liga) o editar fecha
+  // (modalidad eliminación directa, req 4.7.3).
+  #openForm(match, onlyDate = false) {
     const overlay = document.createElement("div");
     overlay.className = "dialog-overlay";
 
@@ -308,13 +314,20 @@ export class MatchesView {
     dialog.className = "league-form-dialog";
 
     const h3 = document.createElement("h3");
-    h3.textContent = match ? "Editar Partido" : "Nuevo Partido";
+    h3.textContent = onlyDate
+      ? "Editar Fecha"
+      : match
+        ? "Editar Partido"
+        : "Nuevo Partido";
     dialog.appendChild(h3);
 
     const form = document.createElement("form");
 
-    form.appendChild(this.#selectGroup("Equipo local", "home", match?.homeTeamId));
-    form.appendChild(this.#selectGroup("Equipo visitante", "away", match?.awayTeamId));
+    // En torneo no se editan los equipos: el bracket ya fijó los slots.
+    if (!onlyDate) {
+      form.appendChild(this.#selectGroup("Equipo local", "home", match?.homeTeamId));
+      form.appendChild(this.#selectGroup("Equipo visitante", "away", match?.awayTeamId));
+    }
 
     const dateGroup = document.createElement("div");
     dateGroup.className = "form-group";
@@ -351,7 +364,7 @@ export class MatchesView {
     actions.appendChild(submitBtn);
     form.appendChild(actions);
 
-    form.addEventListener("submit", (e) => this.#handleFormSubmit(e, match, overlay));
+    form.addEventListener("submit", (e) => this.#handleFormSubmit(e, match, overlay, onlyDate));
 
     dialog.appendChild(form);
     overlay.appendChild(dialog);
@@ -395,14 +408,35 @@ export class MatchesView {
     return group;
   }
 
-  // Validaciones de creación/edición de partidos (modalidad liga).
-  async #handleFormSubmit(e, match, overlay) {
+  // Validaciones de creación/edición de partidos (modalidad liga) y de
+  // edición de fecha en eliminación directa (solo cambia `date`).
+  async #handleFormSubmit(e, match, overlay, onlyDate = false) {
     e.preventDefault();
     const form = e.target;
 
+    const dateValue = form.date.value;
+    if (!dateValue) {
+      showToast("La fecha y hora son obligatorias", "error");
+      return;
+    }
+
+    const isoDate = new Date(dateValue).toISOString();
+
+    // En torneo solo se actualiza la fecha; los equipos los fija el bracket.
+    if (onlyDate) {
+      try {
+        await db.put("matches", { ...match, date: isoDate });
+        showToast("Fecha actualizada", "success");
+      } catch (err) {
+        showToast("No se pudo actualizar la fecha", "error");
+      }
+      overlay.remove();
+      this.render();
+      return;
+    }
+
     const homeId = Number(form.home.value);
     const awayId = Number(form.away.value);
-    const dateValue = form.date.value;
 
     if (!homeId || !awayId) {
       showToast("Selecciona ambos equipos", "error");
@@ -412,12 +446,6 @@ export class MatchesView {
       showToast("Un equipo no puede enfrentarse a sí mismo", "error");
       return;
     }
-    if (!dateValue) {
-      showToast("La fecha y hora son obligatorias", "error");
-      return;
-    }
-
-    const isoDate = new Date(dateValue).toISOString();
 
     // No se permiten dos partidos con los mismos equipos en la misma fecha.
     const duplicate = this.matches.find(
