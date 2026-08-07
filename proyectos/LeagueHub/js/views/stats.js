@@ -4,6 +4,7 @@ import "../components/standings-table.js";
 import "../components/ranking-table.js";
 import "../components/bracket-view.js";
 import { getSportTerms } from "../sports-terms.js";
+import { roundLabel } from "../utils/helpers.js";
 
 const PALETTE = ["#6c5ce7", "#22c55e", "#60a5fa", "#f97316", "#eab308", "#ef4444", "#ec4899", "#14b8a6"];
 
@@ -88,7 +89,7 @@ export class StatsView {
       section.appendChild(this.#buildStandingsBlock(teams, matches, terms));
     }
 
-    section.appendChild(this.#buildCharts(terms, teams, players, teamById, matches, events));
+    section.appendChild(this.#buildCharts(terms, teams, players, teamById, matches, events, league.modalidad === "tournament"));
 
     container.appendChild(section);
   }
@@ -172,7 +173,9 @@ export class StatsView {
     return card;
   }
 
-  #buildCharts(terms, teams, players, teamById, matches, events) {
+  // En liga se compara la evolución de puntos; en eliminación directa el
+  // requisito 4.9.3 pide anotaciones por ronda.
+  #buildCharts(terms, teams, players, teamById, matches, events, isTournament) {
     const sec = document.createElement("section");
     sec.className = "detail-section";
     const h2 = document.createElement("h2");
@@ -183,7 +186,11 @@ export class StatsView {
     grid.className = "charts-grid";
 
     grid.appendChild(this.#scorersChart(terms, players, teamById, events));
-    grid.appendChild(this.#pointsChart(teams, matches));
+    if (isTournament) {
+      grid.appendChild(this.#roundsChart(terms, matches, teams.length, events));
+    } else {
+      grid.appendChild(this.#pointsChart(teams, matches));
+    }
     grid.appendChild(this.#goalsByTeamChart(teams, players, teamById, events));
 
     sec.appendChild(grid);
@@ -288,6 +295,46 @@ export class StatsView {
         responsive: true,
         maintainAspectRatio: false,
         plugins: { legend: { display: true, labels: { color: "#8888aa", boxWidth: 12 } } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+      },
+    }, null);
+  }
+
+  // Anotaciones agrupadas por ronda del bracket (modalidad eliminación
+  // directa). Cada evento se asigna a la ronda del partido que lo contiene.
+  #roundsChart(terms, matches, totalTeams, events) {
+    const byRound = new Map();
+    events.forEach((e) => {
+      if (e.playerId == null) return;
+      const match = matches.find((m) => m.id === e.matchId);
+      if (!match) return;
+      const r = match.round || 1;
+      byRound.set(r, (byRound.get(r) || 0) + 1);
+    });
+
+    const title = `${terms.eventNamePlural || "Anotaciones"} por ronda`;
+    if (byRound.size === 0) {
+      return this.#buildChartCard(title, null, "Aún no hay anotaciones registradas.");
+    }
+
+    const rounds = Array.from(byRound.keys()).sort((a, b) => a - b);
+    return this.#buildChartCard(title, {
+      type: "bar",
+      data: {
+        labels: rounds.map((r) => roundLabel(r, totalTeams) || `Ronda ${r}`),
+        datasets: [
+          {
+            label: terms.eventNamePlural || "Anotaciones",
+            data: rounds.map((r) => byRound.get(r)),
+            backgroundColor: rounds.map((_, i) => PALETTE[i % PALETTE.length]),
+            borderRadius: 6,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
         scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
       },
     }, null);

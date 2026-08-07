@@ -86,7 +86,7 @@ const LEAGUE2_PLAYERS = [
 const LEAGUE2_MATCHES = [
   { home: 0, away: 1, date: iso(-7), status: "Finalizado", homeScore: 62, awayScore: 58, round: 1, position: 0, events: [{ player: 0, minute: 5 }, { player: 0, minute: 22 }, { player: 1, minute: 30 }, { player: 2, minute: 12 }, { player: 3, minute: 40 }] },
   { home: 2, away: 3, date: iso(-6), status: "Finalizado", homeScore: 55, awayScore: 60, round: 1, position: 1, events: [{ player: 4, minute: 8 }, { player: 4, minute: 25 }, { player: 5, minute: 18 }, { player: 6, minute: 33 }, { player: 7, minute: 15 }, { player: 7, minute: 44 }] },
-  { home: 0, away: 3, date: iso(3), status: "Programado", homeScore: null, awayScore: null, round: 2, position: 0, events: [] },
+  { home: 0, away: 3, date: iso(-2), status: "Finalizado", homeScore: 61, awayScore: 57, round: 2, position: 0, events: [{ player: 0, minute: 6 }, { player: 0, minute: 28 }, { player: 1, minute: 33 }, { player: 6, minute: 12 }, { player: 6, minute: 41 }, { player: 7, minute: 19 }] },
 ];
 
 async function insertLeague(stores, league, teams, players, matches) {
